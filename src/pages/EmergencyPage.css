@@ -1,0 +1,608 @@
+/* EmergencyPage.css */
+
+.emergency-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    direction: rtl;
+  }
+  
+  /* Header */
+  .emergency-header {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+  }
+  
+  .emergency-header .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+  .emergency-header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .emergency-back-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .emergency-back-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+  }
+  
+  .emergency-title {
+    text-align: center;
+    flex: 1;
+  }
+  
+  .emergency-title h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .emergency-title h1 i {
+    animation: emergencyPulse 1.5s infinite;
+  }
+  
+  @keyframes emergencyPulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  .emergency-title p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    margin: 0;
+  }
+  
+  /* Main Content */
+  .emergency-main {
+    padding: 2rem 0;
+  }
+  
+  .emergency-main .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  /* Emergency Banner */
+  .emergency-banner {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+    animation: emergencyBannerPulse 2s infinite;
+  }
+  
+  @keyframes emergencyBannerPulse {
+    0% {
+      box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+    }
+    50% {
+      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.5);
+    }
+    100% {
+      box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+    }
+  }
+  
+  .emergency-banner h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .emergency-banner p {
+    font-size: 1.125rem;
+    margin-bottom: 1.5rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .emergency-hotline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+  
+  .emergency-hotline i {
+    animation: callShake 1s infinite;
+  }
+  
+  @keyframes callShake {
+    0% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(10deg);
+    }
+    50% {
+      transform: rotate(0deg);
+    }
+    75% {
+      transform: rotate(-10deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+  
+  .emergency-call-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    color: #dc2626;
+    padding: 0.75rem 2rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .emergency-call-button:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Emergency Types */
+  .emergency-types {
+    margin-bottom: 3rem;
+  }
+  
+  .emergency-types h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #7f1d1d;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .emergency-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .emergency-type {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+  
+  .emergency-type:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    border-color: #dc2626;
+  }
+  
+  .emergency-type.selected {
+    border-color: #dc2626;
+    background: #fef2f2;
+  }
+  
+  .emergency-type-icon {
+    font-size: 3rem;
+    color: #dc2626;
+    margin-bottom: 1rem;
+    display: block;
+    text-align: center;
+  }
+  
+  .emergency-type-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  
+  .emergency-type-description {
+    color: #6b7280;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+  
+  /* Emergency Form */
+  .emergency-form {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    margin-bottom: 3rem;
+  }
+  
+  .emergency-form h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .emergency-form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .emergency-form-label {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+  
+  .emergency-form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .emergency-form-input:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+  
+  .emergency-form-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    min-height: 120px;
+    resize: vertical;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+  
+  .emergency-form-textarea:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+  
+  .emergency-form-button {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  
+  .emergency-form-button:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+  }
+  
+  /* Nearby Facilities */
+  .emergency-nearby {
+    margin-bottom: 3rem;
+  }
+  
+  .emergency-nearby h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #7f1d1d;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .emergency-nearby-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .emergency-facility {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .emergency-facility:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .emergency-facility-header {
+    background: #fef2f2;
+    padding: 1rem;
+    border-bottom: 1px solid #fee2e2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .emergency-facility-type {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #dc2626;
+  }
+  
+  .emergency-facility-distance {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .emergency-facility-content {
+    padding: 1.5rem;
+  }
+  
+  .emergency-facility-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+  
+  .emergency-facility-address {
+    color: #6b7280;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .emergency-facility-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .emergency-facility-status-indicator {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+  }
+  
+  .emergency-facility-status-indicator.open {
+    background: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  }
+  
+  .emergency-facility-status-indicator.busy {
+    background: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  }
+  
+  .emergency-facility-status-indicator.closed {
+    background: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+  }
+  
+  .emergency-facility-status-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .emergency-facility-status-text.open {
+    color: #10b981;
+  }
+  
+  .emergency-facility-status-text.busy {
+    color: #f59e0b;
+  }
+  
+  .emergency-facility-status-text.closed {
+    color: #ef4444;
+  }
+  
+  .emergency-facility-actions {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .emergency-facility-action {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .emergency-facility-action.call {
+    background: #dc2626;
+    color: white;
+  }
+  
+  .emergency-facility-action.call:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+  
+  .emergency-facility-action.directions {
+    background: #f3f4f6;
+    color: #374151;
+  }
+  
+  .emergency-facility-action.directions:hover {
+    background: #e5e7eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Emergency Tips */
+  .emergency-tips {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .emergency-tips h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .emergency-tips-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .emergency-tip {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+  }
+  
+  .emergency-tip-icon {
+    font-size: 1.5rem;
+    color: #dc2626;
+    flex-shrink: 0;
+  }
+  
+  .emergency-tip-content h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+  
+  .emergency-tip-content p {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin: 0;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .emergency-header-content {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .emergency-banner h2 {
+      font-size: 1.75rem;
+    }
+  
+    .emergency-banner p {
+      font-size: 1rem;
+    }
+  
+    .emergency-hotline {
+      font-size: 1.25rem;
+    }
+  
+    .emergency-call-button {
+      font-size: 1rem;
+      padding: 0.625rem 1.5rem;
+    }
+  
+    .emergency-form {
+      padding: 1.5rem;
+    }
+  
+    .emergency-facility-actions {
+      flex-direction: column;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .emergency-banner h2 {
+      font-size: 1.5rem;
+    }
+  
+    .emergency-banner p {
+      font-size: 0.875rem;
+    }
+  
+    .emergency-hotline {
+      font-size: 1.125rem;
+    }
+  
+    .emergency-call-button {
+      font-size: 0.875rem;
+      padding: 0.5rem 1.25rem;
+    }
+  
+    .emergency-form {
+      padding: 1rem;
+    }
+  
+    .emergency-types-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .emergency-tip {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .emergency-tip-icon {
+      margin: 0 auto 0.5rem;
+    }
+  }
+  

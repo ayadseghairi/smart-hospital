@@ -1,0 +1,644 @@
+/* HealthInstitutions.css */
+
+.health-institutions-card {
+    background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.1);
+    border: 1px solid #e9d5ff;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .health-institutions-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+  }
+  
+  .health-institutions-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+  }
+  
+  .institutions-header {
+    text-align: center;
+    padding: 2rem 2rem 1rem;
+  }
+  
+  .institutions-icon-container {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  
+  .institutions-main-icon {
+    font-size: 4rem;
+    color: #8b5cf6;
+    filter: drop-shadow(0 4px 8px rgba(139, 92, 246, 0.2));
+    animation: institutionFloat 3s ease-in-out infinite;
+  }
+  
+  @keyframes institutionFloat {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-8px) rotate(2deg);
+    }
+  }
+  
+  .institutions-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #8b5cf6;
+    color: white;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 2px solid white;
+    animation: badgePulse 2s infinite;
+  }
+  
+  @keyframes badgePulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  .institutions-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+  }
+  
+  .institutions-description {
+    color: #6b7280;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+  
+  .institutions-content {
+    padding: 0 2rem 2rem;
+  }
+  
+  .institutions-closed-state {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .institutions-show-button {
+    width: 100%;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  }
+  
+  .institutions-show-button:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+  }
+  
+  .institutions-stats {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  .stats-title {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .stat-item {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .stat-item:hover {
+    background: #f1f5f9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+  }
+  
+  .stat-number.primary {
+    color: #8b5cf6;
+  }
+  
+  .stat-number.success {
+    color: #10b981;
+  }
+  
+  .stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+    margin: 0;
+  }
+  
+  /* Institutions List */
+  .institutions-open-state {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .institutions-filters {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+  
+  .filter-button {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: #f9fafb;
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+  
+  .filter-button.active {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+  }
+  
+  .filter-button:hover:not(.active) {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+  }
+  
+  .institutions-list {
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .institution-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .institution-item:hover {
+    border-color: #8b5cf6;
+    background: #faf5ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+  }
+  
+  .institution-header {
+    display: flex;
+    justify-content: between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+  
+  .institution-name {
+    font-weight: 700;
+    color: #1f2937;
+    font-size: 0.875rem;
+    flex: 1;
+    margin: 0;
+  }
+  
+  .institution-status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+  
+  .institution-status.available {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  
+  .institution-status.busy {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  
+  .institution-status.closed {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .institution-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+  }
+  
+  .institution-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .rating-stars {
+    display: flex;
+    color: #fbbf24;
+  }
+  
+  .rating-value {
+    font-weight: 600;
+    color: #1f2937;
+  }
+  
+  .institution-distance {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .institution-specialties {
+    margin-bottom: 0.75rem;
+  }
+  
+  .specialties-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  
+  .specialty-tag {
+    background: #e0e7ff;
+    color: #3730a3;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.625rem;
+    font-weight: 500;
+  }
+  
+  .institution-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .institution-action {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: #f9fafb;
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  
+  .institution-action:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #374151;
+  }
+  
+  .institution-action.primary {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+  }
+  
+  .institution-action.primary:hover {
+    background: #7c3aed;
+    border-color: #7c3aed;
+  }
+  
+  .institutions-hide-button {
+    width: 100%;
+    background: transparent;
+    color: #6b7280;
+    border: none;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  .institutions-hide-button:hover {
+    color: #374151;
+    background: #f3f4f6;
+  }
+  
+  /* Loading State */
+  .institutions-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #6b7280;
+  }
+  
+  .loading-spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 50%;
+    border-top-color: #8b5cf6;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Empty State */
+  .institutions-empty {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-message {
+    font-size: 0.875rem;
+    margin: 0;
+  }
+  
+  /* Scrollbar Styling */
+  .institutions-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .institutions-list::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 2px;
+  }
+  
+  .institutions-list::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 2px;
+  }
+  
+  .institutions-list::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .institutions-header {
+      padding: 1.5rem 1.5rem 1rem;
+    }
+  
+    .institutions-content {
+      padding: 0 1.5rem 1.5rem;
+    }
+  
+    .institutions-main-icon {
+      font-size: 3rem;
+    }
+  
+    .institutions-title {
+      font-size: 1.25rem;
+    }
+  
+    .institutions-list {
+      max-height: 250px;
+    }
+  
+    .institution-item {
+      padding: 0.75rem;
+    }
+  
+    .institution-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  
+    .institution-details {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  
+    .institution-actions {
+      flex-direction: column;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .health-institutions-card {
+      border-radius: 1rem;
+    }
+  
+    .institutions-header {
+      padding: 1rem 1rem 0.75rem;
+    }
+  
+    .institutions-content {
+      padding: 0 1rem 1rem;
+    }
+  
+    .institutions-main-icon {
+      font-size: 2.5rem;
+    }
+  
+    .institutions-title {
+      font-size: 1.125rem;
+    }
+  
+    .institutions-description {
+      font-size: 0.8rem;
+    }
+  
+    .institutions-list {
+      max-height: 200px;
+    }
+  
+    .institution-item {
+      padding: 0.625rem;
+    }
+  
+    .institution-name {
+      font-size: 0.8rem;
+    }
+  
+    .institution-details {
+      font-size: 0.7rem;
+    }
+  
+    .stats-grid {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+  
+    .filter-button {
+      font-size: 0.7rem;
+      padding: 0.375rem 0.5rem;
+    }
+  }
+  
+  /* High Contrast Mode */
+  @media (prefers-contrast: high) {
+    .health-institutions-card {
+      border: 2px solid #000;
+    }
+  
+    .institutions-show-button {
+      background: #000;
+    }
+  
+    .filter-button.active {
+      background: #000;
+    }
+  
+    .institution-item {
+      border: 1px solid #000;
+    }
+  
+    .institution-action.primary {
+      background: #000;
+    }
+  }
+  
+  /* Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    .institutions-main-icon {
+      animation: none;
+    }
+  
+    .institutions-badge {
+      animation: none;
+    }
+  
+    .health-institutions-card,
+    .institutions-show-button,
+    .filter-button,
+    .institution-item,
+    .institution-action,
+    .stat-item {
+      transition: none;
+    }
+  
+    .loading-spinner {
+      animation: none;
+    }
+  }
+  
+  /* Focus Management */
+  .institutions-show-button:focus-visible,
+  .filter-button:focus-visible,
+  .institution-item:focus-visible,
+  .institution-action:focus-visible,
+  .institutions-hide-button:focus-visible {
+    outline: 2px solid #8b5cf6;
+    outline-offset: 2px;
+  }
+  
+  /* Institution Type Indicators */
+  .institution-type-government {
+    border-left: 4px solid #3b82f6;
+  }
+  
+  .institution-type-private {
+    border-left: 4px solid #10b981;
+  }
+  
+  .institution-type-specialized {
+    border-left: 4px solid #f59e0b;
+  }
+  
+  /* Accessibility Enhancements */
+  .institution-item[aria-selected="true"] {
+    background: #faf5ff;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+  }
+  
+  .institution-status[aria-label] {
+    position: relative;
+  }
+  
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  

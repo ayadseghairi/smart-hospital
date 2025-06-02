@@ -1,0 +1,476 @@
+/* EmergencyAccess.css */
+
+.emergency-access-card {
+    background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.1);
+    border: 1px solid #fecaca;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .emergency-access-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+  }
+  
+  .emergency-access-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(239, 68, 68, 0.2);
+  }
+  
+  .emergency-header {
+    text-align: center;
+    padding: 2rem 2rem 1rem;
+  }
+  
+  .emergency-icon-container {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  
+  .emergency-main-icon {
+    font-size: 4rem;
+    color: #ef4444;
+    filter: drop-shadow(0 4px 8px rgba(239, 68, 68, 0.2));
+    animation: emergencyPulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes emergencyPulse {
+    0% {
+      transform: scale(1);
+      filter: drop-shadow(0 4px 8px rgba(239, 68, 68, 0.2));
+    }
+    50% {
+      transform: scale(1.1);
+      filter: drop-shadow(0 8px 16px rgba(239, 68, 68, 0.4));
+    }
+    100% {
+      transform: scale(1);
+      filter: drop-shadow(0 4px 8px rgba(239, 68, 68, 0.2));
+    }
+  }
+  
+  .emergency-alert-indicator {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: #ef4444;
+    border: 3px solid white;
+    border-radius: 50%;
+    animation: emergencyBlink 1s infinite;
+  }
+  
+  @keyframes emergencyBlink {
+    0%, 50% {
+      opacity: 1;
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    51%, 100% {
+      opacity: 0.3;
+      box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+  }
+  
+  .emergency-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+  }
+  
+  .emergency-description {
+    color: #6b7280;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+  
+  .emergency-content {
+    padding: 0 2rem 2rem;
+  }
+  
+  .emergency-main-button {
+    width: 100%;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .emergency-main-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .emergency-main-button:hover::before {
+    left: 100%;
+  }
+  
+  .emergency-main-button:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+  }
+  
+  .emergency-main-button:active {
+    transform: translateY(0);
+  }
+  
+  .emergency-button-icon {
+    font-size: 1.25rem;
+    animation: ring 2s ease-in-out infinite;
+  }
+  
+  @keyframes ring {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    10%, 30% {
+      transform: rotate(-10deg);
+    }
+    20% {
+      transform: rotate(10deg);
+    }
+  }
+  
+  .emergency-hospitals-section {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+  
+  .hospitals-title {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  
+  .hospitals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .hospital-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.875rem;
+    font-size: 0.75rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .hospital-item:hover {
+    background: #f3f4f6;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .hospital-name {
+    font-weight: 600;
+    color: #1f2937;
+    flex: 1;
+    text-align: right;
+  }
+  
+  .hospital-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .hospital-status {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  
+  .hospital-status.available {
+    background: #10b981;
+    animation: statusPulse 2s infinite;
+  }
+  
+  .hospital-status.busy {
+    background: #f59e0b;
+    animation: statusPulse 2s infinite;
+  }
+  
+  @keyframes statusPulse {
+    0% {
+      box-shadow: 0 0 0 0 currentColor;
+      opacity: 1;
+    }
+    70% {
+      box-shadow: 0 0 0 4px transparent;
+      opacity: 0.7;
+    }
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+      opacity: 1;
+    }
+  }
+  
+  .hospital-distance {
+    color: #6b7280;
+    font-weight: 500;
+  }
+  
+  .emergency-warning {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 0.75rem;
+    text-align: center;
+  }
+  
+  .emergency-warning-text {
+    font-size: 0.75rem;
+    color: #92400e;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .emergency-warning-icon {
+    font-size: 1rem;
+    color: #f59e0b;
+  }
+  
+  .emergency-quick-actions {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .emergency-quick-action {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    font-size: 0.75rem;
+    color: #991b1b;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+  
+  .emergency-quick-action:hover {
+    background: #fee2e2;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .emergency-quick-action i {
+    font-size: 0.875rem;
+  }
+  
+  /* Emergency Call Animation */
+  .emergency-calling {
+    animation: emergencyCall 1s ease-in-out infinite;
+  }
+  
+  @keyframes emergencyCall {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .emergency-header {
+      padding: 1.5rem 1.5rem 1rem;
+    }
+  
+    .emergency-content {
+      padding: 0 1.5rem 1.5rem;
+    }
+  
+    .emergency-main-icon {
+      font-size: 3rem;
+    }
+  
+    .emergency-title {
+      font-size: 1.25rem;
+    }
+  
+    .emergency-main-button {
+      padding: 1rem;
+      font-size: 0.875rem;
+    }
+  
+    .hospital-item {
+      padding: 0.75rem;
+    }
+  
+    .emergency-quick-actions {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .emergency-access-card {
+      border-radius: 1rem;
+    }
+  
+    .emergency-header {
+      padding: 1rem 1rem 0.75rem;
+    }
+  
+    .emergency-content {
+      padding: 0 1rem 1rem;
+    }
+  
+    .emergency-main-icon {
+      font-size: 2.5rem;
+    }
+  
+    .emergency-title {
+      font-size: 1.125rem;
+    }
+  
+    .emergency-description {
+      font-size: 0.8rem;
+    }
+  
+    .emergency-main-button {
+      padding: 0.875rem;
+      font-size: 0.8rem;
+    }
+  
+    .hospital-item {
+      padding: 0.625rem;
+      font-size: 0.7rem;
+    }
+  
+    .emergency-warning {
+      padding: 0.75rem;
+    }
+  
+    .emergency-warning-text {
+      font-size: 0.7rem;
+    }
+  }
+  
+  /* High Contrast Mode */
+  @media (prefers-contrast: high) {
+    .emergency-access-card {
+      border: 2px solid #000;
+    }
+  
+    .emergency-main-button {
+      background: #000;
+    }
+  
+    .hospital-item {
+      border: 1px solid #000;
+    }
+  
+    .emergency-warning {
+      border: 2px solid #000;
+    }
+  }
+  
+  /* Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    .emergency-main-icon {
+      animation: none;
+    }
+  
+    .emergency-alert-indicator {
+      animation: none;
+    }
+  
+    .emergency-button-icon {
+      animation: none;
+    }
+  
+    .hospital-status {
+      animation: none;
+    }
+  
+    .emergency-access-card,
+    .emergency-main-button,
+    .hospital-item,
+    .emergency-quick-action {
+      transition: none;
+    }
+  
+    .emergency-calling {
+      animation: none;
+    }
+  }
+  
+  /* Focus Management */
+  .emergency-main-button:focus-visible,
+  .emergency-quick-action:focus-visible {
+    outline: 2px solid #ef4444;
+    outline-offset: 2px;
+  }
+  
+  .hospital-item:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+  
+  /* Emergency Priority Levels */
+  .emergency-level-critical {
+    border-left: 4px solid #dc2626;
+  }
+  
+  .emergency-level-high {
+    border-left: 4px solid #f59e0b;
+  }
+  
+  .emergency-level-medium {
+    border-left: 4px solid #3b82f6;
+  }
+  
+  .emergency-level-low {
+    border-left: 4px solid #10b981;
+  }
+  
