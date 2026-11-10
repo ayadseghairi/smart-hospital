@@ -7,10 +7,12 @@ import SearchBox from "../components/Sections/SearchBox"
 import SmartAssistant from "../components/Sections/SmartAssistant"
 import EmergencyAccess from "../components/Sections/EmergencyAccess"
 import HealthInstitutions from "../components/Sections/HealthInstitutions"
+import { useAuth } from "../contexts/AuthContext"
 
 const Home = () => {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
+  const { user, logout } = useAuth()
 
   const handleInstitutionSelect = (institution) => {
     navigate(`/institution/${institution.id}`)
@@ -60,19 +62,51 @@ const Home = () => {
                 <p className="text-gray-600">{t("brand.name")}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <button
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                onClick={() => navigate("/login")}
-              >
-                {t("nav.login")}
-              </button>
-              <button
-                className="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
-                onClick={() => navigate("/register")}
-              >
-                {t("nav.register")}
-              </button>
+            <div className="flex items-center gap-3">
+              {user ? (
+                <>
+                  {user.role === "PATIENT" && (
+                    <button onClick={() => navigate("/my-appointments")}
+                      className="text-sm text-blue-600 hover:underline">
+                      {t("nav.myAppointments")}
+                    </button>
+                  )}
+                  {user.role === "DOCTOR" && (
+                    <button onClick={() => navigate("/doctor-dashboard")}
+                      className="text-sm text-blue-600 hover:underline">
+                      {t("nav.doctorDashboard")}
+                    </button>
+                  )}
+                  {user.role === "SUPER_ADMIN" && (
+                    <button onClick={() => navigate("/admin")}
+                      className="text-sm text-blue-600 hover:underline">
+                      {t("nav.adminPanel")}
+                    </button>
+                  )}
+                  <span className="text-sm text-gray-600">{user.fullName}</span>
+                  <button
+                    className="border border-red-300 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors text-sm"
+                    onClick={logout}
+                  >
+                    {t("nav.logout")}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    onClick={() => navigate("/login")}
+                  >
+                    {t("nav.login")}
+                  </button>
+                  <button
+                    className="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+                    onClick={() => navigate("/register")}
+                  >
+                    {t("nav.register")}
+                  </button>
+                </>
+              )}
               {/* Language switcher */}
               <button
                 onClick={() => i18n.changeLanguage(i18n.language === "ar" ? "fr" : "ar")}

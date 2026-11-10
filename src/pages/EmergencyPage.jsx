@@ -1,72 +1,78 @@
 // pages/EmergencyPage.jsx
-
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-
-// Algerian national emergency numbers — verified against official sources
-const EMERGENCY_NUMBERS = [
-  { key: "civil", number: "14" },
-  { key: "police", number: "17" },
-  { key: "gendarmerie", number: "1055" },
-  { key: "samu", number: "115" },
-]
+import { useQuery } from "@tanstack/react-query"
+import { apiGet } from "../api/client"
 
 // Static color map — avoids dynamic Tailwind class interpolation that gets purged
 const EMERGENCY_TYPE_STYLES = {
-  heart: "border-red-500 bg-red-50 text-red-700",
-  accident: "border-orange-500 bg-orange-50 text-orange-700",
+  heart:     "border-red-500 bg-red-50 text-red-700",
+  accident:  "border-orange-500 bg-orange-50 text-orange-700",
   breathing: "border-blue-500 bg-blue-50 text-blue-700",
-  stroke: "border-purple-500 bg-purple-50 text-purple-700",
-  bleeding: "border-red-500 bg-red-50 text-red-700",
+  stroke:    "border-purple-500 bg-purple-50 text-purple-700",
+  bleeding:  "border-red-500 bg-red-50 text-red-700",
   poisoning: "border-green-500 bg-green-50 text-green-700",
-  burns: "border-orange-500 bg-orange-50 text-orange-700",
-  other: "border-gray-500 bg-gray-50 text-gray-700",
+  burns:     "border-orange-500 bg-orange-50 text-orange-700",
+  other:     "border-gray-500 bg-gray-50 text-gray-700",
 }
 
 const EMERGENCY_TYPE_ICONS = {
-  heart: "bx-heart",
-  accident: "bx-car-crash",
-  breathing: "bx-wind",
-  stroke: "bx-brain",
-  bleeding: "bx-droplet",
-  poisoning: "bx-shield-x",
-  burns: "bx-fire",
-  other: "bx-plus-medical",
+  heart: "bx-heart", accident: "bx-car-crash", breathing: "bx-wind",
+  stroke: "bx-brain", bleeding: "bx-droplet", poisoning: "bx-shield-x",
+  burns: "bx-fire", other: "bx-plus-medical",
 }
 
 const EMERGENCY_TIPS = [
-  { key: "heart", icon: "bx-heart", color: "text-red-500" },
-  { key: "breathing", icon: "bx-wind", color: "text-blue-500" },
-  { key: "bleeding", icon: "bx-droplet", color: "text-red-500" },
+  { key: "heart",     icon: "bx-heart",   color: "text-red-500" },
+  { key: "breathing", icon: "bx-wind",    color: "text-blue-500" },
+  { key: "bleeding",  icon: "bx-droplet", color: "text-red-500" },
 ]
 
 const EmergencyPage = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language === "fr" ? "fr" : "ar"
   const [selectedEmergencyType, setSelectedEmergencyType] = useState("")
-  const [location, setLocation] = useState("")
+  const [userCoords, setUserCoords] = useState(null)
   const [isLocating, setIsLocating] = useState(false)
   const [locationError, setLocationError] = useState("")
-  // nearbyHospitals will be populated from the real API in Phase 5
-  const nearbyHospitals = []
 
-  const emergencyTypeKeys = ["heart", "accident", "breathing", "stroke", "bleeding", "poisoning", "burns", "other"]
+  // Load national emergency numbers from the API
+  const { data: numbersData } = useQuery({
+    queryKey: ["emergency-numbers"],
+    queryFn: () => apiGet("/emergency/numbers", lang),
+  })
 
-  const getCurrentLocation = () => {
-    setIsLocating(true)
-    setLocationError("")
+  // Load nearby hospitals when we have coordinates
+  const { data: nearbyData, isLoading: nearbyLoading } = useQuery({
+    queryKey: ["emergency-nearby", userCoords?.lat, userCoords?.lng],
+    queryFn: () => apiGet(`/emergency/nearby?lat=${userCoords.lat}&lng=${userCoords.lng}`, lang),
+    enabled: !!userCoords,
+  })
+
+  const emergencyNumbers = numbersData ?? []
+  const nearbyHospitals = nearbyData ?? []
+
+  // Map DB number labels to i18n keys (fallback to labelAr/labelFr)
+  const numberI18nKey = (num) => {
+    if (num.number === "14")   return t("emergency.civil")
+    if (num.number === "17")   return t("emergency.police")
+    if (num.number === "1055") return t("emergency.gendarmerie")
+    if (num.number === "115")  return t("emergency.samu")
+    return lang === "ar" ? num.labelAr : num.labelFr
+  }
+
+  const handleGetLocation = () => {
     if (!navigator.geolocation) {
       setLocationError(t("emergency.geoNotSupported"))
-      setIsLocating(false)
       return
     }
+    setIsLocating(true)
+    setLocationError("")
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocation(
-          `${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`
-        )
+      (pos) => {
+        setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
         setIsLocating(false)
-        // Phase 5: call /emergency/nearby?lat=&lng= here
       },
       () => {
         setLocationError(t("emergency.geoDenied"))
@@ -75,180 +81,163 @@ const EmergencyPage = () => {
     )
   }
 
+  const emergencyTypeKeys = ["heart", "accident", "breathing", "stroke", "bleeding", "poisoning", "burns", "other"]
+
+  const formatDistance = (km) => {
+    if (km == null) return ""
+    if (km < 1) return `${Math.round(km * 1000)} m`
+    return `${km.toFixed(1)} km`
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-100">
-      {/* Emergency Header */}
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
+      {/* Header */}
       <header className="bg-red-600 text-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link
-              to="/"
-              className="flex items-center gap-2 text-white hover:text-red-200 transition-colors"
-            >
+            <Link to="/" className="flex items-center gap-2 hover:text-red-200 transition-colors">
               <i className="bx bx-arrow-back text-xl"></i>
               <span>{t("nav.backHome")}</span>
             </Link>
-            <div className="text-center">
-              <h1 className="text-xl font-bold flex items-center justify-center gap-2">
-                <i className="bx bx-first-aid text-2xl"></i>
-                <span>{t("emergency.pageTitle")}</span>
-              </h1>
-              <p className="text-red-200">{t("emergency.nationalNumbers")}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <a
-                href="tel:14"
-                className="bg-white text-red-600 px-4 py-2 rounded-lg font-bold hover:bg-red-50 transition-colors"
-              >
-                {t("emergency.call14")}
-              </a>
-            </div>
+            <h1 className="text-2xl font-bold">{t("emergency.pageTitle")}</h1>
+            <div></div>
           </div>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Emergency Alert */}
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-8">
-          <div className="flex items-center gap-2">
-            <i className="bx bx-error text-xl"></i>
-            <div>
-              <strong>{t("emergency.alert")}</strong>{" "}
-              {t("emergency.alertText")}
-            </div>
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Emergency Numbers */}
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <i className="bx bx-phone text-red-500"></i>
-              <span>{t("emergency.nationalNumbers")}</span>
-            </h2>
-            <div className="space-y-3">
-              {EMERGENCY_NUMBERS.map((n) => (
-                <div
-                  key={n.number}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-red-300 hover:bg-red-50 transition-colors"
-                >
-                  <span className="font-medium text-gray-800">{t(`emergency.${n.key}`)}</span>
-                  <a
-                    href={`tel:${n.number}`}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 font-bold"
-                  >
-                    <i className="bx bx-phone-call"></i>
-                    <span>{n.number}</span>
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Location & nearby hospitals */}
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <i className="bx bx-hospital text-blue-500"></i>
-              <span>{t("emergency.nearestHospitals")}</span>
-            </h2>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("emergency.locationLabel")}</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder={t("emergency.locationPlaceholder")}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                />
-                <button
-                  onClick={getCurrentLocation}
-                  disabled={isLocating}
-                  className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
-                  {isLocating ? (
-                    <i className="bx bx-loader-alt animate-spin"></i>
-                  ) : (
-                    <i className="bx bx-current-location"></i>
-                  )}
-                </button>
+          {/* Emergency Numbers Column */}
+          <div className="space-y-6">
+            {/* National numbers — from API */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i className="bx bx-phone text-red-500"></i>
+                {t("emergency.nationalNumbers")}
+              </h2>
+              <div className="space-y-3">
+                {emergencyNumbers.length === 0 ? (
+                  // Hardcoded fallback shown immediately (UX: no blank while API loads)
+                  [{ number: "14", key: "civil" }, { number: "17", key: "police" },
+                   { number: "1055", key: "gendarmerie" }, { number: "115", key: "samu" }].map((n) => (
+                    <a key={n.number} href={`tel:${n.number}`}
+                      className="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg p-4 hover:bg-red-100 transition-colors group">
+                      <span className="font-medium text-gray-800">{t(`emergency.${n.key}`)}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-red-600 text-lg" dir="ltr">{n.number}</span>
+                        <i className="bx bx-phone-call text-red-500 group-hover:scale-110 transition-transform"></i>
+                      </div>
+                    </a>
+                  ))
+                ) : (
+                  emergencyNumbers.map((n) => (
+                    <a key={n.id} href={`tel:${n.number}`}
+                      className="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg p-4 hover:bg-red-100 transition-colors group">
+                      <span className="font-medium text-gray-800">{numberI18nKey(n)}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-red-600 text-lg" dir="ltr">{n.number}</span>
+                        <i className="bx bx-phone-call text-red-500 group-hover:scale-110 transition-transform"></i>
+                      </div>
+                    </a>
+                  ))
+                )}
               </div>
-              {locationError && (
-                <p className="text-sm text-red-600 mt-2">{locationError}</p>
-              )}
             </div>
 
-            {nearbyHospitals.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <i className="bx bx-map text-4xl mb-2 text-gray-300"></i>
-                <p className="text-sm">{t("emergency.noLocation")}</p>
-                <p className="text-xs mt-1 text-gray-400">{t("emergency.geoHint")}</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {nearbyHospitals.map((hospital) => (
-                  <div
-                    key={hospital.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+            {/* Emergency type selector */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-2">{t("emergency.emergencyTypeTitle")}</h2>
+              <p className="text-gray-600 text-sm mb-4">{t("emergency.emergencyTypeHint")}</p>
+              <div className="grid grid-cols-2 gap-3">
+                {emergencyTypeKeys.map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedEmergencyType(key)}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors text-sm font-medium ${
+                      selectedEmergencyType === key
+                        ? EMERGENCY_TYPE_STYLES[key]
+                        : "border-gray-200 text-gray-600 hover:border-gray-300 bg-white"
+                    }`}
                   >
-                    <h3 className="font-semibold text-gray-800">{hospital.nameAr}</h3>
-                    {hospital.phone && (
-                      <a
-                        href={`tel:${hospital.phone}`}
-                        className="mt-2 inline-flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors"
-                      >
-                        <i className="bx bx-phone"></i>
-                        <span>{t("emergency.callButton")}</span>
-                      </a>
-                    )}
+                    <i className={`bx ${EMERGENCY_TYPE_ICONS[key]} text-lg`}></i>
+                    {t(`emergency.types.${key}`)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tips */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">{t("emergency.tipsTitle")}</h2>
+              <div className="space-y-3">
+                {EMERGENCY_TIPS.map(({ key, icon, color }) => (
+                  <div key={key} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                    <i className={`bx ${icon} text-xl ${color}`}></i>
+                    <p className="text-sm text-gray-700">{t(`emergency.tips.${key}`)}</p>
                   </div>
                 ))}
               </div>
-            )}
+            </div>
           </div>
-        </div>
 
-        {/* Emergency Type info */}
-        <div className="bg-white rounded-xl shadow-lg p-8 mt-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-            <i className="bx bx-plus-medical text-red-500"></i>
-            <span>{t("emergency.emergencyTypeTitle")}</span>
-          </h2>
-          <p className="text-sm text-gray-500 mb-4">{t("emergency.emergencyTypeHint")}</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {emergencyTypeKeys.map((typeKey) => (
-              <button
-                key={typeKey}
-                onClick={() => setSelectedEmergencyType(typeKey)}
-                className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors ${
-                  selectedEmergencyType === typeKey
-                    ? EMERGENCY_TYPE_STYLES[typeKey]
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <i className={`bx ${EMERGENCY_TYPE_ICONS[typeKey]} text-xl`}></i>
-                <span className="text-sm font-medium">{t(`emergency.types.${typeKey}`)}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+          {/* Nearby Hospitals Column */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i className="bx bx-map text-blue-500"></i>
+                {t("emergency.nearestHospitals")}
+              </h2>
 
-        {/* Emergency Tips */}
-        <div className="bg-white rounded-xl shadow-lg p-8 mt-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-            <i className="bx bx-info-circle text-blue-500"></i>
-            <span>{t("emergency.tipsTitle")}</span>
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {EMERGENCY_TIPS.map((tip) => (
-              <div key={tip.key} className="text-center p-4">
-                <i className={`bx ${tip.icon} text-4xl ${tip.color} mb-3`}></i>
-                <h3 className="font-semibold text-gray-800 mb-2">{t(`emergency.tips.${tip.key}.title`)}</h3>
-                <p className="text-sm text-gray-600">{t(`emergency.tips.${tip.key}.desc`)}</p>
-              </div>
-            ))}
+              {!userCoords ? (
+                <div className="text-center py-6">
+                  <i className="bx bx-map-pin text-4xl text-gray-300 mb-3"></i>
+                  <p className="text-gray-600 mb-2">{t("emergency.geoHint")}</p>
+                  {locationError && <p className="text-red-500 text-sm mb-3">{locationError}</p>}
+                  <button
+                    onClick={handleGetLocation}
+                    disabled={isLocating}
+                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  >
+                    {isLocating ? t("emergency.noLocation") : t("emergency.locationLabel")}
+                  </button>
+                </div>
+              ) : nearbyLoading ? (
+                <p className="text-gray-500 text-center py-4">{t("common.loading")}</p>
+              ) : nearbyHospitals.length === 0 ? (
+                <p className="text-gray-500 text-center py-4">{t("institutions.empty")}</p>
+              ) : (
+                <div className="space-y-3">
+                  {nearbyHospitals.map((hospital) => (
+                    <div key={hospital.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h3 className="font-semibold text-gray-800">
+                            {lang === "ar" ? hospital.nameAr : hospital.nameFr}
+                          </h3>
+                          {(lang === "ar" ? hospital.addressAr : hospital.addressFr) && (
+                            <p className="text-sm text-gray-500">
+                              {lang === "ar" ? hospital.addressAr : hospital.addressFr}
+                            </p>
+                          )}
+                          {hospital.distanceKm != null && (
+                            <p className="text-xs text-blue-600 mt-1">{formatDistance(hospital.distanceKm)}</p>
+                          )}
+                        </div>
+                        {hospital.phone && (
+                          <a href={`tel:${hospital.phone}`}
+                            className="flex-shrink-0 bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-colors text-sm"
+                            dir="ltr">
+                            <i className="bx bx-phone-call me-1"></i>
+                            {hospital.phone}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

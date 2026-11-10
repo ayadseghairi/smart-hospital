@@ -4,6 +4,8 @@ import "./InstitutionPage.css"
 import { useState, useEffect } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { useQuery } from "@tanstack/react-query"
+import { apiGet } from "../api/client"
 import AdminPanel from "../components/Sections/InstitutionDetails/AdminPanel"
 import DoctorsSection from "../components/Sections/InstitutionDetails/DoctorsSection"
 import ImagingSection from "../components/Sections/InstitutionDetails/ImagingSection"
@@ -13,42 +15,39 @@ import NursesSection from "../components/Sections/InstitutionDetails/NursesSecti
 
 // Static color map for tab active states — avoids purged dynamic Tailwind classes
 const SECTION_ACTIVE_STYLES = {
-  blue: "border-blue-500 text-blue-600 bg-blue-50",
-  gray: "border-gray-500 text-gray-600 bg-gray-50",
-  green: "border-green-500 text-green-600 bg-green-50",
+  blue:   "border-blue-500 text-blue-600 bg-blue-50",
+  gray:   "border-gray-500 text-gray-600 bg-gray-50",
+  green:  "border-green-500 text-green-600 bg-green-50",
   purple: "border-purple-500 text-purple-600 bg-purple-50",
-  red: "border-red-500 text-red-600 bg-red-50",
+  red:    "border-red-500 text-red-600 bg-red-50",
   yellow: "border-yellow-500 text-yellow-600 bg-yellow-50",
-  pink: "border-pink-500 text-pink-600 bg-pink-50",
+  pink:   "border-pink-500 text-pink-600 bg-pink-50",
 }
 
 const SECTIONS = [
-  { id: "overview", color: "blue", icon: "bx-home" },
-  { id: "admin", color: "gray", icon: "bx-cog" },
-  { id: "doctors", color: "green", icon: "bx-user-plus" },
-  { id: "imaging", color: "purple", icon: "bx-camera" },
-  { id: "pharmacy", color: "red", icon: "bx-plus-medical" },
-  { id: "lab", color: "yellow", icon: "bx-test-tube" },
-  { id: "nurses", color: "pink", icon: "bx-heart" },
+  { id: "overview", color: "blue",   icon: "bx-home" },
+  { id: "admin",    color: "gray",   icon: "bx-cog" },
+  { id: "doctors",  color: "green",  icon: "bx-user-plus" },
+  { id: "imaging",  color: "purple", icon: "bx-camera" },
+  { id: "pharmacy", color: "red",    icon: "bx-plus-medical" },
+  { id: "lab",      color: "yellow", icon: "bx-test-tube" },
+  { id: "nurses",   color: "pink",   icon: "bx-heart" },
 ]
 
 const InstitutionPage = () => {
   const { id, section } = useParams()
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language === "fr" ? "fr" : "ar"
   const [activeSection, setActiveSection] = useState(section || "overview")
-  const [institution] = useState(null)
-  const [notFound, setNotFound] = useState(false)
+
+  const { data: institution, isLoading, error } = useQuery({
+    queryKey: ["institution", id],
+    queryFn: () => apiGet(`/institutions/${id}`, lang),
+  })
 
   useEffect(() => {
-    // Phase 5: replace with real API call: GET /institutions/:id
-    setNotFound(true)
-  }, [id])
-
-  useEffect(() => {
-    if (section) {
-      setActiveSection(section)
-    }
+    if (section) setActiveSection(section)
   }, [section])
 
   const handleSectionChange = (sectionId) => {
@@ -75,59 +74,56 @@ const InstitutionPage = () => {
           <div className="bg-white rounded-xl shadow-lg p-8">
             <div className="text-center mb-8">
               <i className="bx bx-hospital text-6xl text-blue-500 mb-4"></i>
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">{institution?.nameAr}</h2>
-              <p className="text-gray-600">{t("institutions.digitalPlatform")}</p>
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                {lang === "ar" ? institution?.nameAr : institution?.nameFr}
+              </h2>
+              <p className="text-gray-600">
+                {lang === "ar" ? institution?.commune?.nameAr : institution?.commune?.nameFr}
+              </p>
             </div>
 
-            {institution?.phone && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {institution?.phone && (
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <i className="bx bx-phone text-3xl text-green-500 mb-2"></i>
                   <h3 className="font-semibold text-gray-800">{t("institutions.phone")}</h3>
-                  <p className="text-gray-600">{institution.phone}</p>
+                  <a href={`tel:${institution.phone}`} className="text-gray-600 hover:underline" dir="ltr">
+                    {institution.phone}
+                  </a>
                 </div>
-                {institution.addressAr && (
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <i className="bx bx-map text-3xl text-purple-500 mb-2"></i>
-                    <h3 className="font-semibold text-gray-800">{t("institutions.address")}</h3>
-                    <p className="text-gray-600">{institution.addressAr}</p>
-                  </div>
-                )}
-              </div>
-            )}
+              )}
+              {(lang === "ar" ? institution?.addressAr : institution?.addressFr) && (
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <i className="bx bx-map text-3xl text-purple-500 mb-2"></i>
+                  <h3 className="font-semibold text-gray-800">{t("institutions.address")}</h3>
+                  <p className="text-gray-600">
+                    {lang === "ar" ? institution.addressAr : institution.addressFr}
+                  </p>
+                </div>
+              )}
+              {institution?.hasEmergency24h && (
+                <div className="text-center p-4 bg-red-50 rounded-lg">
+                  <i className="bx bx-heart text-3xl text-red-500 mb-2"></i>
+                  <h3 className="font-semibold text-gray-800">{t("emergency.open24h")}</h3>
+                </div>
+              )}
+            </div>
 
             <div className="bg-gray-50 p-6 rounded-lg">
               <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("institutions.quickServices")}</h3>
-              <div className="space-y-3">
-                <Link
-                  to={`/institution/${id}/doctors`}
-                  className="block w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
-                >
-                  {t("institutions.bookAppointment")}
-                </Link>
-              </div>
+              <Link
+                to={`/institution/${id}/doctors`}
+                className="block w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
+              >
+                {t("institutions.bookAppointment")}
+              </Link>
             </div>
           </div>
         )
     }
   }
 
-  if (notFound && !institution) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <i className="bx bx-error text-6xl text-gray-400 mb-4"></i>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">{t("institutions.notFound")}</h2>
-          <p className="text-gray-500 mb-4">{t("institutions.notFoundDesc")}</p>
-          <Link to="/" className="text-blue-600 hover:text-blue-800">
-            {t("nav.backHome")}
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
-  if (!institution) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
@@ -138,23 +134,32 @@ const InstitutionPage = () => {
     )
   }
 
+  if (error || !institution) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <i className="bx bx-error text-6xl text-gray-400 mb-4"></i>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">{t("institutions.notFound")}</h2>
+          <p className="text-gray-500 mb-4">{t("institutions.notFoundDesc")}</p>
+          <Link to="/" className="text-blue-600 hover:text-blue-800">{t("nav.backHome")}</Link>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
       <header className="bg-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link
-                to="/"
-                className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                <i className="bx bx-arrow-back text-xl"></i>
-                <span>{t("nav.backHome")}</span>
-              </Link>
-            </div>
+            <Link to="/" className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors">
+              <i className="bx bx-arrow-back text-xl"></i>
+              <span>{t("nav.backHome")}</span>
+            </Link>
             <div className="text-center">
-              <h1 className="text-xl font-bold text-gray-800">{institution.nameAr}</h1>
+              <h1 className="text-xl font-bold text-gray-800">
+                {lang === "ar" ? institution.nameAr : institution.nameFr}
+              </h1>
               <p className="text-gray-600">{t("institutions.digitalPlatform")}</p>
             </div>
             <div></div>
@@ -162,7 +167,6 @@ const InstitutionPage = () => {
         </div>
       </header>
 
-      {/* Navigation Tabs */}
       <nav className="bg-white border-b">
         <div className="container mx-auto px-4">
           <div className="flex overflow-x-auto">
@@ -184,7 +188,6 @@ const InstitutionPage = () => {
         </div>
       </nav>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">{renderActiveSection()}</main>
     </div>
   )
