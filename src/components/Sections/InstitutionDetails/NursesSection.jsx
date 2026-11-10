@@ -1,10 +1,9 @@
-"use client"
-
 // components/Sections/InstitutionDetails/NursesSection.jsx
 
 import { useState } from "react"
+import Avatar from "../../common/Avatar"
 
-const NursesSection = ({ institution }) => {
+const NursesSection = () => {
   const [activeTab, setActiveTab] = useState("services")
   const [selectedService, setSelectedService] = useState(null)
   const [showBooking, setShowBooking] = useState(false)
@@ -14,7 +13,7 @@ const NursesSection = ({ institution }) => {
       id: 1,
       name: "رعاية منزلية",
       description: "خدمات التمريض في المنزل",
-      price: "200 ريال/يوم",
+      price: null,
       duration: "8-24 ساعة",
       includes: ["قياس العلامات الحيوية", "إعطاء الأدوية", "العناية بالجروح", "المتابعة الطبية"],
       icon: "bx-home-heart",
@@ -24,7 +23,7 @@ const NursesSection = ({ institution }) => {
       id: 2,
       name: "العناية بالجروح",
       description: "تنظيف وتضميد الجروح",
-      price: "80 ريال/جلسة",
+      price: null,
       duration: "30-45 دقيقة",
       includes: ["تنظيف الجرح", "تطبيق المطهرات", "تغيير الضمادات", "متابعة الشفاء"],
       icon: "bx-band-aid",
@@ -34,7 +33,7 @@ const NursesSection = ({ institution }) => {
       id: 3,
       name: "حقن طبية",
       description: "إعطاء الحقن والأدوية",
-      price: "50 ريال/حقنة",
+      price: null,
       duration: "15-20 دقيقة",
       includes: ["حقن عضلية", "حقن وريدية", "حقن تحت الجلد", "متابعة الآثار الجانبية"],
       icon: "bx-injection",
@@ -44,7 +43,7 @@ const NursesSection = ({ institution }) => {
       id: 4,
       name: "قياس العلامات الحيوية",
       description: "مراقبة الحالة الصحية",
-      price: "30 ريال/زيارة",
+      price: null,
       duration: "15-30 دقيقة",
       includes: ["قياس الضغط", "قياس الحرارة", "قياس النبض", "قياس التنفس"],
       icon: "bx-pulse",
@@ -54,7 +53,7 @@ const NursesSection = ({ institution }) => {
       id: 5,
       name: "العلاج الطبيعي",
       description: "تمارين وعلاج طبيعي",
-      price: "150 ريال/جلسة",
+      price: null,
       duration: "45-60 دقيقة",
       includes: ["تمارين حركية", "تدليك علاجي", "تقوية العضلات", "تحسين المرونة"],
       icon: "bx-dumbbell",
@@ -64,7 +63,7 @@ const NursesSection = ({ institution }) => {
       id: 6,
       name: "رعاية كبار السن",
       description: "رعاية شاملة لكبار السن",
-      price: "300 ريال/يوم",
+      price: null,
       duration: "12-24 ساعة",
       includes: ["مساعدة في الأنشطة اليومية", "إعطاء الأدوية", "المراقبة الصحية", "الدعم النفسي"],
       icon: "bx-user-check",
@@ -72,64 +71,9 @@ const NursesSection = ({ institution }) => {
     },
   ]
 
-  const nurses = [
-    {
-      id: 1,
-      name: "الممرضة سارة أحمد",
-      specialty: "تمريض عام",
-      experience: "8 سنوات",
-      rating: 4.9,
-      image: "/placeholder.svg?height=100&width=100",
-      certifications: ["ممرضة مسجلة", "إسعافات أولية", "رعاية منزلية"],
-      languages: ["العربية", "الإنجليزية"],
-      availability: "متاحة",
-    },
-    {
-      id: 2,
-      name: "الممرض محمد علي",
-      specialty: "العناية المركزة",
-      experience: "12 سنة",
-      rating: 4.8,
-      image: "/placeholder.svg?height=100&width=100",
-      certifications: ["ممرض مسجل", "العناية المركزة", "الطوارئ"],
-      languages: ["العربية", "الإنجليزية"],
-      availability: "متاح",
-    },
-    {
-      id: 3,
-      name: "الممرضة فاطمة حسن",
-      specialty: "تمريض الأطفال",
-      experience: "6 سنوات",
-      rating: 4.9,
-      image: "/placeholder.svg?height=100&width=100",
-      certifications: ["تمريض الأطفال", "رعاية حديثي الولادة"],
-      languages: ["العربية"],
-      availability: "متاحة",
-    },
-  ]
-
-  const appointments = [
-    {
-      id: 1,
-      patientName: "أحمد محمد",
-      nurseName: "سارة أحمد",
-      service: "رعاية منزلية",
-      date: "2024-01-15",
-      time: "09:00",
-      status: "مؤكد",
-      duration: "8 ساعات",
-    },
-    {
-      id: 2,
-      patientName: "فاطمة علي",
-      nurseName: "محمد علي",
-      service: "العناية بالجروح",
-      date: "2024-01-15",
-      time: "14:00",
-      status: "قيد التنفيذ",
-      duration: "45 دقيقة",
-    },
-  ]
+  // No mock data — nurses and appointments load from the real API (Phase 5)
+  const nurses = []
+  const appointments = []
 
   const handleServiceSelect = (service) => {
     setSelectedService(service)
@@ -155,7 +99,11 @@ const NursesSection = ({ institution }) => {
               <div className="space-y-2 text-sm mb-4">
                 <div className="flex justify-between">
                   <span className="text-gray-500">السعر:</span>
-                  <span className="font-semibold text-pink-600">{service.price}</span>
+                  <span className="font-semibold text-pink-600">
+                    {service.price != null
+                      ? new Intl.NumberFormat("ar-DZ").format(service.price) + " دج"
+                      : "السعر غير متوفر"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">المدة:</span>
@@ -193,16 +141,18 @@ const NursesSection = ({ institution }) => {
 
   const renderNursesTab = () => (
     <div className="space-y-6">
+      {nurses.length === 0 ? (
+        <div className="text-center py-16 text-gray-500">
+          <i className="bx bx-user-plus text-6xl mb-4 text-gray-300"></i>
+          <p className="text-lg">لا يوجد ممرضون مسجلون في هذه المؤسسة بعد.</p>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {nurses.map((nurse) => (
           <div key={nurse.id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
             <div className="p-6">
               <div className="text-center mb-4">
-                <img
-                  src={nurse.image || "/placeholder.svg"}
-                  alt={nurse.name}
-                  className="w-20 h-20 rounded-full mx-auto mb-3 object-cover"
-                />
+                <Avatar name={nurse.name} size="xl" className="mx-auto mb-3" />
                 <h3 className="text-lg font-semibold text-gray-800">{nurse.name}</h3>
                 <p className="text-gray-600 text-sm">{nurse.specialty}</p>
               </div>
@@ -211,17 +161,6 @@ const NursesSection = ({ institution }) => {
                 <div className="flex justify-between">
                   <span className="text-gray-500">الخبرة:</span>
                   <span className="font-medium">{nurse.experience}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">التقييم:</span>
-                  <div className="flex items-center space-x-1 space-x-reverse">
-                    <span className="font-medium">{nurse.rating}</span>
-                    <i className="bx bx-star text-yellow-500"></i>
-                  </div>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">الحالة:</span>
-                  <span className="font-medium text-green-600">{nurse.availability}</span>
                 </div>
               </div>
 
@@ -248,6 +187,7 @@ const NursesSection = ({ institution }) => {
           </div>
         ))}
       </div>
+      )}
     </div>
   )
 
@@ -255,6 +195,12 @@ const NursesSection = ({ institution }) => {
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">المواعيد المحجوزة</h3>
+        {appointments.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <i className="bx bx-calendar text-4xl mb-2 text-gray-300"></i>
+            <p>لا توجد مواعيد مسجلة بعد.</p>
+          </div>
+        ) : (
         <div className="space-y-4">
           {appointments.map((appointment) => (
             <div key={appointment.id} className="border border-gray-200 rounded-lg p-4">
@@ -296,6 +242,7 @@ const NursesSection = ({ institution }) => {
             </div>
           ))}
         </div>
+        )}
       </div>
     </div>
   )
@@ -318,29 +265,7 @@ const NursesSection = ({ institution }) => {
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 bg-pink-50 rounded-lg">
-            <i className="bx bx-user-plus text-3xl text-pink-500 mb-2"></i>
-            <div className="text-2xl font-bold text-pink-600">25</div>
-            <div className="text-sm text-gray-600">ممرض/ة</div>
-          </div>
-          <div className="text-center p-4 bg-green-50 rounded-lg">
-            <i className="bx bx-check-circle text-3xl text-green-500 mb-2"></i>
-            <div className="text-2xl font-bold text-green-600">98%</div>
-            <div className="text-sm text-gray-600">رضا المرضى</div>
-          </div>
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <i className="bx bx-calendar text-3xl text-blue-500 mb-2"></i>
-            <div className="text-2xl font-bold text-blue-600">35</div>
-            <div className="text-sm text-gray-600">موعد اليوم</div>
-          </div>
-          <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <i className="bx bx-time text-3xl text-purple-500 mb-2"></i>
-            <div className="text-2xl font-bold text-purple-600">24/7</div>
-            <div className="text-sm text-gray-600">خدمة طوارئ</div>
-          </div>
-        </div>
+        {/* Section summary — real numbers from API in Phase 5 */}
 
         {/* Tabs Navigation */}
         <div className="flex space-x-0 space-x-reverse border-b mt-6">
@@ -461,7 +386,7 @@ const NursesSection = ({ institution }) => {
               <div className="flex space-x-3 space-x-reverse">
                 <button
                   onClick={() => {
-                    alert("تم طلب الخدمة بنجاح! سيتم التواصل معك قريباً.")
+                    // Phase 5: send to real API
                     setShowBooking(false)
                   }}
                   className="flex-1 bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700 transition-colors"

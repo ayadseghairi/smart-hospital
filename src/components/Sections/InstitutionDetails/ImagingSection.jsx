@@ -1,10 +1,8 @@
-"use client"
-
 // components/Sections/InstitutionDetails/ImagingSection.jsx
 
 import { useState } from "react"
 
-const ImagingSection = ({ institution }) => {
+const ImagingSection = () => {
   const [selectedService, setSelectedService] = useState(null)
   const [showBooking, setShowBooking] = useState(false)
   const [bookingData, setBookingData] = useState({
@@ -24,7 +22,7 @@ const ImagingSection = ({ institution }) => {
       id: "xray",
       name: "الأشعة السينية",
       description: "فحص الأشعة السينية للعظام والصدر",
-      price: "150 ريال",
+      price: null,
       duration: "15 دقيقة",
       preparation: "لا يتطلب تحضير خاص",
       icon: "bx-x-ray",
@@ -34,7 +32,7 @@ const ImagingSection = ({ institution }) => {
       id: "ct",
       name: "الأشعة المقطعية",
       description: "فحص مقطعي مفصل للأعضاء الداخلية",
-      price: "800 ريال",
+      price: null,
       duration: "30 دقيقة",
       preparation: "صيام 4 ساعات قبل الفحص",
       icon: "bx-scan",
@@ -44,7 +42,7 @@ const ImagingSection = ({ institution }) => {
       id: "mri",
       name: "الرنين المغناطيسي",
       description: "تصوير مفصل بالرنين المغناطيسي",
-      price: "1200 ريال",
+      price: null,
       duration: "45 دقيقة",
       preparation: "إزالة جميع المعادن",
       icon: "bx-brain",
@@ -54,7 +52,7 @@ const ImagingSection = ({ institution }) => {
       id: "ultrasound",
       name: "الموجات فوق الصوتية",
       description: "فحص بالموجات فوق الصوتية",
-      price: "200 ريال",
+      price: null,
       duration: "20 دقيقة",
       preparation: "امتلاء المثانة للفحص البطني",
       icon: "bx-pulse",
@@ -64,7 +62,7 @@ const ImagingSection = ({ institution }) => {
       id: "mammography",
       name: "تصوير الثدي",
       description: "فحص تصوير الثدي للكشف المبكر",
-      price: "300 ريال",
+      price: null,
       duration: "25 دقيقة",
       preparation: "تجنب مزيل العرق",
       icon: "bx-health",
@@ -74,7 +72,7 @@ const ImagingSection = ({ institution }) => {
       id: "nuclear",
       name: "الطب النووي",
       description: "فحوصات الطب النووي المتخصصة",
-      price: "1500 ريال",
+      price: null,
       duration: "60 دقيقة",
       preparation: "تعليمات خاصة حسب نوع الفحص",
       icon: "bx-atom",
@@ -82,14 +80,8 @@ const ImagingSection = ({ institution }) => {
     },
   ]
 
-  const availableSlots = [
-    { date: "2024-01-15", time: "09:00", available: true },
-    { date: "2024-01-15", time: "10:00", available: true },
-    { date: "2024-01-15", time: "11:00", available: false },
-    { date: "2024-01-15", time: "14:00", available: true },
-    { date: "2024-01-16", time: "09:30", available: true },
-    { date: "2024-01-16", time: "10:30", available: true },
-  ]
+  // Phase 5: available slots come from the real API
+  const availableSlots = []
 
   const handleServiceSelect = (service) => {
     setSelectedService(service)
@@ -101,7 +93,7 @@ const ImagingSection = ({ institution }) => {
   }
 
   const handleConfirmBooking = () => {
-    alert(`تم حجز موعد ${selectedService.name} بنجاح!`)
+    // Phase 5: send to real API
     setShowBooking(false)
     setSelectedService(null)
   }
@@ -118,29 +110,7 @@ const ImagingSection = ({ institution }) => {
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <i className="bx bx-devices text-3xl text-purple-500 mb-2"></i>
-            <div className="text-2xl font-bold text-purple-600">12</div>
-            <div className="text-sm text-gray-600">جهاز تصوير</div>
-          </div>
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <i className="bx bx-calendar text-3xl text-blue-500 mb-2"></i>
-            <div className="text-2xl font-bold text-blue-600">45</div>
-            <div className="text-sm text-gray-600">موعد اليوم</div>
-          </div>
-          <div className="text-center p-4 bg-green-50 rounded-lg">
-            <i className="bx bx-check-circle text-3xl text-green-500 mb-2"></i>
-            <div className="text-2xl font-bold text-green-600">98%</div>
-            <div className="text-sm text-gray-600">دقة التشخيص</div>
-          </div>
-          <div className="text-center p-4 bg-yellow-50 rounded-lg">
-            <i className="bx bx-time text-3xl text-yellow-500 mb-2"></i>
-            <div className="text-2xl font-bold text-yellow-600">15</div>
-            <div className="text-sm text-gray-600">دقيقة متوسط الانتظار</div>
-          </div>
-        </div>
+        {/* Section summary — real numbers from API in Phase 5 */}
       </div>
 
       {/* Imaging Services */}
@@ -168,7 +138,11 @@ const ImagingSection = ({ institution }) => {
                 <p className="text-gray-600">{service.description}</p>
                 <div className="flex justify-between">
                   <span className="text-gray-500">السعر:</span>
-                  <span className="font-semibold text-purple-600">{service.price}</span>
+                  <span className="font-semibold text-purple-600">
+                    {service.price != null
+                      ? new Intl.NumberFormat("ar-DZ").format(service.price) + " دج"
+                      : "السعر غير محدد"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">المدة:</span>
@@ -272,7 +246,11 @@ const ImagingSection = ({ institution }) => {
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-semibold">السعر:</span>
-                  <span className="text-purple-600 font-bold">{selectedService.price}</span>
+                  <span className="text-purple-600 font-bold">
+                    {selectedService.price != null
+                      ? new Intl.NumberFormat("ar-DZ").format(selectedService.price) + " دج"
+                      : "السعر غير محدد"}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">المدة:</span>

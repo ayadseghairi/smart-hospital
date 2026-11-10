@@ -1,15 +1,18 @@
 {
-  "name": "smart-hospital",
+  "name": "delin-smart-care",
+  "description": "منصة دلين الصحية الذكية — Delin Smart Care Platform (Khenchela, Algeria)",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:no-fake-data": "node scripts/check-no-fake-data.js"
   },
   "dependencies": {
+    "boxicons": "^2.1.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0"

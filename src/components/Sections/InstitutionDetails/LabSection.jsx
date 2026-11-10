@@ -1,10 +1,8 @@
-"use client"
-
 // components/Sections/InstitutionDetails/LabSection.jsx
 
 import { useState } from "react"
 
-const LabSection = ({ institution }) => {
+const LabSection = () => {
   const [activeTab, setActiveTab] = useState("tests")
   const [selectedTest, setSelectedTest] = useState(null)
   const [showBooking, setShowBooking] = useState(false)
@@ -14,7 +12,7 @@ const LabSection = ({ institution }) => {
       id: 1,
       name: "تحليل الدم الشامل",
       category: "blood",
-      price: "80 ريال",
+      price: null,
       duration: "2-4 ساعات",
       preparation: "صيام 8-12 ساعة",
       description: "فحص شامل لمكونات الدم",
@@ -24,7 +22,7 @@ const LabSection = ({ institution }) => {
       id: 2,
       name: "وظائف الكلى",
       category: "kidney",
-      price: "120 ريال",
+      price: null,
       duration: "4-6 ساعات",
       preparation: "صيام 8 ساعات",
       description: "فحص وظائف الكلى",
@@ -34,7 +32,7 @@ const LabSection = ({ institution }) => {
       id: 3,
       name: "وظائف الكبد",
       category: "liver",
-      price: "150 ريال",
+      price: null,
       duration: "4-6 ساعات",
       preparation: "صيام 10-12 ساعة",
       description: "فحص وظائف الكبد",
@@ -44,7 +42,7 @@ const LabSection = ({ institution }) => {
       id: 4,
       name: "السكر التراكمي",
       category: "diabetes",
-      price: "90 ريال",
+      price: null,
       duration: "2-3 ساعات",
       preparation: "لا يتطلب صيام",
       description: "قياس متوسط السكر خلال 3 أشهر",
@@ -54,7 +52,7 @@ const LabSection = ({ institution }) => {
       id: 5,
       name: "الدهون الثلاثية والكوليسترول",
       category: "lipids",
-      price: "100 ريال",
+      price: null,
       duration: "3-4 ساعات",
       preparation: "صيام 12 ساعة",
       description: "فحص مستوى الدهون في الدم",
@@ -64,7 +62,7 @@ const LabSection = ({ institution }) => {
       id: 6,
       name: "هرمونات الغدة الدرقية",
       category: "hormones",
-      price: "200 ريال",
+      price: null,
       duration: "6-8 ساعات",
       preparation: "لا يتطلب صيام",
       description: "فحص وظائف الغدة الدرقية",
@@ -72,32 +70,8 @@ const LabSection = ({ institution }) => {
     },
   ]
 
-  const testResults = [
-    {
-      id: 1,
-      patientName: "أحمد محمد",
-      testName: "تحليل الدم الشامل",
-      date: "2024-01-15",
-      status: "جاهز",
-      doctorName: "د. سارة أحمد",
-    },
-    {
-      id: 2,
-      patientName: "فاطمة علي",
-      testName: "وظائف الكبد",
-      date: "2024-01-14",
-      status: "قيد المعالجة",
-      doctorName: "د. محمد الأحمد",
-    },
-    {
-      id: 3,
-      patientName: "خالد سعد",
-      testName: "السكر التراكمي",
-      date: "2024-01-13",
-      status: "جاهز",
-      doctorName: "د. نورا حسن",
-    },
-  ]
+  // No mock data — test results come from the real API (Phase 5)
+  const testResults = []
 
   const categories = [
     { id: "all", name: "جميع التحاليل", icon: "bx-test-tube" },
@@ -142,7 +116,11 @@ const LabSection = ({ institution }) => {
               <div className="space-y-2 text-sm mb-4">
                 <div className="flex justify-between">
                   <span className="text-gray-500">السعر:</span>
-                  <span className="font-semibold text-yellow-600">{test.price}</span>
+                  <span className="font-semibold text-yellow-600">
+                    {test.price != null
+                      ? new Intl.NumberFormat("ar-DZ").format(test.price) + " دج"
+                      : "السعر غير محدد"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">مدة النتيجة:</span>
@@ -186,47 +164,20 @@ const LabSection = ({ institution }) => {
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">نتائج التحاليل</h3>
-        <div className="space-y-4">
-          {testResults.map((result) => (
-            <div key={result.id} className="border border-gray-200 rounded-lg p-4">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h4 className="font-semibold text-gray-800">{result.patientName}</h4>
-                  <p className="text-sm text-gray-600">{result.testName}</p>
-                  <p className="text-xs text-gray-500">طلب من {result.doctorName}</p>
-                </div>
-                <div className="text-right">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      result.status === "جاهز" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {result.status}
-                  </span>
-                  <p className="text-xs text-gray-500 mt-1">{result.date}</p>
-                </div>
+        {testResults.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <i className="bx bx-file text-4xl mb-2 text-gray-300"></i>
+            <p>لا توجد نتائج متوفرة بعد.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {testResults.map((result) => (
+              <div key={result.id} className="border border-gray-200 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-800">{result.testName}</h4>
               </div>
-
-              <div className="flex justify-end space-x-2 space-x-reverse">
-                {result.status === "جاهز" && (
-                  <>
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
-                      عرض النتيجة
-                    </button>
-                    <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">
-                      تحميل PDF
-                    </button>
-                  </>
-                )}
-                {result.status === "قيد المعالجة" && (
-                  <button className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors text-sm">
-                    تتبع الحالة
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -282,29 +233,7 @@ const LabSection = ({ institution }) => {
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 bg-yellow-50 rounded-lg">
-            <i className="bx bx-test-tube text-3xl text-yellow-500 mb-2"></i>
-            <div className="text-2xl font-bold text-yellow-600">150+</div>
-            <div className="text-sm text-gray-600">نوع تحليل</div>
-          </div>
-          <div className="text-center p-4 bg-green-50 rounded-lg">
-            <i className="bx bx-time text-3xl text-green-500 mb-2"></i>
-            <div className="text-2xl font-bold text-green-600">2-8</div>
-            <div className="text-sm text-gray-600">ساعات للنتيجة</div>
-          </div>
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <i className="bx bx-check-circle text-3xl text-blue-500 mb-2"></i>
-            <div className="text-2xl font-bold text-blue-600">99%</div>
-            <div className="text-sm text-gray-600">دقة النتائج</div>
-          </div>
-          <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <i className="bx bx-calendar text-3xl text-purple-500 mb-2"></i>
-            <div className="text-2xl font-bold text-purple-600">24/7</div>
-            <div className="text-sm text-gray-600">خدمة الطوارئ</div>
-          </div>
-        </div>
+        {/* Section summary — real numbers from API in Phase 5 */}
 
         {/* Tabs Navigation */}
         <div className="flex space-x-0 space-x-reverse border-b mt-6">
@@ -350,7 +279,11 @@ const LabSection = ({ institution }) => {
                   </div>
                   <div className="flex justify-between">
                     <span className="font-semibold">السعر:</span>
-                    <span className="text-yellow-600 font-bold">{selectedTest.price}</span>
+                    <span className="text-yellow-600 font-bold">
+                      {selectedTest.price != null
+                        ? new Intl.NumberFormat("ar-DZ").format(selectedTest.price) + " دج"
+                        : "السعر غير محدد"}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-semibold">مدة النتيجة:</span>
@@ -393,7 +326,7 @@ const LabSection = ({ institution }) => {
               <div className="flex space-x-3 space-x-reverse">
                 <button
                   onClick={() => {
-                    alert("تم حجز التحليل بنجاح!")
+                    // Phase 5: send to real API
                     setShowBooking(false)
                   }}
                   className="flex-1 bg-yellow-600 text-white py-3 rounded-lg hover:bg-yellow-700 transition-colors"

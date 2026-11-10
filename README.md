@@ -1,88 +1,96 @@
-# Smart Hospital Frontend
+# منصة دلين الصحية الذكية — Delin Smart Care
 
-This repository contains the frontend application for the Smart Hospital system, built using React, Vite, and Tailwind CSS.
+خدمات صحية رقمية متكاملة لولاية خنشلة والجزائر.
 
-## Features
+> **الحالة:** مرحلة 1 من 8 — واجهة المستخدم (Frontend, React + Vite + Tailwind). تطوير الخادم (backend) قيد الإعداد.
 
-* Modern React-based architecture
-* Vite for fast development and build processes
-* Tailwind CSS for utility-first styling
-* ESLint configured for code quality
+---
 
-## Getting Started
+## المتطلبات الأساسية
 
-### Prerequisites
+- Node.js 20+
+- npm 9+
 
-* Node.js (version 14 or above)
-* npm or yarn package manager
+---
 
-### Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/ayadseghairi/smart-hospital.git
-   cd smart-hospital
-   ```
-
-
-
-2. Install dependencies:
-
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-
-
-
-### Running the Development Server
+## البدء السريع
 
 ```bash
+# استنساخ المستودع
+git clone https://github.com/ayadseghairi/smart-hospital.git
+cd smart-hospital
+
+# تثبيت التبعيات
+npm install
+
+# تشغيل بيئة التطوير
 npm run dev
-# or
-yarn dev
 ```
 
+التطبيق يعمل على `http://localhost:5173` بشكل افتراضي.
 
+---
 
-The application will be available at `http://localhost:5173/` by default.
+## الأوامر المتاحة
 
-### Building for Production
+| الأمر | الوصف |
+|---|---|
+| `npm run dev` | تشغيل خادم التطوير |
+| `npm run build` | بناء نسخة الإنتاج |
+| `npm run preview` | معاينة نسخة الإنتاج |
+| `npm run lint` | فحص الكود بـ ESLint |
+| `npm run check:no-fake-data` | التحقق من غياب البيانات الوهمية/التجريبية في `src/` |
 
-```bash
-npm run build
-# or
-yarn build
+---
+
+## هيكل المشروع
+
+```
+src/
+  api/          # عميل HTTP (سيُكتمل في المرحلة 5)
+  lib/          # ثوابت ووحدات مشتركة (brand.js، ...)
+  assets/       # الأصول الثابتة
+  components/
+    common/     # مكونات مشتركة (Avatar، ...)
+    Sections/   # أقسام الصفحة الرئيسية
+      InstitutionDetails/  # تفاصيل المؤسسة الصحية
+  pages/        # صفحات react-router
+  index.css     # التنسيقات العامة
+  main.jsx      # نقطة دخول التطبيق
+  App.jsx       # تعريف المسارات
+scripts/
+  check-no-fake-data.js   # فحص CI للبيانات الوهمية
+public/
+  logo.jpg      # شعار منصة دلين الصحية الذكية
+index.html
+eslint.config.js   # إعداد ESLint 9 (flat config)
+tailwind.config.js
+vite.config.js
 ```
 
+---
 
+## سياسة البيانات
 
-### Previewing the Production Build
+**صفر بيانات وهمية.** لا توجد بيانات تجريبية في الكود. المؤسسات الصحية والأطباء يأتون من قاعدة البيانات فقط، بعد التحقق منهم من قِبل المشرف. تعرض الواجهة حالات فراغ شفافة حتى توفر البيانات الحقيقية.
 
-```bash
-npm run preview
-# or
-yarn preview
-```
+---
 
+## خريطة التطوير (Roadmap)
 
+| المرحلة | الوصف | الحالة |
+|---|---|---|
+| 1 | تنظيف الواجهة، إصلاح ESLint، الهوية البصرية، مكون Avatar | ✅ مكتملة |
+| 2 | التعريب الكامل (i18n: عربي / فرنسي) | ⏳ قادمة |
+| 3 | الخادم (Node, Express, Prisma, PostgreSQL) | ⏳ قادمة |
+| 4 | المساعد الذكي (قاعدة قواعد، بدون LLM) | ⏳ قادمة |
+| 5 | ربط الواجهة بالخادم | ⏳ قادمة |
+| 6 | بذر البيانات الجزائرية (ولاية خنشلة) | ⏳ قادمة |
+| 7 | الأمان والخصوصية والامتثال القانوني | ⏳ قادمة |
+| 8 | الجودة والعمليات (CI/CD، الاختبارات) | ⏳ قادمة |
 
-## Project Structure
+---
 
-* `src/` - Contains the source code of the application
-* `public/` - Static assets
-* `index.html` - Main HTML file
-* `vite.config.js` - Vite configuration
-* `tailwind.config.js` - Tailwind CSS configuration
-* `postcss.config.js` - PostCSS configuration
-* `.eslintrc.js` - ESLint configuration([github.com][1])
+## الترخيص
 
-## Contributing
-
-Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
-
-## License
-
-This project is licensed under the MIT License.
+MIT — © 2025 Delin Smart Care

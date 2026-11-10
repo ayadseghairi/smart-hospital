@@ -1,5 +1,3 @@
-"use client"
-
 // pages/Home.jsx
 
 import "./Home.css"
@@ -8,6 +6,7 @@ import SearchBox from "../components/Sections/SearchBox"
 import SmartAssistant from "../components/Sections/SmartAssistant"
 import EmergencyAccess from "../components/Sections/EmergencyAccess"
 import HealthInstitutions from "../components/Sections/HealthInstitutions"
+import { BRAND } from "../lib/brand"
 
 const Home = () => {
   const navigate = useNavigate()
@@ -30,22 +29,28 @@ const Home = () => {
       <header className="bg-white shadow-lg">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4 space-x-reverse">
+            <div className="flex items-center gap-4">
               <img
                 src="/logo.jpg"
-                alt="Delin Smart Care Logo"
+                alt={BRAND.logoAlt}
                 className="w-12 h-12 rounded-full object-cover shadow-md"
               />
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">منصة دلين الصحية الذكية</h1>
-                <p className="text-gray-600">Delin Smart Care Platform</p>
+                <h1 className="text-2xl font-bold text-gray-800">{BRAND.nameAr}</h1>
+                <p className="text-gray-600">{BRAND.name}</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4 space-x-reverse">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            <div className="flex items-center gap-4">
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                onClick={() => navigate("/login")}
+              >
                 تسجيل الدخول
               </button>
-              <button className="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">
+              <button
+                className="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+                onClick={() => navigate("/register")}
+              >
                 إنشاء حساب
               </button>
             </div>
@@ -59,8 +64,8 @@ const Home = () => {
           <div className="flex items-center justify-center mb-6">
             <img
               src="/logo.jpg"
-              alt="Delin Smart Care"
-              className="w-16 h-16 rounded-full object-cover shadow-lg mr-4"
+              alt={BRAND.logoAlt}
+              className="w-16 h-16 rounded-full object-cover shadow-lg me-4"
             />
             <h2 className="text-4xl font-bold text-gray-800">
               مراحل استفادة المستخدم من الخدمات عبر المنصة الصحية الذكية
@@ -72,84 +77,44 @@ const Home = () => {
           </p>
 
           {/* User Journey Steps */}
-          <div className="bg-white rounded-xl shadow-lg p-8 text-right">
+          <div className="bg-white rounded-xl shadow-lg p-8 text-start">
             <h3 className="text-2xl font-semibold mb-6 text-gray-800">مراحل الرحلة الصحية</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <div className="flex items-start space-x-4 space-x-reverse">
-                  <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
-                    1
-                  </span>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">الولوج إلى المنصة</h4>
-                    <p className="text-gray-600">عبر الواجهة الرئيسية</p>
+                {[
+                  { label: "الولوج إلى المنصة", sub: "عبر الواجهة الرئيسية" },
+                  { label: "تصفح المؤسسة الصحية", sub: "الصفحة الخاصة بالمؤسسة" },
+                  { label: "الإدارة العامة", sub: "خدمات إدارية متكاملة" },
+                  { label: "قسم الأطباء", sub: "حجز المواعيد والاستشارات" },
+                ].map((step, i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+                      {i + 1}
+                    </span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">{step.label}</h4>
+                      <p className="text-gray-600">{step.sub}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start space-x-4 space-x-reverse">
-                  <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
-                    2
-                  </span>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">تصفح المؤسسة الصحية</h4>
-                    <p className="text-gray-600">الصفحة الخاصة بالمؤسسة</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4 space-x-reverse">
-                  <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
-                    3
-                  </span>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">الإدارة العامة</h4>
-                    <p className="text-gray-600">خدمات إدارية متكاملة</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4 space-x-reverse">
-                  <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
-                    4
-                  </span>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">قسم الأطباء</h4>
-                    <p className="text-gray-600">حجز المواعيد والاستشارات</p>
-                  </div>
-                </div>
+                ))}
               </div>
               <div className="space-y-4">
-                <div className="flex items-start space-x-4 space-x-reverse">
-                  <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
-                    5
-                  </span>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">التصوير الطبي</h4>
-                    <p className="text-gray-600">خدمات الأشعة والتصوير</p>
+                {[
+                  { label: "التصوير الطبي", sub: "خدمات الأشعة والتصوير" },
+                  { label: "الصيدلية", sub: "إدارة الأدوية والوصفات" },
+                  { label: "المخبر", sub: "التحاليل والفحوصات" },
+                  { label: "قسم التمريض", sub: "الرعاية التمريضية" },
+                ].map((step, i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+                      {i + 5}
+                    </span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">{step.label}</h4>
+                      <p className="text-gray-600">{step.sub}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start space-x-4 space-x-reverse">
-                  <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
-                    6
-                  </span>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">الصيدلية</h4>
-                    <p className="text-gray-600">إدارة الأدوية والوصفات</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4 space-x-reverse">
-                  <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
-                    7
-                  </span>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">المخبر</h4>
-                    <p className="text-gray-600">التحاليل والفحوصات</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4 space-x-reverse">
-                  <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
-                    8
-                  </span>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">قسم التمريض</h4>
-                    <p className="text-gray-600">الرعاية التمريضية</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -177,8 +142,8 @@ const Home = () => {
             </div>
             <div className="text-center">
               <i className="bx bx-time text-5xl text-blue-500 mb-4"></i>
-              <h4 className="text-xl font-semibold mb-2">متاح 24/7</h4>
-              <p className="text-gray-600">خدمات متاحة على مدار الساعة لجميع المستخدمين</p>
+              <h4 className="text-xl font-semibold mb-2">خدمة مستمرة</h4>
+              <p className="text-gray-600">منصة رقمية متاحة دائماً لجميع المستخدمين</p>
             </div>
             <div className="text-center">
               <i className="bx bx-mobile-alt text-5xl text-purple-500 mb-4"></i>
@@ -193,10 +158,12 @@ const Home = () => {
       <footer className="bg-gray-800 text-white py-8 mt-12">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center mb-4">
-            <img src="/logo.jpg" alt="Delin Smart Care" className="w-8 h-8 rounded-full object-cover mr-2" />
-            <span className="font-semibold">منصة دلين الصحية الذكية</span>
+            <img src="/logo.jpg" alt={BRAND.logoAlt} className="w-8 h-8 rounded-full object-cover me-2" />
+            <span className="font-semibold">{BRAND.nameAr}</span>
           </div>
-          <p>&copy; 2024 منصة دلين الصحية الذكية. جميع الحقوق محفوظة.</p>
+          <p>
+            &copy; {new Date().getFullYear()} {BRAND.nameAr}. جميع الحقوق محفوظة.
+          </p>
         </div>
       </footer>
     </div>

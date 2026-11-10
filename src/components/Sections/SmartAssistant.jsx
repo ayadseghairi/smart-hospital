@@ -1,5 +1,3 @@
-"use client"
-
 // components/Sections/SmartAssistant.jsx
 
 import { useState } from "react"

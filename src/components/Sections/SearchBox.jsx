@@ -1,5 +1,3 @@
-"use client"
-
 // components/Sections/SearchBox.jsx
 
 import { useState } from "react"
