@@ -1,0 +1,48 @@
+[
+  {
+    "_comment": "═══════════════════════════════════════════════════════════════════",
+    "_note": "Khenchela institutions template — fill in real data from official sources",
+    "_source": "Ministry of Health directory / Khenchela Health Directorate / field verification",
+    "_rules": [
+      "NEVER invent names, phones, addresses or coordinates.",
+      "Leave unknown fields as null — the institution stays DRAFT until verified.",
+      "Set status to VERIFIED only after owner confirms the data and fills sourceNote.",
+      "Only VERIFIED institutions are visible to the public.",
+      "Remove _comment, _note, _source and _rules before production."
+    ]
+  },
+  {
+    "type": "EPH",
+    "sector": "PUBLIC",
+    "nameAr": "المستشفى العام لخنشلة",
+    "nameFr": "Hôpital Général de Khenchela",
+    "communeIndex": 0,
+    "addressAr": null,
+    "addressFr": null,
+    "lat": null,
+    "lng": null,
+    "phone": null,
+    "email": null,
+    "website": null,
+    "hasEmergency24h": true,
+    "status": "DRAFT",
+    "sourceNote": null
+  },
+  {
+    "type": "EPSP",
+    "sector": "PUBLIC",
+    "nameAr": "المؤسسة العمومية للصحة الجوارية خنشلة",
+    "nameFr": "EPSP Khenchela",
+    "communeIndex": 0,
+    "addressAr": null,
+    "addressFr": null,
+    "lat": null,
+    "lng": null,
+    "phone": null,
+    "email": null,
+    "website": null,
+    "hasEmergency24h": false,
+    "status": "DRAFT",
+    "sourceNote": null
+  }
+]

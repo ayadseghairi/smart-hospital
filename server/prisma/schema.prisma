@@ -1,0 +1,468 @@
+// This is your Prisma schema file for Delin Smart Care
+// Algerian health platform — Khenchela Province (wilaya 40)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+//  Enums
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  PATIENT
+  DOCTOR
+  INSTITUTION_ADMIN
+  SUPER_ADMIN
+}
+
+enum Lang {
+  ar
+  fr
+}
+
+enum InstitutionType {
+  CHU
+  EPH
+  EPSP
+  EHS
+  POLYCLINIC
+  PRIVATE_CLINIC
+  PRIVATE_LAB
+  PRIVATE_IMAGING
+  PHARMACY
+}
+
+enum InstitutionSector {
+  PUBLIC
+  PRIVATE
+}
+
+enum InstitutionStatus {
+  DRAFT
+  VERIFIED
+  SUSPENDED
+}
+
+enum DoctorStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum ServiceCategory {
+  IMAGING
+  LAB
+  NURSING
+  PHARMACY
+}
+
+enum ReviewTarget {
+  DOCTOR
+  INSTITUTION
+}
+
+enum TokenType {
+  EMAIL_VERIFY
+  PASSWORD_RESET
+  INVITE
+}
+
+enum NotificationKind {
+  EMAIL_VERIFY
+  PASSWORD_RESET
+  INVITE
+  APPT_REQUESTED
+  APPT_CONFIRMED
+  APPT_CANCELLED
+  APPT_RESCHEDULED
+  APPT_REMINDER
+  DOCTOR_NEW_REQUEST
+  DOCTOR_DAILY_DIGEST
+}
+
+enum NotificationChannel {
+  EMAIL
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  FAILED
+  SKIPPED
+}
+
+// ─────────────────────────────────────────────
+//  Geography
+// ─────────────────────────────────────────────
+
+model Wilaya {
+  id      Int     @id @default(autoincrement())
+  code    Int     @unique // 1..58
+  nameAr  String
+  nameFr  String
+  communes Commune[]
+}
+
+model Commune {
+  id           Int          @id @default(autoincrement())
+  wilayaId     Int
+  nameAr       String
+  nameFr       String
+  wilaya       Wilaya       @relation(fields: [wilayaId], references: [id])
+  institutions Institution[]
+
+  @@index([wilayaId])
+}
+
+// ─────────────────────────────────────────────
+//  Users
+// ─────────────────────────────────────────────
+
+model User {
+  id                String    @id @default(cuid())
+  role              UserRole
+  // At least one of phone / email must be set (enforced at app level)
+  phone             String?   @unique  // stored as +213XXXXXXXXX
+  email             String?   @unique  // stored lowercase
+  emailVerifiedAt   DateTime?
+  passwordHash      String?            // null until invited user sets password
+  fullName          String
+  preferredLang     Lang      @default(ar)
+  isActive          Boolean   @default(true)
+  mustSetPassword   Boolean   @default(false)
+  createdById       String?            // super admin who created this account
+  consentAcceptedAt DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  createdBy        User?         @relation("UserCreatedBy", fields: [createdById], references: [id])
+  createdUsers     User[]        @relation("UserCreatedBy")
+
+  doctor           Doctor?
+  institutionAdmins InstitutionAdmin[]
+  patientAppointments Appointment[] @relation("PatientAppointments")
+  authTokens       AuthToken[]
+  refreshTokens    RefreshToken[]
+  notificationPreference NotificationPreference?
+  notifications    Notification[]
+  auditLogs        AuditLog[]
+  reviews          Review[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+}
+
+// ─────────────────────────────────────────────
+//  Institutions
+// ─────────────────────────────────────────────
+
+model Institution {
+  id              String            @id @default(cuid())
+  type            InstitutionType
+  sector          InstitutionSector
+  nameAr          String
+  nameFr          String
+  addressAr       String?
+  addressFr       String?
+  communeId       Int
+  lat             Float?
+  lng             Float?
+  phone           String?
+  email           String?
+  website         String?
+  hasEmergency24h Boolean           @default(false)
+  openingHours    Json?             // { sunday: {from:"08:00", to:"16:00"}, ... }
+  status          InstitutionStatus @default(DRAFT)
+  sourceNote      String?           // where data was verified from, and when
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  commune           Commune           @relation(fields: [communeId], references: [id])
+  admins            InstitutionAdmin[]
+  doctorLinks       DoctorInstitution[]
+  services          Service[]
+  appointments      Appointment[]
+  reviews           Review[]
+
+  @@index([communeId])
+  @@index([status])
+  @@index([sector])
+  @@index([type])
+  @@index([hasEmergency24h])
+}
+
+model InstitutionAdmin {
+  id            String      @id @default(cuid())
+  userId        String
+  institutionId String
+  createdAt     DateTime    @default(now())
+
+  user          User        @relation(fields: [userId], references: [id])
+  institution   Institution @relation(fields: [institutionId], references: [id])
+
+  @@unique([userId, institutionId])
+  @@index([institutionId])
+}
+
+// ─────────────────────────────────────────────
+//  Specialties & Doctors
+// ─────────────────────────────────────────────
+
+model Specialty {
+  id     String  @id @default(cuid())
+  nameAr String
+  nameFr String
+  slug   String  @unique
+  doctors Doctor[]
+}
+
+model Doctor {
+  id                  String       @id @default(cuid())
+  userId              String       @unique
+  specialtyId         String
+  bioAr               String?
+  bioFr               String?
+  yearsExperience     Int?
+  languages           String[]     // e.g. ["ar", "fr"]
+  consultationFeeDZD  Int?
+  status              DoctorStatus @default(ACTIVE)
+  licenseNumber       String?      // visible to SUPER_ADMIN only
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  user                User              @relation(fields: [userId], references: [id])
+  specialty           Specialty         @relation(fields: [specialtyId], references: [id])
+  institutionLinks    DoctorInstitution[]
+  availabilityRules   AvailabilityRule[]
+  appointments        Appointment[]     @relation("DoctorAppointments")
+  reviews             Review[]
+
+  @@index([specialtyId])
+  @@index([status])
+}
+
+model DoctorInstitution {
+  id            String      @id @default(cuid())
+  doctorId      String
+  institutionId String
+  isPrimary     Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+
+  doctor        Doctor      @relation(fields: [doctorId], references: [id])
+  institution   Institution @relation(fields: [institutionId], references: [id])
+
+  @@unique([doctorId, institutionId])
+  @@index([institutionId])
+}
+
+// ─────────────────────────────────────────────
+//  Services (Imaging, Lab, Nursing, Pharmacy)
+// ─────────────────────────────────────────────
+
+model Service {
+  id            String          @id @default(cuid())
+  institutionId String
+  category      ServiceCategory
+  nameAr        String
+  nameFr        String
+  priceDZD      Int?
+  durationMin   Int?
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  institution   Institution     @relation(fields: [institutionId], references: [id])
+  appointments  Appointment[]
+
+  @@index([institutionId])
+  @@index([category])
+  @@index([isActive])
+}
+
+// ─────────────────────────────────────────────
+//  Availability
+// ─────────────────────────────────────────────
+
+model AvailabilityRule {
+  id            String   @id @default(cuid())
+  doctorId      String
+  institutionId String?
+  // 0=Sunday, 1=Monday, ..., 6=Saturday (Sunday-Thursday is typical in Algeria)
+  weekday       Int      // 0..6
+  fromTime      String   // "HH:mm" in Africa/Algiers
+  toTime        String   // "HH:mm" in Africa/Algiers
+  slotMinutes   Int      @default(30)
+  createdAt     DateTime @default(now())
+
+  doctor        Doctor   @relation(fields: [doctorId], references: [id])
+
+  @@index([doctorId])
+}
+
+// ─────────────────────────────────────────────
+//  Appointments
+// ─────────────────────────────────────────────
+
+model Appointment {
+  id              String            @id @default(cuid())
+  patientId       String
+  doctorId        String?
+  serviceId       String?
+  institutionId   String
+  startsAt        DateTime          // UTC
+  endsAt          DateTime          // UTC
+  status          AppointmentStatus @default(PENDING)
+  reason          String?           // short, optional — no diagnosis
+  cancelledById   String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  patient         User        @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctor          Doctor?     @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  service         Service?    @relation(fields: [serviceId], references: [id])
+  institution     Institution @relation(fields: [institutionId], references: [id])
+  review          Review?
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([institutionId])
+  @@index([status])
+  @@index([startsAt])
+  // Prevent double-booking the same doctor slot (excluding cancelled/no-show)
+  // Enforced at application level with a transaction + index
+}
+
+// ─────────────────────────────────────────────
+//  Reviews (only after COMPLETED appointment)
+// ─────────────────────────────────────────────
+
+model Review {
+  id              String        @id @default(cuid())
+  patientId       String
+  doctorId        String?
+  institutionId   String?
+  appointmentId   String        @unique
+  rating          Int           // 1..5
+  comment         String?
+  createdAt       DateTime      @default(now())
+
+  patient         User          @relation(fields: [patientId], references: [id])
+  doctor          Doctor?       @relation(fields: [doctorId], references: [id])
+  institution     Institution?  @relation(fields: [institutionId], references: [id])
+  appointment     Appointment   @relation(fields: [appointmentId], references: [id])
+
+  @@index([doctorId])
+  @@index([institutionId])
+}
+
+// ─────────────────────────────────────────────
+//  Auth tokens
+// ─────────────────────────────────────────────
+
+model AuthToken {
+  id          String     @id @default(cuid())
+  userId      String
+  type        TokenType
+  tokenHash   String     @unique  // SHA-256 of the raw 32-byte token
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime   @default(now())
+
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+}
+
+model RefreshToken {
+  id          String    @id @default(cuid())
+  userId      String
+  tokenHash   String    @unique  // SHA-256 of the raw token
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────
+//  Notifications
+// ─────────────────────────────────────────────
+
+model NotificationPreference {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  emailReminders Boolean  @default(true)
+  emailDigest    Boolean  @default(true)
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id               String              @id @default(cuid())
+  userId           String
+  kind             NotificationKind
+  channel          NotificationChannel @default(EMAIL)
+  locale           Lang                @default(ar)
+  payload          Json                // no medical details
+  idempotencyKey   String              @unique
+  status           NotificationStatus  @default(QUEUED)
+  attempts         Int                 @default(0)
+  lastError        String?
+  sentAt           DateTime?
+  createdAt        DateTime            @default(now())
+
+  user             User                @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([kind])
+}
+
+// ─────────────────────────────────────────────
+//  Audit log
+// ─────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String   // e.g. "CREATE_INSTITUTION", "DEACTIVATE_USER"
+  entity     String?
+  entityId   String?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────
+//  Emergency numbers
+// ─────────────────────────────────────────────
+
+model EmergencyNumber {
+  id      String @id @default(cuid())
+  labelAr String
+  labelFr String
+  number  String
+  scope   String @default("national") // "national" | "wilaya:<code>"
+}
