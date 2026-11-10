@@ -14,7 +14,7 @@ on:
 
 jobs:
   server:
-    name: TypeScript · Tests
+    name: TypeScript · Tests · Audit
     runs-on: ubuntu-latest
 
     services:
@@ -76,3 +76,8 @@ jobs:
       - name: Run tests
         run: npx vitest run
         working-directory: server
+
+      - name: Audit dependencies (high severity)
+        run: npm audit --audit-level=high
+        working-directory: server
+        continue-on-error: true   # warn but don't fail until lockfile is clean

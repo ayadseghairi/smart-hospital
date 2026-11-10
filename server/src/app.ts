@@ -15,6 +15,7 @@ import { searchRouter } from "./modules/search/routes"
 import { emergencyRouter } from "./modules/emergency/routes"
 import { assistantRouter } from "./modules/assistant/routes"
 import { adminRouter } from "./modules/admin/routes"
+import { institutionAdminRouter } from "./modules/institutions/adminRoutes"
 import { notificationsRouter } from "./modules/notifications/routes"
 import { contactRouter } from "./modules/contact/routes"
 
@@ -26,16 +27,47 @@ import { availabilityRuleSchema, updateDoctorProfileSchema } from "./modules/doc
 import * as doctorCtrl from "./modules/doctors/controller"
 import * as apptCtrl from "./modules/appointments/controller"
 import { updateAppointmentStatusSchema } from "./modules/appointments/schema"
+import { requestId } from "./middleware/requestId"
 
 const app = express()
+
+// ── Trust proxy (required for correct IP detection behind nginx/load balancer)
+app.set("trust proxy", 1)
 
 // ── Security ───────────────────────────────────────────────────────────────
 app.use(
   helmet({
-    // Allow token links in email to work without referrer leaking the token
     referrerPolicy: { policy: "no-referrer" },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https://*.tile.openstreetmap.org"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'none'"],
+        frameSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+        baseUri: ["'none'"],
+        formAction: ["'self'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+    },
   })
 )
+
+// Permissions-Policy
+app.use((_req, res, next) => {
+  res.setHeader("Permissions-Policy", "geolocation=(self), camera=(), microphone=(), payment=()")
+  next()
+})
 
 app.use(
   cors({
@@ -43,6 +75,9 @@ app.use(
     credentials: true, // allow httpOnly cookies
   })
 )
+
+// ── Request ID ────────────────────────────────────────────────────────────
+app.use(requestId)
 
 // ── Body parsing ───────────────────────────────────────────────────────────
 app.use(express.json({ limit: "1mb" }))
@@ -105,8 +140,11 @@ doctorRouter.patch(
 )
 
 const api = express.Router()
+// Cache-Control: no-store on all authenticated API responses
+api.use((_req, res, next) => { res.setHeader("Cache-Control", "no-store"); next() })
 api.use("/auth", authRouter)
 api.use("/institutions", institutionsRouter)
+api.use("/institution", institutionAdminRouter)
 api.use("/doctors", doctorsRouter)
 api.use("/appointments", appointmentsRouter)
 api.use("/doctor", doctorRouter)

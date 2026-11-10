@@ -36,6 +36,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # needed for gitleaks full history scan
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -54,3 +56,13 @@ jobs:
 
       - name: Check no fake data
         run: npm run check:no-fake-data
+
+      - name: Audit dependencies (high severity)
+        run: npm audit --audit-level=high
+        continue-on-error: true   # warn but don't fail until lockfile is clean
+
+      - name: Gitleaks — scan for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true   # warn until baseline is established

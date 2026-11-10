@@ -26,7 +26,7 @@ export default function ProtectedRoute({ children, roles = [] }) {
   }
 
   if (roles.length > 0 && !roles.includes(user.role)) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/forbidden" replace />
   }
 
   return children

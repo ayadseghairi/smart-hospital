@@ -9,6 +9,7 @@ import { mail } from "../../lib/mail"
 import { env } from "../../config/env"
 import { createError } from "../../middleware/errorHandler"
 import { buildVerifyEmailEmail, buildPasswordResetEmail } from "../notifications/templates"
+import { stripBidi } from "../../lib/sanitize"
 import type { RegisterInput, LoginInput } from "./schema"
 
 // Generic auth response to never reveal whether an account exists
@@ -36,7 +37,7 @@ export async function registerPatient(input: RegisterInput) {
       phone: normalizedPhone,
       email: normalizedEmail,
       passwordHash,
-      fullName: input.fullName,
+      fullName: stripBidi(input.fullName),
       preferredLang: input.preferredLang,
       consentAcceptedAt: new Date(),
     },

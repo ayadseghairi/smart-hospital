@@ -482,7 +482,66 @@
     "optional": "facultatif",
     "unknown": "Inconnu",
     "loadError": "Une erreur s'est produite lors du chargement.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "error": "Une erreur s'est produite. Veuillez réessayer.",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "all": "Tous",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "close": "Fermer"
+  },
+  "instAdmin": {
+    "dashboard": {
+      "title": "Tableau de bord",
+      "editProfile": "Modifier le profil de l'établissement",
+      "manageServices": "Gérer les services",
+      "appointments": "Rendez-vous",
+      "doctors": "Médecins",
+      "stats": "Statistiques des rendez-vous",
+      "activeServices": "Services actifs"
+    },
+    "profile": {
+      "title": "Profil de l'établissement",
+      "saved": "Modifications enregistrées avec succès.",
+      "emergency24h": "Urgences 24h/24",
+      "openingHours": "Heures d'ouverture (JSON)",
+      "openingHoursHint": "Format JSON : { \"sunday\": {\"from\":\"08:00\",\"to\":\"16:00\"} }",
+      "invalidJson": "Format JSON invalide dans les heures d'ouverture."
+    },
+    "services": {
+      "title": "Services",
+      "addService": "Ajouter un service",
+      "created": "Service créé avec succès.",
+      "deactivated": "Service désactivé.",
+      "deactivate": "Désactiver",
+      "empty": "Aucun service dans cette catégorie.",
+      "price": "Prix (DA)",
+      "priceOptional": "facultatif",
+      "priceUnknown": "Non défini",
+      "duration": "Durée (min)",
+      "min": "min",
+      "category": {
+        "imaging": "Imagerie médicale",
+        "lab": "Laboratoire",
+        "nursing": "Soins infirmiers",
+        "pharmacy": "Pharmacie"
+      }
+    },
+    "appointments": {
+      "title": "Rendez-vous",
+      "empty": "Aucun rendez-vous."
+    },
+    "doctors": {
+      "title": "Médecins",
+      "hint": "Médecins liés à votre établissement.",
+      "addHint": "Pour ajouter un médecin, contactez l'administrateur de la plateforme via :",
+      "empty": "Aucun médecin lié à votre établissement pour l'instant."
+    }
   },
   "langSwitch": {
     "label": "العربية"
@@ -797,5 +856,28 @@
     "noTrackingTitle": "Aucun suivi ni analytique",
     "noTrackingDesc": "Nous n'utilisons pas Google Analytics ni aucun système de suivi commercial. Vos données ne sont ni vendues ni partagées.",
     "moreInfo": "Pour plus d'informations, consultez notre"
+  },
+  "error": {
+    "forbidden": {
+      "title": "Accès refusé",
+      "message": "Vous n'avez pas les droits nécessaires pour accéder à cette page."
+    },
+    "expiredLink": {
+      "title": "Lien expiré",
+      "message": "Ce lien est expiré ou invalide. Veuillez en demander un nouveau.",
+      "tryAgain": "Réessayer"
+    },
+    "tooManyRequests": {
+      "title": "Trop de tentatives",
+      "message": "Vous avez dépassé le nombre de tentatives autorisées. Veuillez patienter avant de réessayer."
+    },
+    "deactivated": {
+      "title": "Compte désactivé",
+      "message": "Votre compte est désactivé. Contactez-nous pour obtenir de l'aide."
+    },
+    "boundary": {
+      "title": "Une erreur inattendue s'est produite",
+      "retry": "Réessayer"
+    }
   }
 }

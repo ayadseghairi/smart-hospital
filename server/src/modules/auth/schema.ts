@@ -7,7 +7,7 @@ export const registerSchema = z
   .object({
     phone: z.string().regex(ALGERIAN_PHONE, "Invalid Algerian phone number").optional(),
     email: z.string().email("Invalid email").optional(),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: z.string().min(10, "Password must be at least 10 characters").max(128, "Password must not exceed 128 characters"),
     fullName: z.string().min(2).max(100),
     preferredLang: z.enum(["ar", "fr"]).default("ar"),
     consent: z.literal(true, { errorMap: () => ({ message: "You must accept the terms" }) }),
@@ -38,12 +38,12 @@ export const forgotPasswordSchema = z.object({
 
 export const resetPasswordSchema = z.object({
   token: z.string().min(1),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(10, "Password must be at least 10 characters").max(128),
 })
 
 export const acceptInviteSchema = z.object({
   token: z.string().min(1),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(10, "Password must be at least 10 characters").max(128),
 })
 
 export const updateProfileSchema = z.object({

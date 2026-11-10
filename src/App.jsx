@@ -7,6 +7,7 @@ import { useAuth } from "./contexts/AuthContext"
 import ProtectedRoute from "./components/ProtectedRoute"
 import GuestOnly from "./components/GuestOnly"
 import UnverifiedEmailBanner from "./components/UnverifiedEmailBanner"
+import ErrorBoundary from "./components/ErrorBoundary"
 
 // Route-level code splitting
 const Home = lazy(() => import("./pages/Home"))
@@ -45,6 +46,20 @@ const SuperAdminDashboardPage = lazy(() => import("./pages/SuperAdminDashboardPa
 const PrivacyPage = lazy(() => import("./pages/PrivacyPage"))
 const TermsPage = lazy(() => import("./pages/TermsPage"))
 
+// Institution admin area
+const InstitutionDashboardPage = lazy(() => import("./pages/institution/InstitutionDashboardPage"))
+const InstitutionProfilePage = lazy(() => import("./pages/institution/InstitutionProfilePage"))
+const InstitutionServicesPage = lazy(() => import("./pages/institution/InstitutionServicesPage"))
+const InstitutionAppointmentsPage = lazy(() => import("./pages/institution/InstitutionAppointmentsPage"))
+const InstitutionDoctorsPage = lazy(() => import("./pages/institution/InstitutionDoctorsPage"))
+const InstitutionSecurityPage = lazy(() => import("./pages/institution/InstitutionSecurityPage"))
+
+// Error pages
+const ForbiddenPage = lazy(() => import("./pages/ForbiddenPage"))
+const ExpiredLinkPage = lazy(() => import("./pages/ExpiredLinkPage"))
+const TooManyRequestsPage = lazy(() => import("./pages/TooManyRequestsPage"))
+const AccountDeactivatedPage = lazy(() => import("./pages/AccountDeactivatedPage"))
+
 // Public pages
 const AboutPage = lazy(() => import("./pages/AboutPage"))
 const ContactPage = lazy(() => import("./pages/ContactPage"))
@@ -64,7 +79,7 @@ function AppRoutes() {
   }, [])
 
   return (
-    <>
+    <ErrorBoundary>
       <UnverifiedEmailBanner />
       <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><span className="text-gray-400 text-sm animate-pulse">…</span></div>}>
         <Routes>
@@ -181,10 +196,35 @@ function AppRoutes() {
             </ProtectedRoute>
           } />
 
-          {/* Institution admin */}
+          {/* Institution admin area */}
           <Route path="/institution" element={
             <ProtectedRoute roles={["INSTITUTION_ADMIN"]}>
-              <MyAccountPage />
+              <InstitutionDashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/institution/profile" element={
+            <ProtectedRoute roles={["INSTITUTION_ADMIN"]}>
+              <InstitutionProfilePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/institution/services" element={
+            <ProtectedRoute roles={["INSTITUTION_ADMIN"]}>
+              <InstitutionServicesPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/institution/appointments" element={
+            <ProtectedRoute roles={["INSTITUTION_ADMIN"]}>
+              <InstitutionAppointmentsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/institution/doctors" element={
+            <ProtectedRoute roles={["INSTITUTION_ADMIN"]}>
+              <InstitutionDoctorsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/institution/security" element={
+            <ProtectedRoute roles={["INSTITUTION_ADMIN"]}>
+              <InstitutionSecurityPage />
             </ProtectedRoute>
           } />
 
@@ -195,11 +235,17 @@ function AppRoutes() {
             </ProtectedRoute>
           } />
 
+          {/* Error pages */}
+          <Route path="/forbidden" element={<ForbiddenPage />} />
+          <Route path="/expired-link" element={<ExpiredLinkPage />} />
+          <Route path="/too-many-requests" element={<TooManyRequestsPage />} />
+          <Route path="/account-deactivated" element={<AccountDeactivatedPage />} />
+
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
-    </>
+    </ErrorBoundary>
   )
 }
 

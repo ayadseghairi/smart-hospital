@@ -54,6 +54,7 @@ export async function apiFetch(path, options = {}, lang = "ar") {
   const headers = {
     "Content-Type": "application/json",
     "Accept-Language": lang,
+    "X-Requested-With": "XMLHttpRequest",
     ...(options.headers ?? {}),
   }
   if (accessToken) {
