@@ -67,6 +67,9 @@ const ForInstitutionsPage = lazy(() => import("./pages/ForInstitutionsPage"))
 const CookiesPage = lazy(() => import("./pages/CookiesPage"))
 const InstitutionsPage = lazy(() => import("./pages/InstitutionsPage"))
 const DoctorsPage = lazy(() => import("./pages/DoctorsPage"))
+const SpecialtiesPage = lazy(() => import("./pages/SpecialtiesPage"))
+const HowItWorksPage = lazy(() => import("./pages/HowItWorksPage"))
+const FaqPage = lazy(() => import("./pages/FaqPage"))
 
 function AppRoutes() {
   const { loadSession } = useAuth()
@@ -93,6 +96,9 @@ function AppRoutes() {
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/faq" element={<FaqPage />} />
+          <Route path="/specialties" element={<SpecialtiesPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/for-institutions" element={<ForInstitutionsPage />} />
           <Route path="/cookies" element={<CookiesPage />} />

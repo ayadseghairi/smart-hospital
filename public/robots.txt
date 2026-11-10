@@ -1,0 +1,43 @@
+User-agent: *
+Allow: /
+Allow: /institutions
+Allow: /institutions/
+Allow: /doctors
+Allow: /doctors/
+Allow: /specialties
+Allow: /specialties/
+Allow: /emergency
+Allow: /search
+Allow: /about
+Allow: /contact
+Allow: /for-institutions
+Allow: /privacy
+Allow: /terms
+Allow: /cookies
+Allow: /how-it-works
+Allow: /faq
+Allow: /map
+
+# Block all authenticated/private areas
+Disallow: /account
+Disallow: /account/
+Disallow: /doctor
+Disallow: /doctor/
+Disallow: /institution
+Disallow: /institution/
+Disallow: /admin
+Disallow: /admin/
+
+# Block auth flows
+Disallow: /login
+Disallow: /register
+Disallow: /verify-email
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /accept-invite
+Disallow: /check-inbox
+Disallow: /my-account
+Disallow: /my-appointments
+Disallow: /appointment
+
+Sitemap: https://delinsmartcare.dz/sitemap.xml
