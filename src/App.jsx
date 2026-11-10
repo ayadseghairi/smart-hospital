@@ -5,6 +5,7 @@ import "./App.css"
 // Eagerly loaded — tiny and needed for first paint
 import { useAuth } from "./contexts/AuthContext"
 import ProtectedRoute from "./components/ProtectedRoute"
+import GuestOnly from "./components/GuestOnly"
 import UnverifiedEmailBanner from "./components/UnverifiedEmailBanner"
 
 // Route-level code splitting
@@ -31,6 +32,14 @@ const SuperAdminDashboardPage = lazy(() => import("./pages/SuperAdminDashboardPa
 const PrivacyPage = lazy(() => import("./pages/PrivacyPage"))
 const TermsPage = lazy(() => import("./pages/TermsPage"))
 
+// New public pages
+const AboutPage = lazy(() => import("./pages/AboutPage"))
+const ContactPage = lazy(() => import("./pages/ContactPage"))
+const ForInstitutionsPage = lazy(() => import("./pages/ForInstitutionsPage"))
+const CookiesPage = lazy(() => import("./pages/CookiesPage"))
+const InstitutionsPage = lazy(() => import("./pages/InstitutionsPage"))
+const DoctorsPage = lazy(() => import("./pages/DoctorsPage"))
+
 function AppRoutes() {
   const { loadSession } = useAuth()
   useLocation() // keep router context active without using the value
@@ -56,9 +65,17 @@ function AppRoutes() {
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
 
-          {/* Auth flows */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          {/* New public pages */}
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/for-institutions" element={<ForInstitutionsPage />} />
+          <Route path="/cookies" element={<CookiesPage />} />
+          <Route path="/institutions" element={<InstitutionsPage />} />
+          <Route path="/doctors" element={<DoctorsPage />} />
+
+          {/* Auth flows — guests only */}
+          <Route path="/login" element={<GuestOnly><LoginPage /></GuestOnly>} />
+          <Route path="/register" element={<GuestOnly><RegisterPage /></GuestOnly>} />
           <Route path="/check-inbox" element={<CheckInboxPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -69,6 +86,11 @@ function AppRoutes() {
           <Route path="/my-appointments" element={
             <ProtectedRoute roles={["PATIENT"]}>
               <MyAppointmentsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/account" element={
+            <ProtectedRoute roles={["PATIENT"]}>
+              <MyAccountPage />
             </ProtectedRoute>
           } />
           <Route path="/my-account" element={
@@ -83,9 +105,21 @@ function AppRoutes() {
           } />
 
           {/* Doctor dashboard */}
+          <Route path="/doctor" element={
+            <ProtectedRoute roles={["DOCTOR"]}>
+              <DoctorDashboardPage />
+            </ProtectedRoute>
+          } />
           <Route path="/doctor-dashboard" element={
             <ProtectedRoute roles={["DOCTOR"]}>
               <DoctorDashboardPage />
+            </ProtectedRoute>
+          } />
+
+          {/* Institution admin */}
+          <Route path="/institution" element={
+            <ProtectedRoute roles={["INSTITUTION_ADMIN"]}>
+              <MyAccountPage />
             </ProtectedRoute>
           } />
 

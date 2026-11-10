@@ -80,6 +80,18 @@ enum TokenType {
   INVITE
 }
 
+enum ContactMessageStatus {
+  NEW
+  READ
+  REPLIED
+}
+
+enum ContactMessageType {
+  GENERAL
+  INSTITUTION_REQUEST
+  REPORT_ERROR
+}
+
 enum NotificationKind {
   EMAIL_VERIFY
   PASSWORD_RESET
@@ -465,4 +477,23 @@ model EmergencyNumber {
   labelFr String
   number  String
   scope   String @default("national") // "national" | "wilaya:<code>"
+}
+
+// ─────────────────────────────────────────────
+//  Contact messages
+// ─────────────────────────────────────────────
+
+model ContactMessage {
+  id        String               @id @default(cuid())
+  fullName  String
+  email     String
+  phone     String?
+  message   String               @db.VarChar(1000)
+  type      ContactMessageType   @default(GENERAL)
+  status    ContactMessageStatus @default(NEW)
+  createdAt DateTime             @default(now())
+
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
 }

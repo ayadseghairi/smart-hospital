@@ -5,12 +5,24 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { useAuth } from "../contexts/AuthContext"
 
+const ROLE_HOME = {
+  PATIENT: "/account",
+  DOCTOR: "/doctor",
+  INSTITUTION_ADMIN: "/institution",
+  SUPER_ADMIN: "/admin",
+}
+
+/** Returns true if `path` is a safe same-origin relative path. */
+function isSafeReturnTo(path) {
+  if (typeof path !== "string") return false
+  return path === "/" || /^\/[^/\\]/.test(path)
+}
+
 export default function LoginPage() {
   const { t } = useTranslation()
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = location.state?.from?.pathname ?? "/"
 
   const [form, setForm] = useState({ identifier: "", password: "" })
   const [loading, setLoading] = useState(false)
@@ -25,8 +37,19 @@ export default function LoginPage() {
         password: form.password,
         ...(isPhone ? { phone: form.identifier } : { email: form.identifier }),
       }
-      await login(credentials)
-      navigate(from, { replace: true })
+      const data = await login(credentials)
+      const role = data?.user?.role ?? null
+
+      // Check returnTo query param first (safe path only)
+      const params = new URLSearchParams(location.search)
+      const returnTo = params.get("returnTo")
+      if (returnTo && isSafeReturnTo(returnTo)) {
+        navigate(returnTo, { replace: true })
+        return
+      }
+
+      // Fall back to role-based home
+      navigate(ROLE_HOME[role] ?? "/", { replace: true })
     } catch (err) {
       toast.error(err.message === "Invalid credentials"
         ? t("auth.invalidCredentials")

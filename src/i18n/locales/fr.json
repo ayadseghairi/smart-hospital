@@ -16,10 +16,18 @@
     "myAccount": "Mon compte",
     "doctorDashboard": "Tableau du médecin",
     "adminPanel": "Administration",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "institutions": "Établissements de santé",
+    "doctors": "Médecins",
+    "about": "À propos",
+    "contact": "Contact",
+    "mainNav": "Navigation principale",
+    "footerNav": "Liens du pied de page"
   },
   "footer": {
-    "rights": "Tous droits réservés."
+    "rights": "Tous droits réservés.",
+    "forInstitutions": "Pour les établissements",
+    "cookies": "Politique des cookies"
   },
   "home": {
     "journeyTitle": "Étapes d'utilisation de la plateforme de santé intelligente",
@@ -135,10 +143,28 @@
     "subtitle": "Parcourez les hôpitaux et accédez à leurs pages dédiées",
     "showList": "Afficher les établissements",
     "hideList": "Masquer la liste",
+    "listTitle": "Établissements de santé",
+    "listSubtitle": "Établissements vérifiés dans la wilaya de Khenchela et alentours",
+    "filterSearch": "Recherche",
+    "filterSearchPlaceholder": "Rechercher un établissement...",
+    "filterSector": "Secteur",
+    "filterEmergency": "Urgences 24h seulement",
+    "emergency24h": "Urgences 24/7",
+    "viewPage": "Voir la page",
+    "emptyList": "Aucun établissement vérifié pour l'instant",
     "types": {
       "all": "Tous les établissements",
       "PUBLIC": "Public",
-      "PRIVATE": "Privé"
+      "PRIVATE": "Privé",
+      "CHU": "CHU",
+      "EPH": "EPH",
+      "EPSP": "EPSP",
+      "EHS": "EHS",
+      "POLYCLINIC": "Polyclinique",
+      "PRIVATE_CLINIC": "Clinique privée",
+      "PRIVATE_LAB": "Laboratoire privé",
+      "PRIVATE_IMAGING": "Centre d'imagerie privé",
+      "PHARMACY": "Pharmacie"
     },
     "empty": "Aucun établissement de santé vérifié dans votre région pour l'instant.",
     "emptyHint": "Les établissements apparaîtront ici après vérification.",
@@ -162,8 +188,16 @@
   },
   "doctors": {
     "title": "Médecins",
-    "empty": "Aucun médecin enregistré dans cet établissement pour l'instant.",
+    "listTitle": "Médecins",
+    "listSubtitle": "Médecins enregistrés et disponibles pour la prise de rendez-vous",
+    "filterSearch": "Recherche",
+    "filterSearchPlaceholder": "Rechercher un médecin ou une spécialité...",
+    "filterSpecialty": "Spécialité",
+    "allSpecialties": "Toutes les spécialités",
+    "emptyList": "Aucun médecin vérifié pour l'instant.",
+    "fee": "Honoraires",
     "viewProfile": "Voir le profil",
+    "empty": "Aucun médecin enregistré dans cet établissement pour l'instant.",
     "bookAppointment": "Prendre rendez-vous",
     "profile": "Profil médecin",
     "profileTitle": "Profil médecin",
@@ -548,5 +582,87 @@
   },
   "doctor": {
     "dashboard": "Tableau du médecin"
+  },
+  "about": {
+    "mission": "Delin Smart Care est une plateforme numérique qui vise à connecter les patients aux établissements de santé et aux médecins de la wilaya de Khenchela, en Algérie, de manière sécurisée, transparente et basée sur des données réelles et vérifiées.",
+    "valuesTitle": "Nos valeurs",
+    "values": {
+      "realData": {
+        "title": "Données réelles",
+        "desc": "Aucun contenu fictif — chaque information est vérifiée auprès de sources officielles ou de l'établissement directement."
+      },
+      "patientFirst": {
+        "title": "Le patient d'abord",
+        "desc": "La plateforme est conçue en plaçant l'expérience et l'accessibilité du patient au premier plan."
+      },
+      "privacy": {
+        "title": "Respect de la vie privée",
+        "desc": "Nous ne vendons ni ne partageons les données des utilisateurs avec des tiers sans consentement."
+      }
+    },
+    "ctaTitle": "Vous souhaitez nous contacter ou devenir partenaire ?",
+    "contactUs": "Nous contacter",
+    "partnerWithUs": "Rejoindre comme établissement"
+  },
+  "contact": {
+    "title": "Nous contacter",
+    "subtitle": "Nous répondons à tous les messages dans un délai de 2 à 3 jours ouvrables.",
+    "fullName": "Nom complet",
+    "email": "Adresse e-mail",
+    "phone": "Numéro de téléphone",
+    "message": "Message",
+    "submit": "Envoyer le message",
+    "successTitle": "Message envoyé",
+    "successDesc": "Merci de votre contact. Notre équipe vous répondra dans 2 à 3 jours ouvrables."
+  },
+  "forInstitutions": {
+    "title": "Pour les établissements de santé",
+    "intro": "Delin Smart Care invite les établissements de santé de la wilaya de Khenchela à rejoindre la plateforme afin d'améliorer l'accès des patients à leurs services.",
+    "adminOnlyNotice": "Les comptes des établissements et des médecins sont créés directement par l'administrateur de la plateforme après vérification des informations. Il n'existe pas d'inscription en libre-service.",
+    "whyTitle": "Pourquoi s'associer à Delin Smart Care ?",
+    "benefits": {
+      "appointments": {
+        "title": "Gestion des rendez-vous",
+        "desc": "Un système numérique pour accepter, confirmer et gérer facilement les réservations."
+      },
+      "notifications": {
+        "title": "Notifications patients",
+        "desc": "Notification automatique des patients lors de la confirmation ou de la modification d'un rendez-vous par e-mail."
+      },
+      "directory": {
+        "title": "Annuaire des services",
+        "desc": "Une page dédiée à votre établissement présentant ses services et médecins au public."
+      }
+    },
+    "form": {
+      "title": "Demande d'adhésion",
+      "institutionName": "Nom de l'établissement",
+      "contactPerson": "Nom du responsable",
+      "wilaya": "Wilaya",
+      "selectWilaya": "Sélectionner la wilaya",
+      "submit": "Envoyer la demande"
+    }
+  },
+  "cookies": {
+    "title": "Politique des cookies",
+    "lastUpdated": "Dernière mise à jour : 2025",
+    "intro": "Nous utilisons uniquement des cookies essentiels au fonctionnement de la plateforme. Nous n'utilisons pas de cookies de suivi ou d'analyse sans votre consentement.",
+    "whatWeUseTitle": "Ce que nous utilisons",
+    "essential": "Essentiel",
+    "items": {
+      "session": {
+        "name": "Jeton de session",
+        "key": "delin_rt",
+        "purpose": "Cookie httpOnly utilisé pour l'authentification et le renouvellement de session. Supprimé à la déconnexion."
+      },
+      "lang": {
+        "name": "Préférence de langue",
+        "key": "delinLang",
+        "purpose": "Mémorise votre langue préférée (arabe ou français) entre les visites."
+      }
+    },
+    "noTrackingTitle": "Aucun suivi ni analytique",
+    "noTrackingDesc": "Nous n'utilisons pas Google Analytics ni aucun système de suivi commercial. Vos données ne sont ni vendues ni partagées.",
+    "moreInfo": "Pour plus d'informations, consultez notre"
   }
 }

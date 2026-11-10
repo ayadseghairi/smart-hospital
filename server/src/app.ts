@@ -16,6 +16,7 @@ import { emergencyRouter } from "./modules/emergency/routes"
 import { assistantRouter } from "./modules/assistant/routes"
 import { adminRouter } from "./modules/admin/routes"
 import { notificationsRouter } from "./modules/notifications/routes"
+import { contactRouter } from "./modules/contact/routes"
 
 const app = express()
 
@@ -60,6 +61,7 @@ api.use("/emergency", emergencyRouter)
 api.use("/assistant", assistantRouter)
 api.use("/admin", adminRouter)
 api.use("/notifications", notificationsRouter)
+api.use("/contact", contactRouter)
 
 app.use("/api/v1", api)
 
