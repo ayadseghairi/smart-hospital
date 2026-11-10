@@ -2,10 +2,12 @@
 
 import { useState } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 const AppointmentBooking = () => {
   const { doctorId } = useParams()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [step, setStep] = useState(1)
   const [bookingData, setBookingData] = useState({
     appointmentType: "consultation",
@@ -25,7 +27,6 @@ const AppointmentBooking = () => {
   const [bookingSubmitted, setBookingSubmitted] = useState(false)
 
   // Phase 5: replace with real API call: GET /doctors/:doctorId
-  // No mock data — show honest not-found state
   const doctor = null
   const loading = false
 
@@ -57,20 +58,16 @@ const AppointmentBooking = () => {
 
   const handleConfirmBooking = () => {
     // Phase 5: POST /appointments
-    // Until then, show a coming-soon message without alert()
     setBookingSubmitted(true)
     navigate(`/doctor/${doctorId}`)
   }
 
   if (loading) {
     return (
-      <div
-        className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center"
-        dir="rtl"
-      >
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <i className="bx bx-loader-alt animate-spin text-4xl text-blue-600 mb-4"></i>
-          <p className="text-gray-600">جاري تحميل بيانات الحجز...</p>
+          <p className="text-gray-600">{t("appointment.loading")}</p>
         </div>
       </div>
     )
@@ -78,45 +75,39 @@ const AppointmentBooking = () => {
 
   if (!doctor) {
     return (
-      <div
-        className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center"
-        dir="rtl"
-      >
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <i className="bx bx-error text-6xl text-gray-400 mb-4"></i>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">الطبيب غير موجود</h2>
-          <p className="text-gray-500 mb-4">لم يتم العثور على هذا الطبيب. لا يمكن إتمام الحجز.</p>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">{t("appointment.doctorNotFound")}</h2>
+          <p className="text-gray-500 mb-4">{t("appointment.doctorNotFoundDesc")}</p>
           <Link to="/" className="text-blue-600 hover:text-blue-800">
-            العودة للرئيسية
+            {t("nav.backHome")}
           </Link>
         </div>
       </div>
     )
   }
 
+  const appointmentTypeKeys = ["consultation", "followup", "checkup"]
+
   const renderStep = () => {
     switch (step) {
       case 1: {
-        const appointmentTypes = [
-          { id: "consultation", name: "استشارة أولى" },
-          { id: "followup", name: "متابعة" },
-          { id: "checkup", name: "فحص دوري" },
-        ]
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">اختر نوع الموعد</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("appointment.chooseType")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {appointmentTypes.map((type) => (
+              {appointmentTypeKeys.map((typeKey) => (
                 <div
-                  key={type.id}
-                  onClick={() => handleInputChange("appointmentType", type.id)}
+                  key={typeKey}
+                  onClick={() => handleInputChange("appointmentType", typeKey)}
                   className={`p-6 rounded-lg border-2 cursor-pointer transition-colors ${
-                    bookingData.appointmentType === type.id
+                    bookingData.appointmentType === typeKey
                       ? "border-blue-500 bg-blue-50"
                       : "border-gray-200 hover:border-blue-300"
                   }`}
                 >
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">{type.name}</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">{t(`appointment.types.${typeKey}`)}</h3>
                 </div>
               ))}
             </div>
@@ -127,11 +118,11 @@ const AppointmentBooking = () => {
       case 2:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">اختر التاريخ والوقت</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("appointment.chooseDateTime")}</h2>
             <p className="text-gray-500 text-center py-8">
               <i className="bx bx-calendar text-4xl mb-2 text-gray-300"></i>
               <br />
-              المواعيد المتاحة ستظهر هنا بعد ربط النظام بالخادم.
+              {t("appointment.noSlotsHint")}
             </p>
           </div>
         )
@@ -139,55 +130,55 @@ const AppointmentBooking = () => {
       case 3:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">معلومات المريض</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("appointment.patientInfo")}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">الاسم الكامل *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("appointment.fullName")}</label>
                 <input
                   type="text"
                   value={bookingData.patientInfo.name}
                   onChange={(e) => handleInputChange("patientInfo.name", e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="أدخل الاسم الكامل"
+                  placeholder={t("appointment.fullNamePlaceholder")}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">رقم الهاتف *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("appointment.phone")}</label>
                 <input
                   type="tel"
                   value={bookingData.patientInfo.phone}
                   onChange={(e) => handleInputChange("patientInfo.phone", e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="05xxxxxxxx"
+                  placeholder={t("appointment.phonePlaceholder")}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("appointment.email")}</label>
                 <input
                   type="email"
                   value={bookingData.patientInfo.email}
                   onChange={(e) => handleInputChange("patientInfo.email", e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="example@email.com"
+                  placeholder={t("appointment.emailPlaceholder")}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">العمر *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("appointment.age")}</label>
                 <input
                   type="number"
                   value={bookingData.patientInfo.age}
                   onChange={(e) => handleInputChange("patientInfo.age", e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="العمر"
+                  placeholder={t("appointment.agePlaceholder")}
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">الجنس *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("appointment.gender")}</label>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2">
                     <input
@@ -196,7 +187,7 @@ const AppointmentBooking = () => {
                       checked={bookingData.patientInfo.gender === "male"}
                       onChange={(e) => handleInputChange("patientInfo.gender", e.target.value)}
                     />
-                    ذكر
+                    {t("appointment.male")}
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -205,44 +196,43 @@ const AppointmentBooking = () => {
                       checked={bookingData.patientInfo.gender === "female"}
                       onChange={(e) => handleInputChange("patientInfo.gender", e.target.value)}
                     />
-                    أنثى
+                    {t("appointment.female")}
                   </label>
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">سبب الزيارة (اختياري)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t("appointment.reason")}</label>
               <textarea
                 value={bookingData.symptoms}
                 onChange={(e) => handleInputChange("symptoms", e.target.value)}
                 rows={3}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="وصف مختصر للسبب..."
+                placeholder={t("appointment.reasonPlaceholder")}
               />
             </div>
           </div>
         )
 
       case 4: {
-        const selectedTypeName = { consultation: "استشارة أولى", followup: "متابعة", checkup: "فحص دوري" }[bookingData.appointmentType]
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">تأكيد الحجز</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("appointment.confirmTitle")}</h2>
 
             <div className="bg-gray-50 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">ملخص الموعد</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">{t("appointment.summary")}</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">نوع الموعد:</span>
-                  <span className="font-medium">{selectedTypeName}</span>
+                  <span className="text-gray-600">{t("appointment.appointmentType")}</span>
+                  <span className="font-medium">{t(`appointment.types.${bookingData.appointmentType}`)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">الاسم:</span>
+                  <span className="text-gray-600">{t("appointment.nameLabel")}</span>
                   <span className="font-medium">{bookingData.patientInfo.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">الهاتف:</span>
+                  <span className="text-gray-600">{t("appointment.phoneLabel")}</span>
                   <span className="font-medium">{bookingData.patientInfo.phone}</span>
                 </div>
               </div>
@@ -252,8 +242,8 @@ const AppointmentBooking = () => {
               <div className="flex items-start gap-3">
                 <i className="bx bx-info-circle text-blue-500 text-xl mt-1"></i>
                 <div className="text-sm text-blue-800">
-                  <p className="font-semibold mb-1">ملاحظة مهمة:</p>
-                  <p>سيكون الحجز بانتظار تأكيد الطبيب أو المؤسسة الصحية. ستصلك رسالة تأكيد على بريدك الإلكتروني.</p>
+                  <p className="font-semibold mb-1">{t("appointment.notice")}</p>
+                  <p>{t("appointment.noticeText")}</p>
                 </div>
               </div>
             </div>
@@ -267,7 +257,7 @@ const AppointmentBooking = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <header className="bg-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
@@ -277,10 +267,10 @@ const AppointmentBooking = () => {
               className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
             >
               <i className="bx bx-arrow-back text-xl"></i>
-              <span>العودة لملف الطبيب</span>
+              <span>{t("nav.backToDoctorProfile")}</span>
             </Link>
             <div className="text-center">
-              <h1 className="text-xl font-bold text-gray-800">حجز موعد</h1>
+              <h1 className="text-xl font-bold text-gray-800">{t("appointment.title")}</h1>
             </div>
             <div></div>
           </div>
@@ -291,15 +281,13 @@ const AppointmentBooking = () => {
         {bookingSubmitted ? (
           <div className="bg-white rounded-xl shadow-lg p-8 text-center">
             <i className="bx bx-check-circle text-6xl text-green-500 mb-4"></i>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">تم إرسال طلب الحجز</h2>
-            <p className="text-gray-600 mb-6">
-              طلبك في انتظار موافقة الطبيب أو المؤسسة الصحية. سيتم إخطارك عبر البريد الإلكتروني.
-            </p>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{t("appointment.submitted")}</h2>
+            <p className="text-gray-600 mb-6">{t("appointment.submittedDesc")}</p>
             <Link
               to="/"
               className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              العودة للرئيسية
+              {t("nav.backHome")}
             </Link>
           </div>
         ) : (
@@ -323,10 +311,10 @@ const AppointmentBooking = () => {
                 ))}
               </div>
               <div className="flex justify-between mt-2 text-sm text-gray-600">
-                <span>نوع الموعد</span>
-                <span>التاريخ والوقت</span>
-                <span>معلومات المريض</span>
-                <span>تأكيد الحجز</span>
+                <span>{t("appointment.steps.type")}</span>
+                <span>{t("appointment.steps.datetime")}</span>
+                <span>{t("appointment.steps.info")}</span>
+                <span>{t("appointment.steps.confirm")}</span>
               </div>
             </div>
 
@@ -341,29 +329,29 @@ const AppointmentBooking = () => {
                   disabled={step === 1}
                   className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  السابق
+                  {t("appointment.prev")}
                 </button>
 
                 {step < 4 ? (
                   <button
                     onClick={handleNextStep}
                     disabled={
-                      (step === 3 &&
-                        (!bookingData.patientInfo.name ||
-                          !bookingData.patientInfo.phone ||
-                          !bookingData.patientInfo.age ||
-                          !bookingData.patientInfo.gender))
+                      step === 3 &&
+                      (!bookingData.patientInfo.name ||
+                        !bookingData.patientInfo.phone ||
+                        !bookingData.patientInfo.age ||
+                        !bookingData.patientInfo.gender)
                     }
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    التالي
+                    {t("appointment.next")}
                   </button>
                 ) : (
                   <button
                     onClick={handleConfirmBooking}
                     className="px-8 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
                   >
-                    تأكيد الحجز
+                    {t("appointment.confirm")}
                   </button>
                 )}
               </div>

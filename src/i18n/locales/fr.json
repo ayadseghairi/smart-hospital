@@ -1,0 +1,408 @@
+{
+  "brand": {
+    "nameAr": "منصة دلين الصحية الذكية",
+    "name": "Delin Smart Care",
+    "logoAlt": "Logo de Delin Smart Care",
+    "tagline": "Plateforme de santé numérique pour la wilaya de Khenchela"
+  },
+  "nav": {
+    "login": "Connexion",
+    "register": "Créer un compte",
+    "backHome": "Retour à l'accueil",
+    "backToDoctorProfile": "Retour au profil du médecin",
+    "search": "Recherche",
+    "emergency": "Urgences"
+  },
+  "footer": {
+    "rights": "Tous droits réservés."
+  },
+  "home": {
+    "journeyTitle": "Étapes d'utilisation de la plateforme de santé intelligente",
+    "journeySubtitle": "L'utilisateur passe par des étapes intégrées et séquentielles pour bénéficier des services de santé numériques offerts par la plateforme intelligente.",
+    "journeyStepsTitle": "Parcours de santé",
+    "steps": {
+      "platform": { "label": "Accès à la plateforme", "sub": "Via l'interface principale" },
+      "browse": { "label": "Parcourir l'établissement", "sub": "Page dédiée à l'établissement" },
+      "admin": { "label": "Administration générale", "sub": "Services administratifs intégrés" },
+      "doctors": { "label": "Section médecins", "sub": "Prise de rendez-vous et consultations" },
+      "imaging": { "label": "Imagerie médicale", "sub": "Services de radiologie et d'imagerie" },
+      "pharmacy": { "label": "Pharmacie", "sub": "Gestion des médicaments et prescriptions" },
+      "lab": { "label": "Laboratoire", "sub": "Analyses et examens médicaux" },
+      "nurses": { "label": "Section infirmiers", "sub": "Soins infirmiers" }
+    },
+    "mainServicesTitle": "Services principaux",
+    "featuresTitle": "Fonctionnalités de la plateforme",
+    "features": {
+      "security": { "title": "Sécurité des données", "desc": "Protection avancée de toutes les données médicales et personnelles" },
+      "availability": { "title": "Service continu", "desc": "Plateforme numérique disponible en permanence pour tous les utilisateurs" },
+      "mobile": { "title": "Compatible mobile", "desc": "Design responsive fonctionnant sur tous les appareils" }
+    }
+  },
+  "search": {
+    "title": "Recherche intelligente",
+    "subtitle": "Saisissez un nom, un mot-clé ou une source pour un accès rapide",
+    "placeholder": "Rechercher un médecin, hôpital ou service...",
+    "button": "Rechercher",
+    "searching": "Recherche en cours...",
+    "canSearch": "Vous pouvez rechercher :",
+    "tags": {
+      "doctors": "Médecins",
+      "hospitals": "Hôpitaux",
+      "specialties": "Spécialités"
+    },
+    "resultsTitle": "Résultats de recherche",
+    "searchingFor": "Recherche de :",
+    "filters": {
+      "all": "Tous les résultats",
+      "doctor": "Médecins",
+      "institution": "Établissements",
+      "service": "Services"
+    },
+    "loading": "Recherche en cours...",
+    "found": "{{count}} résultat(s) trouvé(s)",
+    "noResults": "Aucun résultat trouvé",
+    "startSearch": "Recherchez un médecin ou un établissement",
+    "tryOther": "Essayez avec d'autres mots ou vérifiez l'orthographe",
+    "enterQuery": "Saisissez un terme de recherche pour commencer"
+  },
+  "assistant": {
+    "title": "Assistant intelligent",
+    "subtitle": "Posez vos questions ou demandez des conseils instantanés",
+    "startChat": "Démarrer la conversation",
+    "commonQuestions": "Questions fréquentes :",
+    "quickQuestions": {
+      "book": "Comment prendre un rendez-vous ?",
+      "services": "Quels services sont disponibles ?",
+      "nearest": "Où trouver l'hôpital le plus proche ?",
+      "doctor": "Comment contacter un médecin ?"
+    },
+    "greeting": "Bonjour ! Comment puis-je vous aider aujourd'hui ?",
+    "placeholder": "Écrivez votre message...",
+    "closeChat": "Fermer la conversation",
+    "thanks": "Merci pour votre question. Je vais vous aider bientôt...",
+    "excellent": "C'est une excellente question ! Laissez-moi vous aider..."
+  },
+  "emergency": {
+    "title": "Urgences",
+    "subtitle": "Accès rapide aux services d'urgence sans rendez-vous",
+    "accessButton": "Accéder aux services d'urgence",
+    "civil": "Protection civile",
+    "police": "Police nationale",
+    "gendarmerie": "Gendarmerie nationale",
+    "samu": "SAMU (aide médicale urgente)",
+    "pageTitle": "Cas d'urgence",
+    "nationalNumbers": "Numéros d'urgence nationaux",
+    "call14": "Appeler le 14",
+    "alert": "Avertissement :",
+    "alertText": "En cas d'urgence critique, appelez immédiatement le <strong>14 (Protection civile)</strong> ou le <strong>115 (SAMU)</strong> ou rendez-vous à l'hôpital le plus proche.",
+    "nearestHospitals": "Hôpitaux les plus proches",
+    "locationLabel": "Localisation :",
+    "locationPlaceholder": "Saisissez votre position ou autorisez la géolocalisation",
+    "noLocation": "Aucune donnée de localisation disponible.",
+    "geoHint": "Localisez-vous pour voir les établissements les plus proches.",
+    "geoNotSupported": "Ce navigateur ne prend pas en charge la géolocalisation.",
+    "geoDenied": "Impossible de déterminer votre position. Autorisez le navigateur à accéder à votre localisation.",
+    "callButton": "Appeler",
+    "emergencyTypeTitle": "Type d'urgence",
+    "emergencyTypeHint": "Précisez le type d'urgence et informez le secouriste lors de l'appel :",
+    "types": {
+      "heart": "Cardiaque",
+      "accident": "Accident",
+      "breathing": "Difficultés respiratoires",
+      "stroke": "AVC",
+      "bleeding": "Hémorragie",
+      "poisoning": "Intoxication",
+      "burns": "Brûlures",
+      "other": "Autre"
+    },
+    "tipsTitle": "Conseils d'urgence",
+    "tips": {
+      "heart": { "title": "Crise cardiaque", "desc": "Appelez le 115 ou le 14 immédiatement. Gardez la victime au calme." },
+      "breathing": { "title": "Difficultés respiratoires", "desc": "Aidez la personne à s'asseoir, desserrez les vêtements serrés." },
+      "bleeding": { "title": "Hémorragie", "desc": "Appuyez directement sur la plaie avec un tissu propre." }
+    }
+  },
+  "institutions": {
+    "title": "Liste des établissements de santé",
+    "subtitle": "Parcourez les hôpitaux et accédez à leurs pages dédiées",
+    "showList": "Afficher les établissements",
+    "hideList": "Masquer la liste",
+    "types": {
+      "all": "Tous les établissements",
+      "PUBLIC": "Public",
+      "PRIVATE": "Privé"
+    },
+    "empty": "Aucun établissement de santé vérifié dans votre région pour l'instant.",
+    "emptyHint": "Les établissements apparaîtront ici après vérification.",
+    "notFound": "Établissement introuvable",
+    "notFoundDesc": "Cet établissement de santé n'a pas été trouvé.",
+    "loading": "Chargement des données de l'établissement...",
+    "digitalPlatform": "Plateforme numérique",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "quickServices": "Services rapides",
+    "bookAppointment": "Prendre rendez-vous",
+    "sections": {
+      "overview": "Vue d'ensemble",
+      "admin": "Administration",
+      "doctors": "Médecins",
+      "imaging": "Imagerie médicale",
+      "pharmacy": "Pharmacie",
+      "lab": "Laboratoire",
+      "nurses": "Infirmiers"
+    }
+  },
+  "doctors": {
+    "title": "Médecins",
+    "empty": "Aucun médecin enregistré dans cet établissement pour l'instant.",
+    "viewProfile": "Voir le profil",
+    "bookAppointment": "Prendre rendez-vous",
+    "profileTitle": "Profil médecin",
+    "loading": "Chargement du profil médecin...",
+    "notFound": "Médecin introuvable",
+    "notFoundDesc": "Le profil de ce médecin n'a pas été trouvé.",
+    "tabs": {
+      "overview": "Vue d'ensemble",
+      "schedule": "Disponibilités",
+      "reviews": "Avis",
+      "contact": "Contact"
+    },
+    "bioTitle": "À propos du médecin",
+    "noSlots": "Aucune disponibilité pour le moment.",
+    "noReviews": "Aucun avis pour l'instant.",
+    "noContact": "Coordonnées non disponibles.",
+    "bookBtn": "Prendre rendez-vous",
+    "consultFee": "Frais de consultation"
+  },
+  "appointment": {
+    "title": "Prise de rendez-vous",
+    "loading": "Chargement des données...",
+    "doctorNotFound": "Médecin introuvable",
+    "doctorNotFoundDesc": "Ce médecin est introuvable. La prise de rendez-vous est impossible.",
+    "steps": {
+      "type": "Type de RDV",
+      "datetime": "Date et heure",
+      "info": "Informations patient",
+      "confirm": "Confirmation"
+    },
+    "chooseType": "Choisissez le type de rendez-vous",
+    "types": {
+      "consultation": "Première consultation",
+      "followup": "Suivi",
+      "checkup": "Bilan périodique"
+    },
+    "chooseDateTime": "Choisissez la date et l'heure",
+    "noSlotsHint": "Les créneaux disponibles apparaîtront ici après connexion au serveur.",
+    "patientInfo": "Informations du patient",
+    "fullName": "Nom complet *",
+    "fullNamePlaceholder": "Saisissez le nom complet",
+    "phone": "Numéro de téléphone *",
+    "phonePlaceholder": "05xxxxxxxx",
+    "email": "Adresse e-mail",
+    "emailPlaceholder": "example@email.com",
+    "age": "Âge *",
+    "agePlaceholder": "Âge",
+    "gender": "Sexe *",
+    "male": "Masculin",
+    "female": "Féminin",
+    "reason": "Motif de la visite (facultatif)",
+    "reasonPlaceholder": "Description brève du motif...",
+    "confirmTitle": "Confirmation",
+    "summary": "Récapitulatif du rendez-vous",
+    "appointmentType": "Type de RDV :",
+    "nameLabel": "Nom :",
+    "phoneLabel": "Téléphone :",
+    "notice": "Remarque importante :",
+    "noticeText": "Le rendez-vous sera en attente de confirmation par le médecin ou l'établissement. Vous recevrez un e-mail de confirmation.",
+    "submitted": "Demande de rendez-vous envoyée",
+    "submittedDesc": "Votre demande est en attente d'approbation. Vous serez notifié par e-mail.",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "confirm": "Confirmer le rendez-vous"
+  },
+  "admin": {
+    "title": "Tableau de bord",
+    "subtitle": "Gestion des rendez-vous et services de l'établissement",
+    "tabs": {
+      "overview": "Aperçu des rendez-vous",
+      "general": "Administration générale"
+    },
+    "appointmentsStats": "Statistiques des rendez-vous",
+    "statsPlaceholder": "Les statistiques apparaîtront ici depuis la base de données.",
+    "appointmentsManage": "Gestion des rendez-vous",
+    "appointmentsPlaceholder": "La liste des rendez-vous apparaîtra ici.",
+    "reports": "Rapports",
+    "dailyReport": "Rapport quotidien",
+    "monthlyReport": "Rapport mensuel",
+    "annualReport": "Rapport annuel",
+    "comingSoon": "Les modules comptabilité et RH sont en cours de développement.",
+    "defaultSection": "Sélectionnez une section ci-dessus"
+  },
+  "imaging": {
+    "title": "Service d'imagerie médicale",
+    "subtitle": "Services d'imagerie et de radiologie avancés",
+    "servicesTitle": "Services d'imagerie disponibles",
+    "equipmentTitle": "Équipements et matériel",
+    "equipment": {
+      "modern": { "title": "Équipements modernes", "desc": "Dernières technologies d'imagerie médicale" },
+      "safety": { "title": "Normes de sécurité", "desc": "Les plus hauts standards de sûreté" },
+      "staff": { "title": "Équipe spécialisée", "desc": "Radiologues certifiés" },
+      "fast": { "title": "Résultats rapides", "desc": "Rapports sous 24 heures" },
+      "digital": { "title": "Archivage numérique", "desc": "Sauvegarde électronique des images et rapports" },
+      "consult": { "title": "Consultation immédiate", "desc": "Revue des résultats avec le médecin" }
+    },
+    "price": "Prix :",
+    "priceUnknown": "Prix non défini",
+    "duration": "Durée :",
+    "preparation": "Préparation :",
+    "bookBtn": "Prendre rendez-vous",
+    "unavailable": "Indisponible",
+    "modalTitle": "Rendez-vous",
+    "service": "Service :",
+    "fullName": "Nom complet :",
+    "fullNamePlaceholder": "Saisissez le nom complet",
+    "phone": "Téléphone :",
+    "phonePlaceholder": "05xxxxxxxx",
+    "preferredDate": "Date souhaitée :",
+    "chooseDate": "Choisir la date",
+    "notes": "Remarques supplémentaires :",
+    "notesPlaceholder": "Instructions ou remarques particulières...",
+    "prepInstructions": "Instructions de préparation :",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "services": {
+      "xray": { "name": "Radiographie", "desc": "Examen radiologique des os et de la poitrine", "duration": "15 min", "prep": "Aucune préparation requise" },
+      "ct": { "name": "Scanner (TDM)", "desc": "Examen tomodensitométrique détaillé", "duration": "30 min", "prep": "Jeûne 4 heures avant l'examen" },
+      "mri": { "name": "IRM", "desc": "Imagerie par résonance magnétique", "duration": "45 min", "prep": "Retirer tous les objets métalliques" },
+      "ultrasound": { "name": "Échographie", "desc": "Examen par ultrasons", "duration": "20 min", "prep": "Vessie pleine pour l'abdomen" },
+      "mammography": { "name": "Mammographie", "desc": "Dépistage du cancer du sein", "duration": "25 min", "prep": "Éviter le déodorant" },
+      "nuclear": { "name": "Médecine nucléaire", "desc": "Examens spécialisés en médecine nucléaire", "duration": "60 min", "prep": "Instructions spécifiques selon l'examen" }
+    }
+  },
+  "lab": {
+    "title": "Laboratoire",
+    "subtitle": "Analyses médicales et examens de laboratoire",
+    "tabs": {
+      "tests": "Analyses",
+      "results": "Résultats",
+      "services": "Services"
+    },
+    "price": "Prix :",
+    "priceUnknown": "Prix non défini",
+    "resultDuration": "Délai de résultat :",
+    "preparation": "Préparation :",
+    "includes": "Comprend :",
+    "more": "+{{count}} de plus",
+    "bookBtn": "Réserver l'analyse",
+    "resultsTitle": "Résultats d'analyses",
+    "noResults": "Aucun résultat disponible pour l'instant.",
+    "modalTitle": "Réserver une analyse",
+    "test": "Analyse :",
+    "fullName": "Nom complet :",
+    "fullNamePlaceholder": "Saisissez le nom complet",
+    "phone": "Téléphone :",
+    "phonePlaceholder": "05xxxxxxxx",
+    "preferredDate": "Date souhaitée :",
+    "prepInstructions": "Instructions de préparation :",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "services": {
+      "homeVisit": { "title": "Prélèvement à domicile", "desc": "Prélèvement d'échantillons à domicile", "btn": "Demander une visite" },
+      "fastResults": { "title": "Résultats rapides", "desc": "Résultats en quelques heures", "btn": "Service express" },
+      "consult": { "title": "Consultation des résultats", "desc": "Explication des résultats avec un spécialiste", "btn": "Demander une consultation" }
+    },
+    "categories": {
+      "all": "Toutes les analyses",
+      "blood": "Analyses sanguines",
+      "kidney": "Fonction rénale",
+      "liver": "Fonction hépatique",
+      "diabetes": "Diabète",
+      "lipids": "Lipides",
+      "hormones": "Hormones"
+    },
+    "tests": {
+      "blood": { "name": "Numération formule sanguine (NFS)", "desc": "Analyse complète des composants sanguins", "duration": "2-4 heures", "prep": "Jeûne 8-12 heures" },
+      "kidney": { "name": "Bilan rénal", "desc": "Évaluation de la fonction rénale", "duration": "4-6 heures", "prep": "Jeûne 8 heures" },
+      "liver": { "name": "Bilan hépatique", "desc": "Évaluation de la fonction hépatique", "duration": "4-6 heures", "prep": "Jeûne 10-12 heures" },
+      "diabetes": { "name": "HbA1c (sucre cumulé)", "desc": "Mesure de la glycémie moyenne sur 3 mois", "duration": "2-3 heures", "prep": "Aucun jeûne requis" },
+      "lipids": { "name": "Bilan lipidique", "desc": "Mesure du taux de lipides sanguins", "duration": "3-4 heures", "prep": "Jeûne 12 heures" },
+      "hormones": { "name": "Bilan thyroïdien", "desc": "Évaluation de la fonction thyroïdienne", "duration": "6-8 heures", "prep": "Aucun jeûne requis" }
+    }
+  },
+  "nurses": {
+    "title": "Service infirmiers",
+    "subtitle": "Services de soins infirmiers spécialisés",
+    "tabs": {
+      "services": "Services",
+      "nurses": "Infirmiers",
+      "appointments": "Rendez-vous"
+    },
+    "price": "Prix :",
+    "priceUnknown": "Prix non disponible",
+    "duration": "Durée :",
+    "includes": "Comprend :",
+    "more": "+{{count}} de plus",
+    "requestService": "Demander le service",
+    "noNurses": "Aucun infirmier enregistré dans cet établissement pour l'instant.",
+    "experience": "Expérience :",
+    "certifications": "Certifications :",
+    "requestServiceBtn": "Demander",
+    "profileBtn": "Profil",
+    "noAppointments": "Aucun rendez-vous enregistré pour l'instant.",
+    "appointmentsTitle": "Rendez-vous réservés",
+    "detailsBtn": "Détails",
+    "cancelBtn": "Annuler",
+    "requestModal": "Demande de service",
+    "serviceLabel": "Service :",
+    "priceLabel": "Prix :",
+    "durationLabel": "Durée :",
+    "serviceIncludes": "Le service comprend :",
+    "fullName": "Nom complet :",
+    "fullNamePlaceholder": "Saisissez le nom complet",
+    "phone": "Téléphone :",
+    "phonePlaceholder": "05xxxxxxxx",
+    "addressLabel": "Adresse (pour les services à domicile) :",
+    "addressPlaceholder": "Saisissez l'adresse complète...",
+    "preferredDatetime": "Date et heure souhaitées :",
+    "notes": "Remarques supplémentaires :",
+    "notesPlaceholder": "Instructions ou remarques particulières...",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "services": {
+      "homecare": { "name": "Soins à domicile", "desc": "Services infirmiers à domicile", "duration": "8-24 heures" },
+      "wounds": { "name": "Soins des plaies", "desc": "Nettoyage et pansement des plaies", "duration": "30-45 min" },
+      "injections": { "name": "Injections médicales", "desc": "Administration d'injections et médicaments", "duration": "15-20 min" },
+      "vitals": { "name": "Mesure des constantes vitales", "desc": "Surveillance de l'état de santé", "duration": "15-30 min" },
+      "physio": { "name": "Kinésithérapie", "desc": "Exercices et traitement physique", "duration": "45-60 min" },
+      "elderly": { "name": "Soins aux personnes âgées", "desc": "Prise en charge complète des personnes âgées", "duration": "12-24 heures" }
+    }
+  },
+  "pharmacy": {
+    "title": "Pharmacie",
+    "subtitle": "Gestion des médicaments et prescriptions",
+    "hint": "Les données de stock et les ordonnances seront disponibles après connexion de la pharmacie à la plateforme.",
+    "noMeds": "Aucun médicament enregistré pour l'instant",
+    "noMedsHint": "La liste des médicaments disponibles apparaîtra après la mise à jour des données.",
+    "noPrescrip": "Aucune ordonnance enregistrée pour l'instant",
+    "noPrescripHint": "Les ordonnances apparaîtront après la finalisation des rendez-vous sur la plateforme.",
+    "servicesTitle": "Services disponibles",
+    "services": {
+      "consult": { "title": "Conseil pharmaceutique", "desc": "Consultation avec le pharmacien" },
+      "delivery": { "title": "Livraison à domicile", "desc": "Livraison des médicaments à domicile" },
+      "renew": { "title": "Renouvellement d'ordonnance", "desc": "Renouvellement des ordonnances expirées" }
+    }
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "desc": "Désolé, la page que vous recherchez n'existe pas ou a été déplacée.",
+    "backBtn": "Retour à l'accueil"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "backHome": "Retour à l'accueil",
+    "currency": "DA"
+  },
+  "langSwitch": {
+    "label": "العربية"
+  }
+}

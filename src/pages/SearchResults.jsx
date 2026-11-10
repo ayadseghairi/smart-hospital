@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useSearchParams, Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import "./SearchResults.css"
 
 const SearchResults = () => {
@@ -10,6 +11,7 @@ const SearchResults = () => {
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState("all")
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (!query.trim()) {
@@ -18,25 +20,19 @@ const SearchResults = () => {
     }
     // Phase 5: replace with real API call: GET /search?q=
     setLoading(true)
-    // Simulate brief loading then show empty (no mock data)
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       setResults([])
       setLoading(false)
     }, 300)
-    return () => clearTimeout(t)
+    return () => clearTimeout(timer)
   }, [query])
 
   const filteredResults = filter === "all" ? results : results.filter((result) => result.type === filter)
 
-  const filters = [
-    { id: "all", name: "جميع النتائج", icon: "bx-search" },
-    { id: "doctor", name: "أطباء", icon: "bx-user-plus" },
-    { id: "institution", name: "مستشفيات", icon: "bx-hospital" },
-    { id: "service", name: "خدمات", icon: "bx-cog" },
-  ]
+  const filterKeys = ["all", "doctor", "institution", "service"]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <header className="bg-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
@@ -46,11 +42,11 @@ const SearchResults = () => {
               className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
             >
               <i className="bx bx-arrow-back text-xl"></i>
-              <span>العودة للرئيسية</span>
+              <span>{t("nav.backHome")}</span>
             </Link>
             <div className="text-center">
-              <h1 className="text-xl font-bold text-gray-800">نتائج البحث</h1>
-              {query && <p className="text-gray-600">البحث عن: &ldquo;{query}&rdquo;</p>}
+              <h1 className="text-xl font-bold text-gray-800">{t("search.resultsTitle")}</h1>
+              {query && <p className="text-gray-600">{t("search.searchingFor")} &ldquo;{query}&rdquo;</p>}
             </div>
             <div></div>
           </div>
@@ -61,16 +57,16 @@ const SearchResults = () => {
         {/* Search Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
           <div className="flex gap-2 overflow-x-auto">
-            {filters.map((filterItem) => (
+            {filterKeys.map((filterKey) => (
               <button
-                key={filterItem.id}
-                onClick={() => setFilter(filterItem.id)}
+                key={filterKey}
+                onClick={() => setFilter(filterKey)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
-                  filter === filterItem.id ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  filter === filterKey ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                <i className={`bx ${filterItem.icon}`}></i>
-                <span>{filterItem.name}</span>
+                <i className={`bx bx-${filterKey === "all" ? "search" : filterKey === "doctor" ? "user-plus" : filterKey === "institution" ? "hospital" : "cog"}`}></i>
+                <span>{t(`search.filters.${filterKey}`)}</span>
               </button>
             ))}
           </div>
@@ -80,13 +76,13 @@ const SearchResults = () => {
         {loading ? (
           <div className="text-center py-12">
             <i className="bx bx-loader-alt animate-spin text-4xl text-blue-600 mb-4"></i>
-            <p className="text-gray-600">جاري البحث...</p>
+            <p className="text-gray-600">{t("search.loading")}</p>
           </div>
         ) : filteredResults.length > 0 ? (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold text-gray-800">
-                تم العثور على {filteredResults.length} نتيجة
+                {t("search.found", { count: filteredResults.length })}
               </h2>
             </div>
             {/* Results will be rendered here from real API in Phase 5 */}
@@ -95,20 +91,16 @@ const SearchResults = () => {
           <div className="text-center py-12">
             <i className="bx bx-search text-6xl text-gray-400 mb-4"></i>
             <h2 className="text-xl font-semibold text-gray-600 mb-2">
-              {query
-                ? "لم يتم العثور على نتائج"
-                : "ابحث عن طبيب أو مؤسسة صحية"}
+              {query ? t("search.noResults") : t("search.startSearch")}
             </h2>
             <p className="text-gray-500">
-              {query
-                ? "جرب البحث بكلمات مختلفة أو تحقق من الإملاء"
-                : "أدخل كلمة بحث للبدء"}
+              {query ? t("search.tryOther") : t("search.enterQuery")}
             </p>
             <Link
               to="/"
               className="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              العودة للرئيسية
+              {t("nav.backHome")}
             </Link>
           </div>
         )}

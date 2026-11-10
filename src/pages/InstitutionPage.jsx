@@ -3,6 +3,7 @@ import "./InstitutionPage.css"
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import AdminPanel from "../components/Sections/InstitutionDetails/AdminPanel"
 import DoctorsSection from "../components/Sections/InstitutionDetails/DoctorsSection"
 import ImagingSection from "../components/Sections/InstitutionDetails/ImagingSection"
@@ -22,25 +23,25 @@ const SECTION_ACTIVE_STYLES = {
 }
 
 const SECTIONS = [
-  { id: "overview", name: "نظرة عامة", icon: "bx-home", color: "blue" },
-  { id: "admin", name: "الإدارة العامة", icon: "bx-cog", color: "gray" },
-  { id: "doctors", name: "الأطباء", icon: "bx-user-plus", color: "green" },
-  { id: "imaging", name: "التصوير الطبي", icon: "bx-camera", color: "purple" },
-  { id: "pharmacy", name: "الصيدلية", icon: "bx-plus-medical", color: "red" },
-  { id: "lab", name: "المخبر", icon: "bx-test-tube", color: "yellow" },
-  { id: "nurses", name: "التمريض", icon: "bx-heart", color: "pink" },
+  { id: "overview", color: "blue", icon: "bx-home" },
+  { id: "admin", color: "gray", icon: "bx-cog" },
+  { id: "doctors", color: "green", icon: "bx-user-plus" },
+  { id: "imaging", color: "purple", icon: "bx-camera" },
+  { id: "pharmacy", color: "red", icon: "bx-plus-medical" },
+  { id: "lab", color: "yellow", icon: "bx-test-tube" },
+  { id: "nurses", color: "pink", icon: "bx-heart" },
 ]
 
 const InstitutionPage = () => {
   const { id, section } = useParams()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [activeSection, setActiveSection] = useState(section || "overview")
   const [institution] = useState(null)
   const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
     // Phase 5: replace with real API call: GET /institutions/:id
-    // Until the API is ready, show a "not found" state instead of mock data.
     setNotFound(true)
   }, [id])
 
@@ -75,20 +76,20 @@ const InstitutionPage = () => {
             <div className="text-center mb-8">
               <i className="bx bx-hospital text-6xl text-blue-500 mb-4"></i>
               <h2 className="text-3xl font-bold text-gray-800 mb-2">{institution?.nameAr}</h2>
-              <p className="text-gray-600">مرحباً بكم في صفحة المؤسسة الصحية</p>
+              <p className="text-gray-600">{t("institutions.digitalPlatform")}</p>
             </div>
 
             {institution?.phone && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <i className="bx bx-phone text-3xl text-green-500 mb-2"></i>
-                  <h3 className="font-semibold text-gray-800">الهاتف</h3>
+                  <h3 className="font-semibold text-gray-800">{t("institutions.phone")}</h3>
                   <p className="text-gray-600">{institution.phone}</p>
                 </div>
                 {institution.addressAr && (
                   <div className="text-center p-4 bg-purple-50 rounded-lg">
                     <i className="bx bx-map text-3xl text-purple-500 mb-2"></i>
-                    <h3 className="font-semibold text-gray-800">العنوان</h3>
+                    <h3 className="font-semibold text-gray-800">{t("institutions.address")}</h3>
                     <p className="text-gray-600">{institution.addressAr}</p>
                   </div>
                 )}
@@ -96,13 +97,13 @@ const InstitutionPage = () => {
             )}
 
             <div className="bg-gray-50 p-6 rounded-lg">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">الخدمات السريعة</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("institutions.quickServices")}</h3>
               <div className="space-y-3">
                 <Link
                   to={`/institution/${id}/doctors`}
                   className="block w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
                 >
-                  حجز موعد
+                  {t("institutions.bookAppointment")}
                 </Link>
               </div>
             </div>
@@ -113,16 +114,13 @@ const InstitutionPage = () => {
 
   if (notFound && !institution) {
     return (
-      <div
-        className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center"
-        dir="rtl"
-      >
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <i className="bx bx-error text-6xl text-gray-400 mb-4"></i>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">المؤسسة غير موجودة</h2>
-          <p className="text-gray-500 mb-4">لم يتم العثور على هذه المؤسسة الصحية.</p>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">{t("institutions.notFound")}</h2>
+          <p className="text-gray-500 mb-4">{t("institutions.notFoundDesc")}</p>
           <Link to="/" className="text-blue-600 hover:text-blue-800">
-            العودة للرئيسية
+            {t("nav.backHome")}
           </Link>
         </div>
       </div>
@@ -131,20 +129,17 @@ const InstitutionPage = () => {
 
   if (!institution) {
     return (
-      <div
-        className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center"
-        dir="rtl"
-      >
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <i className="bx bx-loader-alt animate-spin text-4xl text-blue-600 mb-4"></i>
-          <p className="text-gray-600">جاري تحميل بيانات المؤسسة...</p>
+          <p className="text-gray-600">{t("institutions.loading")}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <header className="bg-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
@@ -155,12 +150,12 @@ const InstitutionPage = () => {
                 className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
               >
                 <i className="bx bx-arrow-back text-xl"></i>
-                <span>العودة للرئيسية</span>
+                <span>{t("nav.backHome")}</span>
               </Link>
             </div>
             <div className="text-center">
               <h1 className="text-xl font-bold text-gray-800">{institution.nameAr}</h1>
-              <p className="text-gray-600">المنصة الرقمية</p>
+              <p className="text-gray-600">{t("institutions.digitalPlatform")}</p>
             </div>
             <div></div>
           </div>
@@ -182,7 +177,7 @@ const InstitutionPage = () => {
                 }`}
               >
                 <i className={`bx ${sectionItem.icon}`}></i>
-                <span>{sectionItem.name}</span>
+                <span>{t(`institutions.sections.${sectionItem.id}`)}</span>
               </button>
             ))}
           </div>

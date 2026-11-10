@@ -2,15 +2,16 @@
 
 import { useState } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import Avatar from "../components/common/Avatar"
 
 const DoctorProfile = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState("overview")
 
   // Phase 5: replace with real API call: GET /doctors/:id
-  // No mock data — show honest not-found state
   const doctor = null
   const loading = false
 
@@ -18,22 +19,15 @@ const DoctorProfile = () => {
     navigate(`/appointment/book/${id}`)
   }
 
-  const tabs = [
-    { id: "overview", name: "نظرة عامة", icon: "bx-user" },
-    { id: "schedule", name: "المواعيد المتاحة", icon: "bx-calendar" },
-    { id: "reviews", name: "التقييمات", icon: "bx-star" },
-    { id: "contact", name: "التواصل", icon: "bx-phone" },
-  ]
+  const tabKeys = ["overview", "schedule", "reviews", "contact"]
+  const tabIcons = { overview: "bx-user", schedule: "bx-calendar", reviews: "bx-star", contact: "bx-phone" }
 
   if (loading) {
     return (
-      <div
-        className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center"
-        dir="rtl"
-      >
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <i className="bx bx-loader-alt animate-spin text-4xl text-blue-600 mb-4"></i>
-          <p className="text-gray-600">جاري تحميل بيانات الطبيب...</p>
+          <p className="text-gray-600">{t("doctors.loading")}</p>
         </div>
       </div>
     )
@@ -41,16 +35,13 @@ const DoctorProfile = () => {
 
   if (!doctor) {
     return (
-      <div
-        className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center"
-        dir="rtl"
-      >
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <i className="bx bx-error text-6xl text-gray-400 mb-4"></i>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">الطبيب غير موجود</h2>
-          <p className="text-gray-500 mb-4">لم يتم العثور على ملف هذا الطبيب.</p>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">{t("doctors.notFound")}</h2>
+          <p className="text-gray-500 mb-4">{t("doctors.notFoundDesc")}</p>
           <Link to="/" className="text-blue-600 hover:text-blue-800">
-            العودة للرئيسية
+            {t("nav.backHome")}
           </Link>
         </div>
       </div>
@@ -64,7 +55,7 @@ const DoctorProfile = () => {
           <div className="space-y-6">
             {doctor.bioAr && (
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">نبذة عن الطبيب</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("doctors.bioTitle")}</h3>
                 <p className="text-gray-600 leading-relaxed">{doctor.bioAr}</p>
               </div>
             )}
@@ -74,11 +65,11 @@ const DoctorProfile = () => {
       case "schedule":
         return (
           <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">المواعيد المتاحة</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">{t(`doctors.tabs.schedule`)}</h3>
             <p className="text-gray-500 text-center py-8">
               <i className="bx bx-calendar text-4xl mb-2 text-gray-300"></i>
               <br />
-              لا تتوفر مواعيد حالياً.
+              {t("doctors.noSlots")}
             </p>
           </div>
         )
@@ -86,11 +77,11 @@ const DoctorProfile = () => {
       case "reviews":
         return (
           <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">تقييمات المرضى</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">{t(`doctors.tabs.reviews`)}</h3>
             <p className="text-gray-500 text-center py-8">
               <i className="bx bx-star text-4xl mb-2 text-gray-300"></i>
               <br />
-              لا توجد تقييمات بعد.
+              {t("doctors.noReviews")}
             </p>
           </div>
         )
@@ -98,8 +89,8 @@ const DoctorProfile = () => {
       case "contact":
         return (
           <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">معلومات التواصل</h3>
-            <p className="text-gray-500">بيانات التواصل غير متوفرة.</p>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">{t(`doctors.tabs.contact`)}</h3>
+            <p className="text-gray-500">{t("doctors.noContact")}</p>
           </div>
         )
 
@@ -109,7 +100,7 @@ const DoctorProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <header className="bg-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
@@ -119,10 +110,10 @@ const DoctorProfile = () => {
               className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
             >
               <i className="bx bx-arrow-back text-xl"></i>
-              <span>العودة للرئيسية</span>
+              <span>{t("nav.backHome")}</span>
             </Link>
             <div className="text-center">
-              <h1 className="text-xl font-bold text-gray-800">ملف الطبيب</h1>
+              <h1 className="text-xl font-bold text-gray-800">{t("doctors.profileTitle")}</h1>
             </div>
             <div></div>
           </div>
@@ -144,7 +135,7 @@ const DoctorProfile = () => {
                 <div className="flex items-center gap-1 text-gray-600">
                   <i className="bx bx-money text-green-500"></i>
                   <span>
-                    {new Intl.NumberFormat("ar-DZ").format(doctor.consultationFeeDZD)} دج
+                    {new Intl.NumberFormat("ar-DZ").format(doctor.consultationFeeDZD)} {t("common.currency")}
                   </span>
                 </div>
               )}
@@ -153,7 +144,7 @@ const DoctorProfile = () => {
                 onClick={handleBookAppointment}
                 className="mt-4 bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
               >
-                حجز موعد
+                {t("doctors.bookBtn")}
               </button>
             </div>
           </div>
@@ -162,18 +153,18 @@ const DoctorProfile = () => {
         {/* Tabs Navigation */}
         <div className="bg-white rounded-lg shadow mb-6">
           <div className="flex overflow-x-auto">
-            {tabs.map((tab) => (
+            {tabKeys.map((tabKey) => (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                key={tabKey}
+                onClick={() => setActiveTab(tabKey)}
                 className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
-                  activeTab === tab.id
+                  activeTab === tabKey
                     ? "border-blue-500 text-blue-600 bg-blue-50"
                     : "border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                 }`}
               >
-                <i className={`bx ${tab.icon}`}></i>
-                <span>{tab.name}</span>
+                <i className={`bx ${tabIcons[tabKey]}`}></i>
+                <span>{t(`doctors.tabs.${tabKey}`)}</span>
               </button>
             ))}
           </div>
