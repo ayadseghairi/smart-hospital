@@ -78,9 +78,11 @@
     },
     "greeting": "Bonjour ! Comment puis-je vous aider aujourd'hui ?",
     "placeholder": "Écrivez votre message...",
+    "send": "Envoyer",
     "closeChat": "Fermer la conversation",
-    "thanks": "Merci pour votre question. Je vais vous aider bientôt...",
-    "excellent": "C'est une excellente question ! Laissez-moi vous aider..."
+    "thinking": "En cours de réflexion...",
+    "error": "Une erreur s'est produite lors de la connexion. Veuillez réessayer.",
+    "disclaimer": "Cet assistant ne diagnostique pas et ne remplace pas un médecin."
   },
   "emergency": {
     "title": "Urgences",
