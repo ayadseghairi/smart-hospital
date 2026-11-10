@@ -22,3 +22,33 @@ export async function getSlots(req: Request, res: Response, next: NextFunction) 
     res.json({ data: slots })
   } catch (err) { next(err) }
 }
+
+// ─── Doctor-authenticated endpoints ──────────────────────────────────────────
+
+export async function listAvailability(req: Request, res: Response, next: NextFunction) {
+  try {
+    const rules = await svc.listAvailabilityRulesWithInstitution(req.user!.sub)
+    res.json({ data: rules })
+  } catch (err) { next(err) }
+}
+
+export async function createAvailability(req: Request, res: Response, next: NextFunction) {
+  try {
+    const rule = await svc.createAvailabilityRule(req.user!.sub, req.body)
+    res.status(201).json({ data: rule })
+  } catch (err) { next(err) }
+}
+
+export async function deleteAvailability(req: Request, res: Response, next: NextFunction) {
+  try {
+    await svc.deleteAvailabilityRule(req.user!.sub, req.params.id)
+    res.json({ data: { ok: true } })
+  } catch (err) { next(err) }
+}
+
+export async function updateProfile(req: Request, res: Response, next: NextFunction) {
+  try {
+    const doctor = await svc.updateDoctorProfile(req.user!.sub, req.body)
+    res.json({ data: doctor })
+  } catch (err) { next(err) }
+}

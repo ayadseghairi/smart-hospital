@@ -139,3 +139,45 @@ export async function exportData(req: Request, res: Response, next: NextFunction
     next(err)
   }
 }
+
+export async function updateProfile(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    const user = await authService.updateProfile(req.user.sub, req.body)
+    res.json({ data: user })
+  } catch (err) { next(err) }
+}
+
+export async function addEmail(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    await authService.addEmail(req.user.sub, req.body.email)
+    res.json({ data: { message: "Verification email sent." } })
+  } catch (err) { next(err) }
+}
+
+export async function changePassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    const rawToken = req.cookies[REFRESH_COOKIE]
+    await authService.changePassword(req.user.sub, req.body.currentPassword, req.body.newPassword, rawToken)
+    res.json({ data: { ok: true } })
+  } catch (err) { next(err) }
+}
+
+export async function listSessions(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    const sessions = await authService.listSessions(req.user.sub)
+    res.json({ data: sessions })
+  } catch (err) { next(err) }
+}
+
+export async function revokeOtherSessions(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    const rawToken = req.cookies[REFRESH_COOKIE]
+    const revoked = await authService.revokeOtherSessions(req.user.sub, rawToken)
+    res.json({ data: { revoked } })
+  } catch (err) { next(err) }
+}

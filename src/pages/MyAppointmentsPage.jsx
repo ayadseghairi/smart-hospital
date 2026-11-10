@@ -1,9 +1,11 @@
 // src/pages/MyAppointmentsPage.jsx
+import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { useAuth } from "../contexts/AuthContext"
 import { apiGet, apiPatch } from "../api/client"
+import Layout from "../components/Layout"
 
 function StatusBadge({ status }) {
   const { t } = useTranslation()
@@ -21,11 +23,18 @@ function StatusBadge({ status }) {
   )
 }
 
+const TAB_STATUSES = {
+  upcoming:  ["PENDING", "CONFIRMED"],
+  past:      ["COMPLETED", "NO_SHOW"],
+  cancelled: ["CANCELLED"],
+}
+
 export default function MyAppointmentsPage() {
   const { t, i18n } = useTranslation()
   const lang = i18n.language === "fr" ? "fr" : "ar"
   const { user } = useAuth()
   const qc = useQueryClient()
+  const [tab, setTab] = useState("upcoming")
 
   const { data: appointments = [], isLoading, error } = useQuery({
     queryKey: ["my-appointments"],
@@ -47,72 +56,109 @@ export default function MyAppointmentsPage() {
       dateStyle: "long", timeStyle: "short", timeZone: "Africa/Algiers",
     }).format(new Date(iso))
 
+  const filtered = appointments.filter((a) => TAB_STATUSES[tab].includes(a.status))
+
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10 text-center text-gray-500">
-        {t("common.loading")}
-      </div>
+      <Layout>
+        <div className="max-w-3xl mx-auto px-4 py-10 text-center text-gray-500">
+          {t("common.loading")}
+        </div>
+      </Layout>
     )
   }
 
   if (error) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10 text-center">
-        <p className="text-red-600 mb-4">{t("common.loadError")}</p>
-        <button onClick={() => qc.invalidateQueries({ queryKey: ["my-appointments"] })}
-          className="text-blue-600 hover:underline text-sm">{t("common.retry")}</button>
-      </div>
+      <Layout>
+        <div className="max-w-3xl mx-auto px-4 py-10 text-center">
+          <p className="text-red-600 mb-4">{t("common.loadError")}</p>
+          <button
+            onClick={() => qc.invalidateQueries({ queryKey: ["my-appointments"] })}
+            className="text-blue-600 hover:underline text-sm"
+          >
+            {t("common.retry")}
+          </button>
+        </div>
+      </Layout>
     )
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">{t("appointments.myTitle")}</h1>
+    <Layout>
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">{t("appointments.myTitle")}</h1>
 
-      {appointments.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-          <i className="bx bx-calendar text-5xl text-gray-300 mb-4"></i>
-          <p className="text-gray-500">{t("appointments.noAppointments")}</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {appointments.map((appt) => (
-            <div key={appt.id} className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-              <div className="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                  {appt.doctor && (
-                    <p className="font-semibold text-gray-800">
-                      {appt.doctor.user.fullName}
-                    </p>
-                  )}
-                  {appt.service && (
-                    <p className="font-semibold text-gray-800">
-                      {lang === "ar" ? appt.service.nameAr : appt.service.nameFr}
-                    </p>
-                  )}
-                  <p className="text-sm text-gray-500">
-                    {lang === "ar" ? appt.institution.nameAr : appt.institution.nameFr}
-                  </p>
-                  <p className="text-sm text-gray-600 mt-1">{formatDate(appt.startsAt)}</p>
-                </div>
-                <StatusBadge status={appt.status} />
-              </div>
-
-              {(appt.status === "PENDING" || appt.status === "CONFIRMED") && (
-                <div className="mt-4 flex justify-end">
-                  <button
-                    onClick={() => cancel.mutate(appt.id)}
-                    disabled={cancel.isPending}
-                    className="text-sm text-red-600 hover:underline disabled:opacity-50"
-                  >
-                    {t("appointments.cancel")}
-                  </button>
-                </div>
-              )}
-            </div>
+        {/* Tabs */}
+        <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-6">
+          {(["upcoming", "past", "cancelled"]).map((key) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${
+                tab === key ? "bg-white text-gray-800 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              {t(`appointments.tabs.${key}`)}
+            </button>
           ))}
         </div>
-      )}
-    </div>
+
+        {filtered.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+            <i className="bx bx-calendar text-5xl text-gray-300 mb-4" />
+            <p className="text-gray-500">{t("appointments.noAppointments")}</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filtered.map((appt) => (
+              <div key={appt.id} className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div>
+                    {appt.doctor && (
+                      <p className="font-semibold text-gray-800">
+                        {appt.doctor.user.fullName}
+                        {appt.doctor.specialty && (
+                          <span className="font-normal text-gray-500 text-sm ms-2">
+                            — {lang === "ar" ? appt.doctor.specialty.nameAr : appt.doctor.specialty.nameFr}
+                          </span>
+                        )}
+                      </p>
+                    )}
+                    {appt.service && (
+                      <p className="font-semibold text-gray-800">
+                        {lang === "ar" ? appt.service.nameAr : appt.service.nameFr}
+                      </p>
+                    )}
+                    {appt.institution && (
+                      <p className="text-sm text-gray-500">
+                        {lang === "ar" ? appt.institution.nameAr : appt.institution.nameFr}
+                      </p>
+                    )}
+                    <p className="text-sm text-gray-600 mt-1">{formatDate(appt.startsAt)}</p>
+                    {appt.reason && (
+                      <p className="text-xs text-gray-400 mt-1">{appt.reason}</p>
+                    )}
+                  </div>
+                  <StatusBadge status={appt.status} />
+                </div>
+
+                {(appt.status === "PENDING" || appt.status === "CONFIRMED") && (
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={() => cancel.mutate(appt.id)}
+                      disabled={cancel.isPending}
+                      className="text-sm text-red-600 hover:underline disabled:opacity-50"
+                    >
+                      {t("appointments.cancel")}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Layout>
   )
 }

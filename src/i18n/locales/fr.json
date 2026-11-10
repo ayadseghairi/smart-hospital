@@ -552,7 +552,70 @@
     "deleteSuccess": "Votre compte a été supprimé.",
     "deleteError": "Une erreur s'est produite lors de la suppression du compte.",
     "privacy": "Politique de confidentialité",
-    "terms": "Conditions d'utilisation"
+    "terms": "Conditions d'utilisation",
+    "cookies": "Politique des cookies",
+    "consentHistory": "Vous avez accepté notre politique de confidentialité (version 1.0) le",
+    "dashboard": {
+      "title": "Tableau de bord patient",
+      "upcomingTitle": "Prochains rendez-vous",
+      "noUpcoming": "Aucun rendez-vous à venir.",
+      "unverifiedEmail": "Votre adresse e-mail n'a pas été vérifiée. Vous ne pouvez pas réserver de rendez-vous avant la vérification.",
+      "addEmail": "Ajouter ou vérifier l'adresse e-mail",
+      "viewAllAppointments": "Voir tous les rendez-vous",
+      "editProfile": "Modifier le profil",
+      "accountSettings": "Paramètres du compte"
+    },
+    "profile": {
+      "title": "Profil",
+      "fullName": "Nom complet",
+      "preferredLang": "Langue préférée",
+      "phone": "Numéro de téléphone",
+      "phoneNote": "Contactez le support pour modifier votre numéro de téléphone.",
+      "email": "Adresse e-mail",
+      "changeEmail": "Modifier",
+      "addEmail": "Ajouter une adresse e-mail",
+      "save": "Enregistrer",
+      "saveSuccess": "Profil enregistré.",
+      "saveError": "Une erreur s'est produite lors de l'enregistrement.",
+      "langAr": "العربية",
+      "langFr": "Français"
+    },
+    "addEmail": {
+      "title": "Ajouter une adresse e-mail",
+      "hint": "Ajoutez une adresse e-mail pour vérifier votre compte et réserver des rendez-vous.",
+      "email": "Adresse e-mail",
+      "submit": "Envoyer le lien de vérification",
+      "success": "Lien de vérification envoyé. Vérifiez votre boîte mail.",
+      "error": "Une erreur s'est produite. Vérifiez que l'adresse est valide et non utilisée."
+    },
+    "notifications": {
+      "title": "Préférences de notifications",
+      "emailReminders": "Rappels de rendez-vous",
+      "emailRemindersDesc": "Recevoir des rappels de rendez-vous par e-mail.",
+      "emailDigest": "Récapitulatif quotidien (médecins)",
+      "emailDigestDesc": "Recevoir un récapitulatif quotidien des rendez-vous à venir.",
+      "securityNote": "Les e-mails de sécurité (vérification, réinitialisation) ne peuvent pas être désactivés.",
+      "save": "Enregistrer les préférences",
+      "saveSuccess": "Préférences enregistrées.",
+      "saveError": "Une erreur s'est produite lors de l'enregistrement."
+    },
+    "security": {
+      "title": "Sécurité",
+      "changePasswordTitle": "Modifier le mot de passe",
+      "currentPassword": "Mot de passe actuel",
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordHint": "10 caractères minimum, 128 maximum.",
+      "changePassword": "Modifier le mot de passe",
+      "passwordSuccess": "Mot de passe modifié.",
+      "passwordError": "Mot de passe actuel incorrect ou erreur survenue.",
+      "sessionsTitle": "Sessions actives",
+      "sessionsHint": "Ces sessions sont actuellement connectées à votre compte.",
+      "signOutAll": "Se déconnecter de toutes les autres sessions",
+      "signOutAllSuccess": "{{count}} session(s) révoquée(s).",
+      "signOutAllError": "Une erreur s'est produite lors de la déconnexion.",
+      "createdAt": "Connecté le",
+      "expiresAt": "Expire le"
+    }
   },
   "appointments": {
     "myTitle": "Mes rendez-vous",
@@ -565,6 +628,11 @@
     "markNoShow": "Absent",
     "statusUpdated": "Statut du rendez-vous mis à jour.",
     "updateError": "Une erreur s'est produite lors de la mise à jour.",
+    "tabs": {
+      "upcoming": "À venir",
+      "past": "Passés",
+      "cancelled": "Annulés"
+    },
     "status": {
       "pending": "En attente",
       "confirmed": "Confirmé",
@@ -581,7 +649,72 @@
     "private": "Privé"
   },
   "doctor": {
-    "dashboard": "Tableau du médecin"
+    "dashboard": "Tableau du médecin",
+    "dashboard_": {
+      "todayTitle": "Rendez-vous du jour",
+      "pendingTitle": "Demandes en attente",
+      "pendingCount": "{{count}} demande(s) en attente",
+      "noToday": "Aucun rendez-vous aujourd'hui.",
+      "manageAvailability": "Gérer les disponibilités",
+      "editProfile": "Modifier le profil"
+    },
+    "appointments": {
+      "title": "Gestion des rendez-vous",
+      "tabs": {
+        "pending": "Demandes",
+        "confirmed": "Confirmés",
+        "history": "Historique"
+      },
+      "noAppointments": "Aucun rendez-vous.",
+      "confirm": "Confirmer",
+      "decline": "Refuser",
+      "markComplete": "Terminé",
+      "markNoShow": "Absent",
+      "cancel": "Annuler"
+    },
+    "availability": {
+      "title": "Disponibilités",
+      "rulesTitle": "Règles de disponibilité actuelles",
+      "noRules": "Aucune règle ajoutée pour l'instant.",
+      "addRule": "Ajouter une plage horaire",
+      "weekday": "Jour",
+      "from": "De",
+      "to": "À",
+      "slotDuration": "Durée du créneau (min)",
+      "institution": "Établissement",
+      "selectInstitution": "Choisir l'établissement",
+      "save": "Ajouter",
+      "deleteSuccess": "Règle supprimée.",
+      "deleteError": "Erreur lors de la suppression.",
+      "saveSuccess": "Règle ajoutée.",
+      "saveError": "Erreur lors de l'ajout.",
+      "timeOffNote": "Congés / absences — bientôt disponible.",
+      "weekdays": {
+        "0": "Dimanche",
+        "1": "Lundi",
+        "2": "Mardi",
+        "3": "Mercredi",
+        "4": "Jeudi",
+        "5": "Vendredi",
+        "6": "Samedi"
+      }
+    },
+    "profile": {
+      "title": "Modifier le profil médical",
+      "bioAr": "Biographie (en arabe)",
+      "bioFr": "Biographie (en français)",
+      "languages": "Langues parlées",
+      "langAr": "Arabe",
+      "langFr": "Français",
+      "langTamazight": "Tamazight",
+      "consultationFee": "Honoraires (DA)",
+      "feeOptional": "Facultatif — laisser vide pour afficher «sur demande»",
+      "photoNote": "Téléchargement de photo — bientôt disponible.",
+      "save": "Enregistrer",
+      "saveSuccess": "Profil enregistré.",
+      "saveError": "Erreur lors de l'enregistrement.",
+      "bioMaxHint": "1000 caractères maximum."
+    }
   },
   "about": {
     "mission": "Delin Smart Care est une plateforme numérique qui vise à connecter les patients aux établissements de santé et aux médecins de la wilaya de Khenchela, en Algérie, de manière sécurisée, transparente et basée sur des données réelles et vérifiées.",

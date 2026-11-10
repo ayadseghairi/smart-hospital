@@ -1,9 +1,11 @@
+// src/pages/MyAccountPage.jsx — Privacy & Data page
 import { useTranslation } from "react-i18next"
 import { Link, useNavigate } from "react-router-dom"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { useAuth } from "../contexts/AuthContext"
 import { apiDelete } from "../api/client"
+import Layout from "../components/Layout"
 
 const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000/api/v1"
 
@@ -18,11 +20,11 @@ function downloadJson(data, filename) {
 }
 
 export default function MyAccountPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language === "fr" ? "fr" : "ar"
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
-  // Data export — streams the JSON file to the browser
   const exportMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(`${API}/auth/export`, {
@@ -38,7 +40,6 @@ export default function MyAccountPage() {
     onError: () => toast.error(t("account.deleteError")),
   })
 
-  // Account deletion
   const deleteMutation = useMutation({
     mutationFn: () => apiDelete("/auth/account"),
     onSuccess: () => {
@@ -56,7 +57,7 @@ export default function MyAccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <Layout>
       <div className="max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">{t("account.title")}</h1>
 
@@ -66,6 +67,21 @@ export default function MyAccountPage() {
             <p className="text-gray-800 font-medium">{user.fullName}</p>
             {user.email && <p className="text-gray-500 text-sm mt-1">{user.email}</p>}
             {user.phone && <p className="text-gray-500 text-sm">{user.phone}</p>}
+          </div>
+        )}
+
+        {/* Consent history */}
+        {user?.consentAcceptedAt && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4">
+            <p className="text-sm text-gray-600">
+              {t("account.consentHistory")}{" "}
+              <span className="font-medium text-gray-800">
+                {new Intl.DateTimeFormat(lang === "ar" ? "ar-DZ" : "fr-DZ", {
+                  dateStyle: "long",
+                  timeZone: "Africa/Algiers",
+                }).format(new Date(user.consentAcceptedAt))}
+              </span>
+            </p>
           </div>
         )}
 
@@ -82,9 +98,10 @@ export default function MyAccountPage() {
         </div>
 
         {/* Legal links */}
-        <div className="flex gap-4 text-sm text-blue-600 mb-8">
+        <div className="flex flex-wrap gap-4 text-sm text-blue-600 mb-8">
           <Link to="/privacy" className="hover:underline">{t("account.privacy")}</Link>
           <Link to="/terms" className="hover:underline">{t("account.terms")}</Link>
+          <Link to="/cookies" className="hover:underline">{t("account.cookies")}</Link>
         </div>
 
         {/* Danger zone */}
@@ -98,6 +115,6 @@ export default function MyAccountPage() {
           </button>
         </div>
       </div>
-    </div>
+    </Layout>
   )
 }

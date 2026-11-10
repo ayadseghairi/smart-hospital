@@ -25,14 +25,27 @@ const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"))
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"))
 const AcceptInvitePage = lazy(() => import("./pages/AcceptInvitePage"))
 
+// Patient area
+const AccountDashboardPage = lazy(() => import("./pages/account/AccountDashboardPage"))
+const AccountProfilePage = lazy(() => import("./pages/account/AccountProfilePage"))
+const AddEmailPage = lazy(() => import("./pages/account/AddEmailPage"))
+const NotificationsPage = lazy(() => import("./pages/account/NotificationsPage"))
+const SecurityPage = lazy(() => import("./pages/account/SecurityPage"))
 const MyAppointmentsPage = lazy(() => import("./pages/MyAppointmentsPage"))
 const MyAccountPage = lazy(() => import("./pages/MyAccountPage"))
+
+// Doctor area
 const DoctorDashboardPage = lazy(() => import("./pages/DoctorDashboardPage"))
+const DoctorAppointmentsPage = lazy(() => import("./pages/doctor/DoctorAppointmentsPage"))
+const DoctorAvailabilityPage = lazy(() => import("./pages/doctor/DoctorAvailabilityPage"))
+const DoctorProfileEditPage = lazy(() => import("./pages/doctor/DoctorProfileEditPage"))
+const DoctorSecurityPage = lazy(() => import("./pages/doctor/DoctorSecurityPage"))
+
 const SuperAdminDashboardPage = lazy(() => import("./pages/SuperAdminDashboardPage"))
 const PrivacyPage = lazy(() => import("./pages/PrivacyPage"))
 const TermsPage = lazy(() => import("./pages/TermsPage"))
 
-// New public pages
+// Public pages
 const AboutPage = lazy(() => import("./pages/AboutPage"))
 const ContactPage = lazy(() => import("./pages/ContactPage"))
 const ForInstitutionsPage = lazy(() => import("./pages/ForInstitutionsPage"))
@@ -64,8 +77,6 @@ function AppRoutes() {
           <Route path="/doctor/:id" element={<DoctorProfile />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
-
-          {/* New public pages */}
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/for-institutions" element={<ForInstitutionsPage />} />
@@ -77,20 +88,53 @@ function AppRoutes() {
           <Route path="/login" element={<GuestOnly><LoginPage /></GuestOnly>} />
           <Route path="/register" element={<GuestOnly><RegisterPage /></GuestOnly>} />
           <Route path="/check-inbox" element={<CheckInboxPage />} />
+          <Route path="/register/check-email" element={<CheckInboxPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/accept-invite" element={<AcceptInvitePage />} />
 
-          {/* Patient — must be logged in */}
-          <Route path="/my-appointments" element={
+          {/* Patient area */}
+          <Route path="/account" element={
+            <ProtectedRoute roles={["PATIENT"]}>
+              <AccountDashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/account/appointments" element={
             <ProtectedRoute roles={["PATIENT"]}>
               <MyAppointmentsPage />
             </ProtectedRoute>
           } />
-          <Route path="/account" element={
+          <Route path="/account/profile" element={
+            <ProtectedRoute roles={["PATIENT"]}>
+              <AccountProfilePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/account/add-email" element={
+            <ProtectedRoute roles={["PATIENT"]}>
+              <AddEmailPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/account/notifications" element={
+            <ProtectedRoute roles={["PATIENT"]}>
+              <NotificationsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/account/security" element={
+            <ProtectedRoute roles={["PATIENT"]}>
+              <SecurityPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/account/privacy" element={
             <ProtectedRoute roles={["PATIENT"]}>
               <MyAccountPage />
+            </ProtectedRoute>
+          } />
+
+          {/* Legacy patient routes */}
+          <Route path="/my-appointments" element={
+            <ProtectedRoute roles={["PATIENT"]}>
+              <MyAppointmentsPage />
             </ProtectedRoute>
           } />
           <Route path="/my-account" element={
@@ -104,12 +148,33 @@ function AppRoutes() {
             </ProtectedRoute>
           } />
 
-          {/* Doctor dashboard */}
+          {/* Doctor area */}
           <Route path="/doctor" element={
             <ProtectedRoute roles={["DOCTOR"]}>
               <DoctorDashboardPage />
             </ProtectedRoute>
           } />
+          <Route path="/doctor/appointments" element={
+            <ProtectedRoute roles={["DOCTOR"]}>
+              <DoctorAppointmentsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/doctor/availability" element={
+            <ProtectedRoute roles={["DOCTOR"]}>
+              <DoctorAvailabilityPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/doctor/profile" element={
+            <ProtectedRoute roles={["DOCTOR"]}>
+              <DoctorProfileEditPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/doctor/security" element={
+            <ProtectedRoute roles={["DOCTOR"]}>
+              <DoctorSecurityPage />
+            </ProtectedRoute>
+          } />
+          {/* Legacy doctor routes */}
           <Route path="/doctor-dashboard" element={
             <ProtectedRoute roles={["DOCTOR"]}>
               <DoctorDashboardPage />

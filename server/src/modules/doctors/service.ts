@@ -2,7 +2,7 @@
 import { prisma } from "../../lib/prisma"
 import { createError } from "../../middleware/errorHandler"
 import type { z } from "zod"
-import type { listDoctorsSchema } from "./schema"
+import type { listDoctorsSchema, availabilityRuleSchema, updateDoctorProfileSchema } from "./schema"
 
 type ListInput = z.infer<typeof listDoctorsSchema>
 
@@ -115,4 +115,111 @@ export async function getDoctorSlots(doctorId: string, date: string) {
   }
 
   return slots
+}
+
+// ─── Availability rules ───────────────────────────────────────────────────────
+
+type AvailabilityInput = z.infer<typeof availabilityRuleSchema>
+type UpdateProfileInput = z.infer<typeof updateDoctorProfileSchema>
+
+async function getDoctorByUserId(userId: string) {
+  const doctor = await prisma.doctor.findUnique({ where: { userId } })
+  if (!doctor) throw createError("Doctor profile not found", 404)
+  return doctor
+}
+
+export async function listAvailabilityRules(userId: string) {
+  const doctor = await getDoctorByUserId(userId)
+  return prisma.availabilityRule.findMany({
+    where: { doctorId: doctor.id },
+    include: {
+      doctor: {
+        select: {
+          institutionLinks: {
+            select: {
+              institution: { select: { id: true, nameAr: true, nameFr: true } },
+            },
+          },
+        },
+      },
+    },
+    orderBy: [{ weekday: "asc" }, { fromTime: "asc" }],
+  }).then((rules) =>
+    rules.map((r) => {
+      const { doctor: _d, ...rest } = r
+      return rest
+    })
+  )
+}
+
+export async function listAvailabilityRulesWithInstitution(userId: string) {
+  const doctor = await getDoctorByUserId(userId)
+  const rules = await prisma.availabilityRule.findMany({
+    where: { doctorId: doctor.id },
+    orderBy: [{ weekday: "asc" }, { fromTime: "asc" }],
+  })
+  // Attach institution info if institutionId is set
+  const institutionIds = [...new Set(rules.map((r) => r.institutionId).filter(Boolean) as string[])]
+  const institutions = institutionIds.length
+    ? await prisma.institution.findMany({
+        where: { id: { in: institutionIds } },
+        select: { id: true, nameAr: true, nameFr: true },
+      })
+    : []
+  const instMap = new Map(institutions.map((i) => [i.id, i]))
+  return rules.map((r) => ({
+    ...r,
+    institution: r.institutionId ? (instMap.get(r.institutionId) ?? null) : null,
+  }))
+}
+
+export async function createAvailabilityRule(userId: string, input: AvailabilityInput) {
+  const doctor = await getDoctorByUserId(userId)
+  // Verify institutionId belongs to this doctor if provided
+  if (input.institutionId) {
+    const link = await prisma.doctorInstitution.findUnique({
+      where: { doctorId_institutionId: { doctorId: doctor.id, institutionId: input.institutionId } },
+    })
+    if (!link) throw createError("Institution not linked to this doctor", 403)
+  }
+  return prisma.availabilityRule.create({
+    data: {
+      doctorId: doctor.id,
+      weekday: input.weekday,
+      fromTime: input.fromTime,
+      toTime: input.toTime,
+      slotMinutes: input.slotMinutes,
+      institutionId: input.institutionId,
+    },
+  })
+}
+
+export async function deleteAvailabilityRule(userId: string, ruleId: string) {
+  const doctor = await getDoctorByUserId(userId)
+  const rule = await prisma.availabilityRule.findUnique({ where: { id: ruleId } })
+  if (!rule || rule.doctorId !== doctor.id) throw createError("Rule not found", 404)
+  await prisma.availabilityRule.delete({ where: { id: ruleId } })
+}
+
+// ─── Doctor profile update ────────────────────────────────────────────────────
+
+export async function updateDoctorProfile(userId: string, input: UpdateProfileInput) {
+  const doctor = await getDoctorByUserId(userId)
+  const updated = await prisma.doctor.update({
+    where: { id: doctor.id },
+    data: {
+      ...(input.bioAr !== undefined && { bioAr: input.bioAr }),
+      ...(input.bioFr !== undefined && { bioFr: input.bioFr }),
+      ...(input.languages !== undefined && { languages: input.languages }),
+      ...(input.consultationFeeDZD !== undefined && { consultationFeeDZD: input.consultationFeeDZD }),
+    },
+    select: {
+      id: true,
+      bioAr: true,
+      bioFr: true,
+      languages: true,
+      consultationFeeDZD: true,
+    },
+  })
+  return updated
 }

@@ -18,6 +18,15 @@ import { adminRouter } from "./modules/admin/routes"
 import { notificationsRouter } from "./modules/notifications/routes"
 import { contactRouter } from "./modules/contact/routes"
 
+// Doctor self-service router (availability, profile, appointments)
+import { authenticate } from "./middleware/auth"
+import { requireRole } from "./middleware/requireRole"
+import { validate } from "./middleware/validate"
+import { availabilityRuleSchema, updateDoctorProfileSchema } from "./modules/doctors/schema"
+import * as doctorCtrl from "./modules/doctors/controller"
+import * as apptCtrl from "./modules/appointments/controller"
+import { updateAppointmentStatusSchema } from "./modules/appointments/schema"
+
 const app = express()
 
 // ── Security ───────────────────────────────────────────────────────────────
@@ -51,11 +60,56 @@ app.get("/health", (_req, res) => {
 })
 
 // ── API v1 routes ──────────────────────────────────────────────────────────
+// Doctor self-service sub-router (mounted at /doctor)
+const doctorRouter = express.Router()
+doctorRouter.get(
+  "/availability",
+  authenticate,
+  requireRole("DOCTOR"),
+  doctorCtrl.listAvailability
+)
+doctorRouter.post(
+  "/availability",
+  authenticate,
+  requireRole("DOCTOR"),
+  validate(availabilityRuleSchema),
+  doctorCtrl.createAvailability
+)
+doctorRouter.delete(
+  "/availability/:id",
+  authenticate,
+  requireRole("DOCTOR"),
+  doctorCtrl.deleteAvailability
+)
+doctorRouter.patch(
+  "/profile",
+  authenticate,
+  requireRole("DOCTOR"),
+  validate(updateDoctorProfileSchema),
+  doctorCtrl.updateProfile
+)
+
+// Doctor appointments (mirrors /appointments/doctor)
+doctorRouter.get(
+  "/appointments",
+  authenticate,
+  requireRole("DOCTOR"),
+  apptCtrl.doctorList
+)
+doctorRouter.patch(
+  "/appointments/:id/status",
+  authenticate,
+  requireRole("DOCTOR"),
+  validate(updateAppointmentStatusSchema),
+  apptCtrl.doctorUpdateStatus
+)
+
 const api = express.Router()
 api.use("/auth", authRouter)
 api.use("/institutions", institutionsRouter)
 api.use("/doctors", doctorsRouter)
 api.use("/appointments", appointmentsRouter)
+api.use("/doctor", doctorRouter)
 api.use("/search", searchRouter)
 api.use("/emergency", emergencyRouter)
 api.use("/assistant", assistantRouter)

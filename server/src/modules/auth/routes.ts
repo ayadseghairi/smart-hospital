@@ -11,6 +11,9 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
   acceptInviteSchema,
+  updateProfileSchema,
+  addEmailSchema,
+  changePasswordSchema,
 } from "./schema"
 
 export const authRouter = Router()
@@ -27,3 +30,10 @@ authRouter.post("/reset-password", authRateLimit, validate(resetPasswordSchema),
 authRouter.post("/accept-invite", authRateLimit, validate(acceptInviteSchema), ctrl.acceptInvite)
 authRouter.delete("/account", authenticate, ctrl.deleteAccount)
 authRouter.get("/export", authenticate, ctrl.exportData)
+
+// Profile & security
+authRouter.patch("/profile", authenticate, validate(updateProfileSchema), ctrl.updateProfile)
+authRouter.post("/add-email", emailRateLimit, authenticate, validate(addEmailSchema), ctrl.addEmail)
+authRouter.patch("/password", authRateLimit, authenticate, validate(changePasswordSchema), ctrl.changePassword)
+authRouter.get("/sessions", authenticate, ctrl.listSessions)
+authRouter.delete("/sessions", authenticate, ctrl.revokeOtherSessions)

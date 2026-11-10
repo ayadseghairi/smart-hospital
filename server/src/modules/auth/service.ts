@@ -273,6 +273,106 @@ export async function deleteOwnAccount(userId: string) {
   ])
 }
 
+// ─── Profile update ─────────────────────────────────────────────────────────
+
+export async function updateProfile(userId: string, data: { fullName?: string; preferredLang?: string }) {
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      ...(data.fullName && { fullName: data.fullName }),
+      ...(data.preferredLang && { preferredLang: data.preferredLang as "ar" | "fr" }),
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phone: true,
+      role: true,
+      preferredLang: true,
+      emailVerifiedAt: true,
+      consentAcceptedAt: true,
+    },
+  })
+  return user
+}
+
+// ─── Add email to phone-only account ────────────────────────────────────────
+
+export async function addEmail(userId: string, email: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user) throw createError("User not found", 404)
+  if (user.email) throw createError("Account already has an email", 409)
+
+  const normalized = email.toLowerCase()
+  const existing = await prisma.user.findUnique({ where: { email: normalized } })
+  if (existing) throw createError("Email already in use", 409)
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { email: normalized, emailVerifiedAt: null },
+  })
+
+  await sendEmailVerification(userId, normalized, user.preferredLang)
+}
+
+// ─── Change password ─────────────────────────────────────────────────────────
+
+export async function changePassword(
+  userId: string,
+  currentPassword: string,
+  newPassword: string,
+  currentTokenHash?: string
+) {
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user || !user.passwordHash) throw createError("User not found", 404)
+
+  const valid = await argon2.verify(user.passwordHash, currentPassword)
+  if (!valid) throw createError("Current password is incorrect", 400)
+
+  const newHash = await argon2.hash(newPassword)
+
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: userId }, data: { passwordHash: newHash } }),
+    // Revoke all refresh tokens except current session
+    prisma.refreshToken.updateMany({
+      where: {
+        userId,
+        revokedAt: null,
+        ...(currentTokenHash ? { tokenHash: { not: currentTokenHash } } : {}),
+      },
+      data: { revokedAt: new Date() },
+    }),
+  ])
+}
+
+// ─── Sessions ────────────────────────────────────────────────────────────────
+
+export async function listSessions(userId: string) {
+  return prisma.refreshToken.findMany({
+    where: {
+      userId,
+      revokedAt: null,
+      expiresAt: { gt: new Date() },
+    },
+    select: { id: true, createdAt: true, expiresAt: true },
+    orderBy: { createdAt: "desc" },
+  })
+}
+
+export async function revokeOtherSessions(userId: string, currentRawToken?: string) {
+  const where: Record<string, unknown> = { userId, revokedAt: null }
+  if (currentRawToken) {
+    const { hashToken: ht } = await import("../../lib/tokens")
+    const currentHash = ht(currentRawToken)
+    where["tokenHash"] = { not: currentHash }
+  }
+  const result = await prisma.refreshToken.updateMany({
+    where,
+    data: { revokedAt: new Date() },
+  })
+  return result.count
+}
+
 // ─── Data export (GDPR-style) ────────────────────────────────────────────────
 
 export async function exportOwnData(userId: string) {

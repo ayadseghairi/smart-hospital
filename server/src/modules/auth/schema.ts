@@ -46,5 +46,19 @@ export const acceptInviteSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 })
 
+export const updateProfileSchema = z.object({
+  fullName: z.string().min(2).max(100).optional(),
+  preferredLang: z.enum(["ar", "fr"]).optional(),
+})
+
+export const addEmailSchema = z.object({
+  email: z.string().email(),
+})
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(10, "Password must be at least 10 characters").max(128),
+})
+
 export type RegisterInput = z.infer<typeof registerSchema>
 export type LoginInput = z.infer<typeof loginSchema>
