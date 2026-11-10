@@ -13,6 +13,7 @@
     "search": "البحث",
     "emergency": "الطوارئ",
     "myAppointments": "مواعيدي",
+    "myAccount": "حسابي",
     "doctorDashboard": "لوحة الطبيب",
     "adminPanel": "لوحة الإدارة",
     "logout": "تسجيل الخروج"
@@ -245,6 +246,7 @@
   "admin": {
     "title": "لوحة الإدارة",
     "subtitle": "إدارة المواعيد وخدمات المؤسسة",
+    "superTitle": "لوحة المسؤول العام",
     "tabs": {
       "overview": "نظرة عامة على المواعيد",
       "general": "الإدارة العامة"
@@ -258,7 +260,27 @@
     "monthlyReport": "تقرير شهري",
     "annualReport": "تقرير سنوي",
     "comingSoon": "وحدات المحاسبة والموارد البشرية قيد التطوير وستُتاح في مرحلة لاحقة.",
-    "defaultSection": "اختر قسماً من الأعلى"
+    "defaultSection": "اختر قسماً من الأعلى",
+    "users": "المستخدمون",
+    "createInstitution": "إضافة مؤسسة",
+    "createDoctor": "إضافة طبيب",
+    "createError": "حدث خطأ أثناء الإنشاء.",
+    "institutionCreated": "تم إنشاء المؤسسة بنجاح.",
+    "doctorCreated": "تم إنشاء حساب الطبيب وإرسال الدعوة.",
+    "active": "نشط",
+    "inactive": "معطل",
+    "deactivate": "تعطيل",
+    "reactivate": "تفعيل",
+    "deactivated": "تم تعطيل الحساب.",
+    "reactivated": "تم تفعيل الحساب.",
+    "resendInvite": "إعادة إرسال الدعوة",
+    "inviteResent": "تم إرسال الدعوة مجدداً.",
+    "inviteError": "حدث خطأ أثناء إرسال الدعوة.",
+    "updateError": "حدث خطأ أثناء التحديث.",
+    "noUsers": "لا يوجد مستخدمون بعد.",
+    "role": "الدور",
+    "status": "الحالة",
+    "selectSpecialty": "اختر التخصص"
   },
   "imaging": {
     "title": "قسم التصوير الطبي",
@@ -487,6 +509,17 @@
     "invalidToken": "الرابط غير صالح.",
     "unverifiedEmailBanner": "لم يتم التحقق من بريدك الإلكتروني بعد. لا يمكنك حجز مواعيد حتى تتحقق من البريد."
   },
+  "account": {
+    "title": "حسابي",
+    "export": "تنزيل بياناتي",
+    "exportHint": "تنزيل جميع بياناتك الشخصية والمواعيد بصيغة JSON.",
+    "delete": "حذف الحساب",
+    "deleteConfirm": "هل أنت متأكد من حذف حسابك نهائياً؟ هذا الإجراء لا يمكن التراجع عنه.",
+    "deleteSuccess": "تم حذف حسابك.",
+    "deleteError": "حدث خطأ أثناء حذف الحساب.",
+    "privacy": "سياسة الخصوصية",
+    "terms": "شروط الاستخدام"
+  },
   "appointments": {
     "myTitle": "مواعيدي",
     "noAppointments": "لا توجد مواعيد حتى الآن.",
@@ -505,29 +538,6 @@
       "completed": "مكتمل",
       "no_show": "لم يحضر"
     }
-  },
-  "admin": {
-    "title": "لوحة المسؤول",
-    "users": "المستخدمون",
-    "createInstitution": "إضافة مؤسسة",
-    "createDoctor": "إضافة طبيب",
-    "createError": "حدث خطأ أثناء الإنشاء.",
-    "institutionCreated": "تم إنشاء المؤسسة بنجاح.",
-    "doctorCreated": "تم إنشاء حساب الطبيب وإرسال الدعوة.",
-    "active": "نشط",
-    "inactive": "معطل",
-    "deactivate": "تعطيل",
-    "reactivate": "تفعيل",
-    "deactivated": "تم تعطيل الحساب.",
-    "reactivated": "تم تفعيل الحساب.",
-    "resendInvite": "إعادة إرسال الدعوة",
-    "inviteResent": "تم إرسال الدعوة مجدداً.",
-    "inviteError": "حدث خطأ أثناء إرسال الدعوة.",
-    "updateError": "حدث خطأ أثناء التحديث.",
-    "noUsers": "لا يوجد مستخدمون بعد.",
-    "role": "الدور",
-    "status": "الحالة",
-    "selectSpecialty": "اختر التخصص"
   },
   "institution": {
     "nameAr": "الاسم بالعربية",

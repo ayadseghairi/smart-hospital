@@ -189,7 +189,7 @@ export default function SuperAdminDashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">{t("admin.title")}</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">{t("admin.superTitle")}</h1>
 
       <div className="flex gap-2 mb-6 border-b">
         {tabs.map(({ key, label }) => (

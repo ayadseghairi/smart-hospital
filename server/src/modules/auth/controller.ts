@@ -116,3 +116,26 @@ export async function acceptInvite(req: Request, res: Response, next: NextFuncti
     next(err)
   }
 }
+
+export async function deleteAccount(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    await authService.deleteOwnAccount(req.user.sub)
+    res.clearCookie("delin_rt", { path: "/api/v1/auth" })
+    res.json({ data: { ok: true } })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function exportData(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    const data = await authService.exportOwnData(req.user.sub)
+    res.setHeader("Content-Disposition", `attachment; filename="delin-export-${req.user.sub}.json"`)
+    res.setHeader("Content-Type", "application/json; charset=utf-8")
+    res.json(data)
+  } catch (err) {
+    next(err)
+  }
+}

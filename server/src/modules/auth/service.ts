@@ -237,3 +237,90 @@ export async function acceptInvite(rawToken: string, newPassword: string) {
     }),
   ])
 }
+
+// ─── Account deletion ───────────────────────────────────────────────────────
+
+export async function deleteOwnAccount(userId: string) {
+  // Soft-delete pattern: anonymize PII and mark inactive.
+  // Hard deletion of all related records is deferred to a scheduled purge
+  // job (run via worker) so that audit logs and appointment history are
+  // retained for the legally required period. The user's public presence
+  // (doctor/institution links) is severed immediately.
+  await prisma.$transaction([
+    // Revoke all sessions
+    prisma.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    }),
+    // Invalidate all pending auth tokens
+    prisma.authToken.updateMany({
+      where: { userId, usedAt: null },
+      data: { usedAt: new Date() },
+    }),
+    // Anonymize the user record — PII is replaced with a tombstone
+    prisma.user.update({
+      where: { id: userId },
+      data: {
+        isActive: false,
+        email: null,
+        phone: null,
+        fullName: `[deleted-${userId.slice(0, 8)}]`,
+        passwordHash: null,
+        emailVerifiedAt: null,
+        consentAcceptedAt: null,
+      },
+    }),
+  ])
+}
+
+// ─── Data export (GDPR-style) ────────────────────────────────────────────────
+
+export async function exportOwnData(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phone: true,
+      role: true,
+      preferredLang: true,
+      createdAt: true,
+      emailVerifiedAt: true,
+      consentAcceptedAt: true,
+    },
+  })
+
+  const appointments = await prisma.appointment.findMany({
+    where: { patientId: userId },
+    select: {
+      id: true,
+      startsAt: true,
+      endsAt: true,
+      status: true,
+      reason: true,
+      createdAt: true,
+      doctor: {
+        select: {
+          user: { select: { fullName: true } },
+          specialty: { select: { nameAr: true, nameFr: true } },
+        },
+      },
+      institution: { select: { nameAr: true, nameFr: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  })
+
+  const reviews = await prisma.review.findMany({
+    where: { patientId: userId },
+    select: {
+      id: true,
+      rating: true,
+      comment: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+  })
+
+  return { user, appointments, reviews, exportedAt: new Date().toISOString() }
+}

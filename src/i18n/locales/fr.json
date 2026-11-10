@@ -13,6 +13,7 @@
     "search": "Recherche",
     "emergency": "Urgences",
     "myAppointments": "Mes rendez-vous",
+    "myAccount": "Mon compte",
     "doctorDashboard": "Tableau du médecin",
     "adminPanel": "Administration",
     "logout": "Déconnexion"
@@ -245,6 +246,7 @@
   "admin": {
     "title": "Tableau de bord",
     "subtitle": "Gestion des rendez-vous et services de l'établissement",
+    "superTitle": "Tableau de bord administrateur",
     "tabs": {
       "overview": "Aperçu des rendez-vous",
       "general": "Administration générale"
@@ -258,7 +260,27 @@
     "monthlyReport": "Rapport mensuel",
     "annualReport": "Rapport annuel",
     "comingSoon": "Les modules comptabilité et RH sont en cours de développement.",
-    "defaultSection": "Sélectionnez une section ci-dessus"
+    "defaultSection": "Sélectionnez une section ci-dessus",
+    "users": "Utilisateurs",
+    "createInstitution": "Ajouter un établissement",
+    "createDoctor": "Ajouter un médecin",
+    "createError": "Une erreur s'est produite lors de la création.",
+    "institutionCreated": "Établissement créé avec succès.",
+    "doctorCreated": "Compte médecin créé et invitation envoyée.",
+    "active": "Actif",
+    "inactive": "Désactivé",
+    "deactivate": "Désactiver",
+    "reactivate": "Réactiver",
+    "deactivated": "Compte désactivé.",
+    "reactivated": "Compte réactivé.",
+    "resendInvite": "Renvoyer l'invitation",
+    "inviteResent": "Invitation renvoyée.",
+    "inviteError": "Erreur lors de l'envoi de l'invitation.",
+    "updateError": "Erreur lors de la mise à jour.",
+    "noUsers": "Aucun utilisateur pour l'instant.",
+    "role": "Rôle",
+    "status": "Statut",
+    "selectSpecialty": "Choisir la spécialité"
   },
   "imaging": {
     "title": "Service d'imagerie médicale",
@@ -487,6 +509,17 @@
     "invalidToken": "Lien invalide.",
     "unverifiedEmailBanner": "Votre adresse e-mail n'a pas encore été vérifiée. Vous ne pouvez pas prendre de rendez-vous avant la vérification."
   },
+  "account": {
+    "title": "Mon compte",
+    "export": "Télécharger mes données",
+    "exportHint": "Téléchargez toutes vos données personnelles et vos rendez-vous au format JSON.",
+    "delete": "Supprimer le compte",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer définitivement votre compte ? Cette action est irréversible.",
+    "deleteSuccess": "Votre compte a été supprimé.",
+    "deleteError": "Une erreur s'est produite lors de la suppression du compte.",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation"
+  },
   "appointments": {
     "myTitle": "Mes rendez-vous",
     "noAppointments": "Aucun rendez-vous pour l'instant.",
@@ -505,29 +538,6 @@
       "completed": "Terminé",
       "no_show": "Absent"
     }
-  },
-  "admin": {
-    "title": "Tableau de bord administrateur",
-    "users": "Utilisateurs",
-    "createInstitution": "Ajouter un établissement",
-    "createDoctor": "Ajouter un médecin",
-    "createError": "Une erreur s'est produite lors de la création.",
-    "institutionCreated": "Établissement créé avec succès.",
-    "doctorCreated": "Compte médecin créé et invitation envoyée.",
-    "active": "Actif",
-    "inactive": "Désactivé",
-    "deactivate": "Désactiver",
-    "reactivate": "Réactiver",
-    "deactivated": "Compte désactivé.",
-    "reactivated": "Compte réactivé.",
-    "resendInvite": "Renvoyer l'invitation",
-    "inviteResent": "Invitation renvoyée.",
-    "inviteError": "Erreur lors de l'envoi de l'invitation.",
-    "updateError": "Erreur lors de la mise à jour.",
-    "noUsers": "Aucun utilisateur pour l'instant.",
-    "role": "Rôle",
-    "status": "Statut",
-    "selectSpecialty": "Choisir la spécialité"
   },
   "institution": {
     "nameAr": "Nom en arabe",

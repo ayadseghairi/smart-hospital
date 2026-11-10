@@ -25,3 +25,5 @@ authRouter.post("/resend-verification", emailRateLimit, authenticate, ctrl.resen
 authRouter.post("/forgot-password", emailRateLimit, validate(forgotPasswordSchema), ctrl.forgotPassword)
 authRouter.post("/reset-password", authRateLimit, validate(resetPasswordSchema), ctrl.resetPassword)
 authRouter.post("/accept-invite", authRateLimit, validate(acceptInviteSchema), ctrl.acceptInvite)
+authRouter.delete("/account", authenticate, ctrl.deleteAccount)
+authRouter.get("/export", authenticate, ctrl.exportData)

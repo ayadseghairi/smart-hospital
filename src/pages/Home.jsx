@@ -83,7 +83,10 @@ const Home = () => {
                       {t("nav.adminPanel")}
                     </button>
                   )}
-                  <span className="text-sm text-gray-600">{user.fullName}</span>
+                  <button onClick={() => navigate("/my-account")}
+                    className="text-sm text-gray-600 hover:underline">
+                    {user.fullName}
+                  </button>
                   <button
                     className="border border-red-300 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors text-sm"
                     onClick={logout}
