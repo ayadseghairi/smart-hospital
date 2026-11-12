@@ -215,7 +215,10 @@ const EmergencyPage = () => {
                   return (
                     <div key={tip.key} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                       <TipIcon size={20} className={`${tip.color} shrink-0 mt-0.5`} aria-hidden />
-                      <p className="text-sm text-gray-700 leading-relaxed">{t(`emergency.tips.${tip.key}`)}</p>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800 mb-0.5">{t(`emergency.tips.${tip.key}.title`)}</p>
+                        <p className="text-sm text-gray-600 leading-relaxed">{t(`emergency.tips.${tip.key}.desc`)}</p>
+                      </div>
                     </div>
                   )
                 })}

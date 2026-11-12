@@ -217,11 +217,19 @@ function CreateInstitutionPanel({ lang }) {
   const [loading, setLoading] = useState(false)
   const f = (k) => ({ value: form[k], onChange: (e) => setForm({ ...form, [k]: e.target.value }) })
 
+  // Load communes for dropdown (re-use public endpoint)
+  const { data: communesRaw = [] } = useQuery({
+    queryKey: ["communes-admin"],
+    queryFn: () => apiGet("/emergency/communes", lang),
+    staleTime: Infinity,
+  })
+
   const create = async (e) => {
     e.preventDefault()
+    if (!form.communeId) { toast.error(lang === "ar" ? "اختر البلدية" : "Choisissez une commune"); return }
     setLoading(true)
     try {
-      await apiPost("/admin/institutions", { ...form, communeId: form.communeId ? parseInt(form.communeId) : undefined }, lang)
+      await apiPost("/admin/institutions", { ...form, communeId: parseInt(form.communeId) }, lang)
       toast.success(t("admin.institutionCreated"))
       setForm({ nameAr: "", nameFr: "", type: "EPH", sector: "PUBLIC", addressAr: "", communeId: "" })
       qc.invalidateQueries({ queryKey: ["admin-institutions"] })
@@ -246,7 +254,14 @@ function CreateInstitutionPanel({ lang }) {
             <option value="PRIVATE">{t("institution.private")}</option>
           </select>
           <input placeholder={t("institution.address")} className={`${inp} sm:col-span-2`} {...f("addressAr")} />
-          <input placeholder={lang === "ar" ? "رمز البلدية" : "Code commune"} type="number" className={`${inp} sm:col-span-2`} {...f("communeId")} />
+          <select required className={`${inp} sm:col-span-2`} {...f("communeId")}>
+            <option value="">{lang === "ar" ? "اختر البلدية *" : "Choisissez une commune *"}</option>
+            {communesRaw.map((c) => (
+              <option key={c.id} value={c.id}>
+                {lang === "ar" ? c.nameAr : c.nameFr}
+              </option>
+            ))}
+          </select>
           <button type="submit" disabled={loading}
             className="sm:col-span-2 bg-[#2C5F8A] text-white py-2.5 rounded-lg hover:bg-[#245075] disabled:opacity-50 font-medium text-sm transition-colors">
             {loading ? t("common.loading") : t("admin.createInstitution")}
