@@ -7,7 +7,7 @@ import { useNavigate, Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { ShieldCheck, Copy, Download, ArrowLeft, ArrowRight, CheckCircle2, Lock } from "lucide-react"
-import { apiGet, apiPost } from "../api/client"
+import { apiPost } from "../api/client"
 import { useAuth } from "../contexts/AuthContext"
 
 export default function TwoFactorSetupPage() {

@@ -29,18 +29,18 @@ export default function ForceChangePasswordPage() {
   const { user, loaded, refreshUser, logout } = useAuth()
   const navigate = useNavigate()
 
+  // Hooks must be declared before any conditional return (Rules of Hooks).
+  const [form, setForm] = useState({ currentPassword: "", newPassword: "", confirm: "" })
+  const [show, setShow] = useState({ current: false, new: false, confirm: false })
+  const [loading, setLoading] = useState(false)
+
   // Guard: must be authenticated. Once `loaded` is true, if there's no user,
   // redirect to /login. We do NOT check mustChangePassword here — the server
   // enforces that. This guard only prevents accessing the page when logged out.
-  // The check is deferred until `loaded=true` to avoid a flash on app mount.
   if (loaded && !user) {
     navigate("/login", { replace: true })
     return null
   }
-
-  const [form, setForm] = useState({ currentPassword: "", newPassword: "", confirm: "" })
-  const [show, setShow] = useState({ current: false, new: false, confirm: false })
-  const [loading, setLoading] = useState(false)
 
   const update = (key, val) => setForm((f) => ({ ...f, [key]: val }))
   const toggleShow = (key) => setShow((s) => ({ ...s, [key]: !s[key] }))
