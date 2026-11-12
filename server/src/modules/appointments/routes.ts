@@ -17,6 +17,7 @@ appointmentsRouter.post(
   ctrl.create
 )
 appointmentsRouter.get("/mine", authenticate, requireRole("PATIENT"), ctrl.mine)
+appointmentsRouter.get("/:id/ics", authenticate, requireRole("PATIENT"), ctrl.downloadIcs)
 appointmentsRouter.patch(
   "/:id/cancel",
   authenticate,

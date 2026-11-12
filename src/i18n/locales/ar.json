@@ -685,7 +685,14 @@
       "signOutAllSuccess": "تم تسجيل الخروج من {{count}} جلسة.",
       "signOutAllError": "حدث خطأ أثناء تسجيل الخروج.",
       "createdAt": "تسجيل الدخول",
-      "expiresAt": "ينتهي"
+      "expiresAt": "ينتهي",
+      "mfaTitle": "التحقق بخطوتين (2FA)",
+      "mfaEnabled": "التحقق بخطوتين مُفعَّل على حسابك.",
+      "mfaNotEnabled": "التحقق بخطوتين غير مفعَّل.",
+      "mfaSetupBtn": "تفعيل التحقق بخطوتين",
+      "mfaDisableBtn": "تعطيل التحقق بخطوتين",
+      "mfaDisabled": "تم تعطيل التحقق بخطوتين.",
+      "mfaDisableError": "حدث خطأ أثناء تعطيل التحقق بخطوتين."
     }
   },
   "appointments": {
@@ -710,7 +717,9 @@
       "cancelled": "ملغى",
       "completed": "مكتمل",
       "no_show": "لم يحضر"
-    }
+    },
+    "downloadIcs": "تحميل .ics",
+    "icsTooltip": "أضف الموعد إلى تقويمك"
   },
   "institution": {
     "nameAr": "الاسم بالعربية",

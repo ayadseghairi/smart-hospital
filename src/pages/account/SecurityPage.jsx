@@ -3,9 +3,10 @@ import { useState } from "react"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { Link } from "react-router-dom"
 import Layout from "../../components/Layout"
 import { useAuth } from "../../contexts/AuthContext"
-import { apiGet, apiPatch, apiDelete } from "../../api/client"
+import { apiGet, apiPatch, apiPost, apiDelete } from "../../api/client"
 
 export default function SecurityPage() {
   const { t, i18n } = useTranslation()
@@ -14,6 +15,7 @@ export default function SecurityPage() {
 
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
+  const [disablePassword, setDisablePassword] = useState("")
 
   // Active sessions
   const { data: sessions = [], isLoading: sessionsLoading, error: sessionsError, refetch: refetchSessions } = useQuery({
@@ -32,6 +34,30 @@ export default function SecurityPage() {
     },
     onError: () => toast.error(t("account.security.passwordError")),
   })
+
+  // 2FA status
+  const { data: mfaStatus, refetch: refetchMfa } = useQuery({
+    queryKey: ["mfa-status"],
+    queryFn: () => apiGet("/auth/2fa/status", lang),
+    enabled: !!user,
+  })
+
+  // Disable 2FA
+  const disableMfa = useMutation({
+    mutationFn: () => apiPost("/auth/2fa/disable", { password: disablePassword }, lang),
+    onSuccess: () => {
+      toast.success(t("account.security.mfaDisabled"))
+      setDisablePassword("")
+      refetchMfa()
+    },
+    onError: (err) => toast.error(err?.message ?? t("account.security.mfaDisableError")),
+  })
+
+  function handleDisableMfa(e) {
+    e.preventDefault()
+    if (!disablePassword) return
+    disableMfa.mutate()
+  }
 
   // Sign out all other sessions
   const signOutAll = useMutation({
@@ -100,6 +126,50 @@ export default function SecurityPage() {
               {changePassword.isPending ? t("common.loading") : t("account.security.changePassword")}
             </button>
           </form>
+        </section>
+
+        {/* Two-factor authentication */}
+        <section className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-base font-semibold text-gray-700 mb-2">{t("account.security.mfaTitle")}</h2>
+          {mfaStatus?.enabled ? (
+            <>
+              <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2 mb-4">
+                {t("account.security.mfaEnabled")}
+              </p>
+              <form onSubmit={handleDisableMfa} className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t("account.security.currentPassword")}
+                  </label>
+                  <input
+                    type="password"
+                    value={disablePassword}
+                    onChange={(e) => setDisablePassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={disableMfa.isPending || !disablePassword}
+                  className="w-full bg-red-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors"
+                >
+                  {disableMfa.isPending ? t("common.loading") : t("account.security.mfaDisableBtn")}
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-gray-500 mb-3">{t("account.security.mfaNotEnabled")}</p>
+              <Link
+                to="/account/security/2fa-setup"
+                className="inline-block bg-[#2C5F8A] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#245075] transition-colors"
+              >
+                {t("account.security.mfaSetupBtn")}
+              </Link>
+            </>
+          )}
         </section>
 
         {/* Active sessions */}

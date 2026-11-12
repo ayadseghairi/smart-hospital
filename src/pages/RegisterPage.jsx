@@ -43,7 +43,7 @@ export default function RegisterPage() {
         ...(form.email ? { email: form.email } : {}),
         password: form.password,
         preferredLang: lang,
-        consentAccepted: true,
+        consent: true,
       }, lang)
       navigate("/check-inbox", { state: { email: form.email } })
     } catch (err) {

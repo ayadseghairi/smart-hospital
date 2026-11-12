@@ -3,9 +3,9 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
-import { Calendar } from "lucide-react"
+import { Calendar, Download } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
-import { apiGet, apiPatch } from "../api/client"
+import { apiGet, apiPatch, apiFetch } from "../api/client"
 import Layout from "../components/Layout"
 
 function StatusBadge({ status }) {
@@ -51,6 +51,22 @@ export default function MyAppointmentsPage() {
     },
     onError: () => toast.error(t("appointments.cancelError")),
   })
+
+  const downloadIcs = async (id) => {
+    try {
+      const res = await apiFetch(`/appointments/${id}/ics`, { method: "GET" }, lang)
+      if (!res.ok) throw new Error()
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `appointment-${id}.ics`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      toast.error(t("common.error"))
+    }
+  }
 
   const formatDate = (iso) =>
     new Intl.DateTimeFormat(lang === "ar" ? "ar-DZ" : "fr-DZ", {
@@ -144,8 +160,16 @@ export default function MyAppointmentsPage() {
                   <StatusBadge status={appt.status} />
                 </div>
 
-                {(appt.status === "PENDING" || appt.status === "CONFIRMED") && (
-                  <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex items-center justify-between gap-2 flex-wrap">
+                  <button
+                    onClick={() => downloadIcs(appt.id)}
+                    title={t("appointments.icsTooltip")}
+                    className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                  >
+                    <Download size={13} aria-hidden />
+                    {t("appointments.downloadIcs")}
+                  </button>
+                  {(appt.status === "PENDING" || appt.status === "CONFIRMED") && (
                     <button
                       onClick={() => cancel.mutate(appt.id)}
                       disabled={cancel.isPending}
@@ -153,8 +177,8 @@ export default function MyAppointmentsPage() {
                     >
                       {t("appointments.cancel")}
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             ))}
           </div>

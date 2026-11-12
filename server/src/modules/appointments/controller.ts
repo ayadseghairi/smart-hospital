@@ -1,6 +1,7 @@
 // server/src/modules/appointments/controller.ts
 import { Request, Response, NextFunction } from "express"
 import * as svc from "./service"
+import { buildIcs } from "./ics"
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
@@ -46,5 +47,28 @@ export async function doctorUpdateStatus(req: Request, res: Response, next: Next
       req.body.status
     )
     res.json({ data: appt })
+  } catch (err) { next(err) }
+}
+
+export async function downloadIcs(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { prisma } = await import("../../lib/prisma")
+    const appt = await prisma.appointment.findUnique({
+      where: { id: req.params.id },
+      include: {
+        doctor: { include: { user: { select: { fullName: true } }, specialty: true } },
+        service: true,
+        institution: { select: { nameAr: true, nameFr: true } },
+      },
+    })
+    if (!appt) { res.status(404).json({ error: "Appointment not found" }); return }
+    // Only the patient who owns the appointment may download it
+    if (appt.patientId !== req.user!.sub) { res.status(403).json({ error: "Forbidden" }); return }
+
+    const lang = (req.headers["accept-language"] ?? "ar") === "fr" ? "fr" : "ar"
+    const ics = buildIcs(appt, lang)
+    res.setHeader("Content-Type", "text/calendar; charset=utf-8")
+    res.setHeader("Content-Disposition", `attachment; filename="appointment-${appt.id}.ics"`)
+    res.send(ics)
   } catch (err) { next(err) }
 }

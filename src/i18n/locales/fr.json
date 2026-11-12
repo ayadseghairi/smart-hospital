@@ -685,7 +685,14 @@
       "signOutAllSuccess": "{{count}} session(s) révoquée(s).",
       "signOutAllError": "Une erreur s'est produite lors de la déconnexion.",
       "createdAt": "Connecté le",
-      "expiresAt": "Expire le"
+      "expiresAt": "Expire le",
+      "mfaTitle": "Double authentification (2FA)",
+      "mfaEnabled": "La double authentification est activée sur votre compte.",
+      "mfaNotEnabled": "La double authentification n'est pas activée.",
+      "mfaSetupBtn": "Activer la 2FA",
+      "mfaDisableBtn": "Désactiver la 2FA",
+      "mfaDisabled": "Double authentification désactivée.",
+      "mfaDisableError": "Une erreur s'est produite lors de la désactivation."
     }
   },
   "appointments": {
@@ -710,7 +717,9 @@
       "cancelled": "Annulé",
       "completed": "Terminé",
       "no_show": "Absent"
-    }
+    },
+    "downloadIcs": "Télécharger .ics",
+    "icsTooltip": "Ajouter au calendrier"
   },
   "institution": {
     "nameAr": "Nom en arabe",
