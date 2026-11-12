@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { Eye, EyeOff, ShieldCheck, Lock } from "lucide-react"
-import { apiPost } from "../api/client"
+import { apiPatch } from "../api/client"
 import { useAuth } from "../contexts/AuthContext"
 
 const ROLE_HOME = {
@@ -55,8 +55,8 @@ export default function ForceChangePasswordPage() {
 
     setLoading(true)
     try {
-      await apiPost(
-        "/auth/change-password",
+      await apiPatch(
+        "/auth/password",
         { currentPassword: form.currentPassword, newPassword: form.newPassword },
         lang,
       )
