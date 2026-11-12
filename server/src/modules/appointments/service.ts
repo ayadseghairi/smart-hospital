@@ -71,7 +71,7 @@ export async function getDoctorAppointments(doctorId: string) {
   return prisma.appointment.findMany({
     where: { doctorId },
     include: {
-      patient: { select: { fullName: true } },
+      patient: { select: { fullName: true, phone: true } },
       service: true,
       institution: { select: { nameAr: true, nameFr: true } },
     },

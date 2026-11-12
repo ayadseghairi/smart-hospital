@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import {
   Calendar, Clock, CheckCircle2, XCircle, AlertCircle,
-  Building2, User,
+  Building2, User, Phone,
 } from "lucide-react"
 import Layout from "../../components/Layout"
 import { apiGet, apiPatch } from "../../api/client"
@@ -147,6 +147,16 @@ export default function DoctorAppointmentsPage() {
                         <User size={14} className="text-gray-400 shrink-0" aria-hidden />
                         {appt.patient?.fullName ?? t("common.unknown")}
                       </p>
+                      {appt.patient?.phone && (
+                        <a
+                          href={`tel:${appt.patient.phone}`}
+                          className="inline-flex items-center gap-1 text-xs text-[#2C5F8A] hover:underline mt-0.5"
+                          dir="ltr"
+                        >
+                          <Phone size={11} aria-hidden />
+                          {appt.patient.phone}
+                        </a>
+                      )}
                       {appt.institution && (
                         <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
                           <Building2 size={11} aria-hidden />

@@ -428,12 +428,28 @@ export async function deleteOwnAccount(userId: string) {
 
 // ─── Profile update ─────────────────────────────────────────────────────────
 
-export async function updateProfile(userId: string, data: { fullName?: string; preferredLang?: string }) {
+export async function updateProfile(userId: string, data: { fullName?: string; preferredLang?: string; phone?: string | null }) {
+  // Handle phone update: normalize, check uniqueness
+  let normalizedPhone: string | null | undefined = undefined // undefined = don't touch
+  if (data.phone !== undefined) {
+    if (data.phone === null || data.phone === "") {
+      normalizedPhone = null
+    } else {
+      const norm = normalizePhone(data.phone)
+      if (!norm) throw createError("Invalid Algerian phone number", 400)
+      // Check uniqueness (exclude current user)
+      const existing = await prisma.user.findFirst({ where: { phone: norm, NOT: { id: userId } } })
+      if (existing) throw createError("Phone number already in use", 409)
+      normalizedPhone = norm
+    }
+  }
+
   const user = await prisma.user.update({
     where: { id: userId },
     data: {
       ...(data.fullName && { fullName: data.fullName }),
       ...(data.preferredLang && { preferredLang: data.preferredLang as "ar" | "fr" }),
+      ...(normalizedPhone !== undefined && { phone: normalizedPhone }),
     },
     select: {
       id: true,

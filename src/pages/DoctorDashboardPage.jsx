@@ -5,8 +5,8 @@ import { Link, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import {
   Calendar, Clock, UserCircle2, ShieldCheck, LogOut,
-  CheckCircle2, XCircle, AlertCircle, Stethoscope,
-  ClipboardList, ChevronRight, ChevronLeft,
+  CheckCircle2, XCircle, AlertCircle,
+  ClipboardList, ChevronRight, ChevronLeft, Phone,
 } from "lucide-react"
 import Layout from "../components/Layout"
 import { apiGet, apiPatch } from "../api/client"
@@ -183,6 +183,16 @@ export default function DoctorDashboardPage() {
                             <Clock size={11} aria-hidden />
                             {formatTime(appt.startsAt)}
                           </p>
+                          {appt.patient?.phone && (
+                            <a
+                              href={`tel:${appt.patient.phone}`}
+                              className="text-xs text-[#2C5F8A] flex items-center gap-1 mt-0.5 hover:underline"
+                              dir="ltr"
+                            >
+                              <Phone size={11} aria-hidden />
+                              {appt.patient.phone}
+                            </a>
+                          )}
                           {appt.reason && <p className="text-xs text-gray-400 mt-0.5">{appt.reason}</p>}
                         </div>
                         <StatusBadge status={appt.status} />

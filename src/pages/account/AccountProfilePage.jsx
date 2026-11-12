@@ -33,22 +33,37 @@ export default function AccountProfilePage() {
 
   const [fullName, setFullName] = useState("")
   const [preferredLang, setPreferredLang] = useState("ar")
+  const [phone, setPhone] = useState("")
 
   useEffect(() => {
     if (user) {
       setFullName(user.fullName ?? "")
       setPreferredLang(user.preferredLang ?? "ar")
+      setPhone(user.phone ?? "")
     }
   }, [user])
 
   const save = useMutation({
-    mutationFn: () => apiPatch("/auth/profile", { fullName: fullName.trim(), preferredLang }, lang),
+    mutationFn: () => apiPatch("/auth/profile", {
+      fullName: fullName.trim(),
+      preferredLang,
+      phone: phone.trim() || null,
+    }, lang),
     onSuccess: async () => {
       toast.success(t("account.profile.saveSuccess"))
       await refreshUser()
       qc.invalidateQueries({ queryKey: ["me"] })
     },
-    onError: () => toast.error(t("account.profile.saveError")),
+    onError: (err) => {
+      const msg = err?.body?.details?.[0]?.message ?? err?.message
+      if (msg?.includes("already in use")) {
+        toast.error(t("account.profile.phoneInUse"))
+      } else if (msg?.includes("Invalid")) {
+        toast.error(t("account.profile.phoneInvalid"))
+      } else {
+        toast.error(t("account.profile.saveError"))
+      }
+    },
   })
 
   const initials = (name) =>
@@ -97,6 +112,21 @@ export default function AccountProfilePage() {
               />
             </div>
             <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5 flex items-center gap-1.5">
+                <Phone size={12} aria-hidden />
+                {t("account.profile.phone")}
+              </label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="07xxxxxxxx"
+                dir="ltr"
+                className={inp}
+              />
+              <p className="text-xs text-gray-400 mt-1">{t("account.profile.phoneLoginNote")}</p>
+            </div>
+            <div>
               <label className="block text-xs font-medium text-gray-500 mb-1.5">{t("account.profile.preferredLang")}</label>
               <select value={preferredLang} onChange={(e) => setPreferredLang(e.target.value)} className={inp}>
                 <option value="ar">{t("account.profile.langAr")}</option>
@@ -137,15 +167,22 @@ export default function AccountProfilePage() {
               </div>
             </div>
 
-            {/* Phone */}
+            {/* Phone (display only — editing is in the Personal info form above) */}
             {user?.phone && (
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1.5 flex items-center gap-1.5">
                   <Phone size={12} aria-hidden />
                   {t("account.profile.phone")}
+                  <span className="text-teal-600 font-medium">{lang === "ar" ? "· مستخدم لتسجيل الدخول" : "· Utilisé pour la connexion"}</span>
                 </label>
-                <input type="text" value={user.phone} readOnly className={inpRO} dir="ltr" />
-                <p className="text-xs text-gray-400 mt-1">{t("account.profile.phoneNote")}</p>
+                <a
+                  href={`tel:${user.phone}`}
+                  className="flex items-center gap-2 w-full border border-gray-200 bg-gray-50 rounded-xl px-3 py-2.5 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+                  dir="ltr"
+                >
+                  <Phone size={13} className="text-gray-400 shrink-0" aria-hidden />
+                  {user.phone}
+                </a>
               </div>
             )}
           </div>

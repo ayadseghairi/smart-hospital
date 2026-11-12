@@ -49,6 +49,7 @@ export const acceptInviteSchema = z.object({
 export const updateProfileSchema = z.object({
   fullName: z.string().min(2).max(100).optional(),
   preferredLang: z.enum(["ar", "fr"]).optional(),
+  phone: z.string().regex(ALGERIAN_PHONE, "Invalid Algerian phone number").optional().nullable(),
 })
 
 export const addEmailSchema = z.object({
