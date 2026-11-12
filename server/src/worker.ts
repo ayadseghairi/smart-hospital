@@ -1,5 +1,6 @@
 // server/src/worker.ts
 // Background worker: runs the pg-boss job queue and scheduled tasks
+import "dotenv/config"
 import PgBoss from "pg-boss"
 import { env } from "./config/env"
 import { logger } from "./lib/logger"
