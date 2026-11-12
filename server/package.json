@@ -19,6 +19,7 @@
     "mail:preview": "tsx scripts/mail-preview.ts",
     "test": "vitest run",
     "test:watch": "vitest",
+    "audit:check": "npm audit --omit=dev --json | node scripts/audit-check.mjs",
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {
