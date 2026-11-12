@@ -21,10 +21,20 @@ const envSchema = z
     API_BASE_URL: z.string().url("API_BASE_URL must be a valid URL"),
     CORS_ORIGIN: z.string().min(1, "CORS_ORIGIN is required"),
 
-    MAIL_ENABLED: z.coerce.boolean().default(false),
+    MAIL_ENABLED: z
+      .string()
+      .optional()
+      .transform((v) => v === "true" || v === "1")
+      .default("false")
+      .pipe(z.boolean()),
     SMTP_HOST: z.string().optional(),
     SMTP_PORT: z.coerce.number().default(587),
-    SMTP_SECURE: z.coerce.boolean().default(false),
+    SMTP_SECURE: z
+      .string()
+      .optional()
+      .transform((v) => v === "true" || v === "1")
+      .default("false")
+      .pipe(z.boolean()),
     SMTP_USER: z.string().optional(),
     SMTP_PASS: z.string().optional(),
     MAIL_FROM_NAME: z.string().default("Delin Smart Care"),
