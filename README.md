@@ -10,11 +10,19 @@ A bilingual (Arabic RTL + French) digital health platform for **Khenchela Provin
 
 ### Prerequisites
 
-| Tool | Version |
-|---|---|
-| Node.js | 20+ |
-| npm | 9+ |
-| Docker & Docker Compose | any recent version |
+| Tool | Minimum version | Download |
+|---|---|---|
+| Node.js | 20 LTS | https://nodejs.org |
+| npm | 9 (bundled with Node 20) | — |
+| Docker Desktop | any recent | https://www.docker.com/products/docker-desktop/ |
+| Git | any recent | https://git-scm.com |
+
+> **Windows note:** use **Git Bash** or **PowerShell** for all commands below.
+> Do **not** use the legacy `cmd.exe` — some npm lifecycle scripts use Unix shell syntax.
+
+---
+
+## 🐧 Linux / macOS
 
 ### 1. Clone and install
 
@@ -35,87 +43,91 @@ cd server && npm install && cd ..
 docker compose up -d
 ```
 
-Services:
-- **PostgreSQL 16** on `localhost:5432` — database `delin_dev`, user `delin`, password `delin_dev_pass`
-- **Mailpit** on `http://localhost:8025` — catches all outgoing emails in development (no real SMTP needed)
+Services started:
+
+| Service | URL / address |
+|---|---|
+| PostgreSQL 16 | `localhost:5432` — db `delin_dev`, user `delin`, password `delin_dev_pass` |
+| Mailpit (email catcher) | `http://localhost:8025` — no real SMTP needed in dev |
 
 ### 3. Configure the backend
 
 ```bash
 cp server/.env.example server/.env
-# Edit server/.env — see variable reference below.
-# The defaults in .env.example already point to the Docker Compose services.
 ```
 
-Required variables that have no default and must be set:
+Open `server/.env` in your editor and set the two required secrets (everything else has working defaults):
+
+```bash
+# Generate two independent secrets — run each line separately:
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+Paste the output into `.env`:
 
 ```
-JWT_ACCESS_SECRET=<at-least-32-random-chars>
-JWT_REFRESH_SECRET=<at-least-32-random-chars>
+JWT_ACCESS_SECRET=<first output>
+JWT_REFRESH_SECRET=<second output>
 ```
 
-For SMTP, the default `server/.env.example` uses Mailpit (`SMTP_HOST=localhost`, `SMTP_PORT=1025`, `SMTP_SECURE=false`), so you do not need a real SMTP server in development.
+Generate the TOTP encryption key (required for 2FA):
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+```
+MFA_ENCRYPTION_KEY=<output — must be exactly 64 hex chars>
+```
 
 ### 4. Migrate and seed the database
 
 ```bash
 cd server
 
-# Apply migrations
-npx prisma migrate dev
-
-# Seed reference data (wilaya, communes, specialties, emergency numbers)
-npm run seed
-
-# Validate the seed (lists institutions missing phone or coordinates)
-npm run seed:validate
+npx prisma migrate dev        # applies all migrations
+npm run seed                  # seeds wilaya, communes, specialties, emergency numbers
+npm run seed:validate         # lists institutions missing phone or coordinates
 ```
 
 ### 5. Create the first super admin
 
-Edit `server/.env` and fill in the bootstrap variables:
+Edit `server/.env`:
 
-```bash
+```
 SUPER_ADMIN_EMAIL=you@yourcompany.dz
 SUPER_ADMIN_FULL_NAME=Your Full Name
-# Choose a strong temporary password (≥16 chars).
-# You MUST remove this variable from .env after your first login.
-SUPER_ADMIN_INITIAL_PASSWORD=<at-least-16-random-chars>
+SUPER_ADMIN_INITIAL_PASSWORD=<strong-password-min-16-chars>
 ```
 
-Then run:
+Then:
 
 ```bash
 cd server && npm run create-super-admin
 ```
 
-**If `SUPER_ADMIN_INITIAL_PASSWORD` is set:** The account is created with that password (hashed with argon2id). You will receive a "Your administrator account is ready" email (no password inside — login link only). At first login you will be forced to change the password before accessing anything else.
+**After first login:**
+1. Change your password when prompted (min 14 chars for SUPER_ADMIN).
+2. Enroll TOTP 2FA at `/account/security/2fa-setup` — required to reach `/admin`.
+3. **Remove `SUPER_ADMIN_INITIAL_PASSWORD` from `.env` immediately.**
 
-**If `SUPER_ADMIN_INITIAL_PASSWORD` is empty:** An invitation email with a set-password link is sent instead.
-
-**After the first login:**
-1. Change your password when prompted (minimum 14 characters for super admin).
-2. Complete TOTP 2FA enrollment at `/account/security/2fa-setup` — you cannot reach `/admin` until enrolled.
-3. **Delete `SUPER_ADMIN_INITIAL_PASSWORD` from `server/.env`.**
-
-To reset the super admin password in an emergency (server shell only):
+Emergency password reset (local shell only):
 
 ```bash
 cd server && npm run reset-super-admin-password
 ```
 
-### 6. Start the services
+### 6. Start all services (three terminals)
 
 ```bash
-# In separate terminals:
-
-# Backend API
+# Terminal 1 — Backend API
 cd server && npm run dev
 
-# Background job worker (reminders, notifications, digests)
+# Terminal 2 — Background worker (reminders, notifications, digests)
 cd server && npm run worker
 
-# Frontend (Vite dev server)
+# Terminal 3 — Frontend (Vite)
 npm run dev
 ```
 
@@ -123,7 +135,130 @@ npm run dev
 |---|---|
 | Frontend | `http://localhost:5173` |
 | API | `http://localhost:4000/api/v1` |
-| Mailpit (email inbox) | `http://localhost:8025` |
+| Mailpit inbox | `http://localhost:8025` |
+
+---
+
+## 🪟 Windows
+
+> All commands below assume **Git Bash** (installed with Git for Windows).
+> In PowerShell, replace `cp` with `Copy-Item` and `/` path separators work as-is.
+
+### 1. Install prerequisites
+
+1. Download and install **Node.js 20 LTS** from https://nodejs.org — accept the default options including "Add to PATH".
+2. Install **Docker Desktop** from https://www.docker.com/products/docker-desktop/ — enable WSL 2 backend when prompted.
+3. Install **Git for Windows** from https://git-scm.com — choose "Git Bash Here" in context menu.
+
+Verify in Git Bash:
+
+```bash
+node --version    # should print v20.x.x
+npm --version     # should print 9.x.x or 10.x.x
+docker --version  # should print Docker version 24.x or higher
+```
+
+### 2. Clone and install (Git Bash)
+
+```bash
+git clone https://github.com/ayadseghairi/smart-hospital.git
+cd smart-hospital
+
+npm install
+cd server && npm install && cd ..
+```
+
+### 3. Start infrastructure
+
+```bash
+docker compose up -d
+```
+
+Wait ~15 seconds for PostgreSQL to be ready. Check it with:
+
+```bash
+docker compose ps
+```
+
+Both `db` and `mailpit` should show `healthy` or `running`.
+
+### 4. Configure the backend (Git Bash)
+
+```bash
+cp server/.env.example server/.env
+```
+
+Open `server/.env` in Notepad (or VS Code) and generate secrets:
+
+```bash
+# Run in Git Bash — copy each output into .env:
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Set in `server/.env`:
+
+```
+JWT_ACCESS_SECRET=<first output>
+JWT_REFRESH_SECRET=<second output>
+MFA_ENCRYPTION_KEY=<third output — must be exactly 64 hex chars>
+```
+
+The SMTP defaults (`SMTP_HOST=localhost`, `SMTP_PORT=1025`) already point to Mailpit — no changes needed for local email testing.
+
+### 5. Migrate and seed (Git Bash)
+
+```bash
+cd server
+npx prisma migrate dev
+npm run seed
+```
+
+### 6. Create the first super admin
+
+Edit `server/.env`:
+
+```
+SUPER_ADMIN_EMAIL=you@yourcompany.dz
+SUPER_ADMIN_FULL_NAME=Your Name
+SUPER_ADMIN_INITIAL_PASSWORD=<strong-password-min-16-chars>
+```
+
+```bash
+cd server && npm run create-super-admin
+```
+
+**After first login:** change password → enroll 2FA → delete `SUPER_ADMIN_INITIAL_PASSWORD` from `.env`.
+
+### 7. Start all services (three Git Bash windows)
+
+```bash
+# Window 1 — Backend API
+cd server && npm run dev
+
+# Window 2 — Background worker
+cd server && npm run worker
+
+# Window 3 — Frontend
+cd .. && npm run dev        # or open a new Git Bash at the project root
+```
+
+| Service | URL |
+|---|---|
+| Frontend | `http://localhost:5173` |
+| API | `http://localhost:4000/api/v1` |
+| Mailpit inbox | `http://localhost:8025` |
+
+### Windows-specific troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `prisma migrate dev` fails with "could not connect to server" | Docker Desktop is not running — start it from the taskbar tray icon |
+| `npm run dev` fails with `EACCES` or `EPERM` | Run Git Bash as Administrator, or move the project outside `C:\Program Files\` |
+| Port 5432 already in use | Another PostgreSQL is installed. Stop it: `net stop postgresql` in PowerShell |
+| Long paths error during `npm install` | Enable long paths: `git config --system core.longpaths true` (run as Administrator) |
+| Vite HMR not updating | Windows Defender may block file watching — add the project folder to exclusions |
 
 ---
 
