@@ -44,6 +44,30 @@ adminRouter.post("/institutions", validate(createInstitutionSchema), async (req,
   } catch (err) { next(err) }
 })
 
+adminRouter.get("/institutions/:id", async (req, res, next) => {
+  try {
+    const institution = await prisma.institution.findUnique({
+      where: { id: req.params.id },
+      include: { commune: { select: { id: true, nameAr: true, nameFr: true } } },
+    })
+    if (!institution) { res.status(404).json({ error: "Not found" }); return }
+    res.json({ data: institution })
+  } catch (err) { next(err) }
+})
+
+const updateInstitutionSchema = createInstitutionSchema.partial()
+
+adminRouter.patch("/institutions/:id", validate(updateInstitutionSchema), async (req, res, next) => {
+  try {
+    const institution = await prisma.institution.update({
+      where: { id: req.params.id },
+      data: req.body,
+    })
+    await audit({ userId: req.user!.sub, action: "UPDATE_INSTITUTION", entity: "Institution", entityId: institution.id, ip: req.ip })
+    res.json({ data: institution })
+  } catch (err) { next(err) }
+})
+
 adminRouter.patch("/institutions/:id/verify", async (req, res, next) => {
   try {
     const institution = await prisma.institution.update({
@@ -63,6 +87,14 @@ adminRouter.patch("/institutions/:id/suspend", async (req, res, next) => {
     })
     await audit({ userId: req.user!.sub, action: "SUSPEND_INSTITUTION", entity: "Institution", entityId: institution.id, ip: req.ip })
     res.json({ data: institution })
+  } catch (err) { next(err) }
+})
+
+adminRouter.delete("/institutions/:id", async (req, res, next) => {
+  try {
+    await prisma.institution.delete({ where: { id: req.params.id } })
+    await audit({ userId: req.user!.sub, action: "DELETE_INSTITUTION", entity: "Institution", entityId: req.params.id, ip: req.ip })
+    res.json({ data: { ok: true } })
   } catch (err) { next(err) }
 })
 
@@ -92,6 +124,68 @@ const createDoctorSchema = z.object({
   institutionIds: z.array(z.string()).min(1),
   consultationFeeDZD: z.number().int().optional(),
   licenseNumber: z.string().optional(),
+})
+
+adminRouter.get("/doctors", async (req, res, next) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page as string) || 1)
+    const limit = Math.min(50, parseInt(req.query.limit as string) || 20)
+    const q = req.query.q as string | undefined
+    const where = q ? {
+      user: { OR: [
+        { fullName: { contains: q, mode: "insensitive" as const } },
+        { email:    { contains: q, mode: "insensitive" as const } },
+      ]}
+    } : {}
+    const [doctors, total] = await prisma.$transaction([
+      prisma.doctor.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true, specialtyId: true, consultationFeeDZD: true, licenseNumber: true, status: true, createdAt: true,
+          user: { select: { id: true, fullName: true, email: true, phone: true, isActive: true } },
+          specialty: { select: { nameAr: true, nameFr: true } },
+          institutionLinks: { select: { institution: { select: { id: true, nameAr: true, nameFr: true } }, isPrimary: true } },
+        },
+      }),
+      prisma.doctor.count({ where }),
+    ])
+    res.json({ data: { doctors, total, page, limit } })
+  } catch (err) { next(err) }
+})
+
+const updateDoctorAdminSchema = z.object({
+  specialtyId: z.string().min(1).optional(),
+  consultationFeeDZD: z.number().int().optional(),
+  licenseNumber: z.string().optional(),
+  status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+})
+
+adminRouter.patch("/doctors/:id", validate(updateDoctorAdminSchema), async (req, res, next) => {
+  try {
+    const doctor = await prisma.doctor.update({
+      where: { id: req.params.id },
+      data: req.body,
+    })
+    await audit({ userId: req.user!.sub, action: "UPDATE_DOCTOR", entity: "Doctor", entityId: doctor.id, ip: req.ip })
+    res.json({ data: doctor })
+  } catch (err) { next(err) }
+})
+
+adminRouter.delete("/doctors/:id", async (req, res, next) => {
+  try {
+    // Soft-delete: deactivate the doctor and their user account
+    const doctor = await prisma.doctor.findUnique({ where: { id: req.params.id }, select: { userId: true } })
+    if (!doctor) { res.status(404).json({ error: "Doctor not found" }); return }
+    await prisma.$transaction([
+      prisma.doctor.update({ where: { id: req.params.id }, data: { status: "INACTIVE" } }),
+      prisma.user.update({ where: { id: doctor.userId }, data: { isActive: false } }),
+    ])
+    await audit({ userId: req.user!.sub, action: "DELETE_DOCTOR", entity: "Doctor", entityId: req.params.id, ip: req.ip })
+    res.json({ data: { ok: true } })
+  } catch (err) { next(err) }
 })
 
 adminRouter.post("/doctors", emailRateLimit, validate(createDoctorSchema), async (req, res, next) => {
