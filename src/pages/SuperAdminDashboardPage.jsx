@@ -108,10 +108,11 @@ function UsersPanel({ lang }) {
   const { t } = useTranslation()
   const qc = useQueryClient()
 
-  const { data: users = [], isLoading } = useQuery({
+  const { data: usersData, isLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: () => apiGet("/admin/users", lang),
   })
+  const users = usersData?.users ?? []
 
   const deactivate = useMutation({
     mutationFn: (id) => apiPatch(`/admin/users/${id}/deactivate`, {}, lang),
