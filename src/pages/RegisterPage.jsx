@@ -49,6 +49,13 @@ export default function RegisterPage() {
     } catch (err) {
       if (err.status === 409) {
         toast.error(t("auth.accountExists"))
+      } else if (err.status === 400) {
+        // Show the first field-level validation message if available, else the top-level error
+        const details = err?.body?.details
+        const msg = Array.isArray(details) && details.length > 0
+          ? details[0].message
+          : (err.message ?? t("auth.registerError"))
+        toast.error(msg)
       } else {
         toast.error(t("auth.registerError"))
       }
@@ -99,8 +106,9 @@ export default function RegisterPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">
               {t("auth.password")} *
             </label>
-            <input id="password" type="password" required autoComplete="new-password" {...field("password")}
+            <input id="password" type="password" required autoComplete="new-password" minLength={10} {...field("password")}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <p className="text-xs text-gray-400 mt-1">{t("account.security.newPasswordHint")}</p>
           </div>
 
           <div>
