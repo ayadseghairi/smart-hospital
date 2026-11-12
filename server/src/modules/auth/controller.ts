@@ -151,8 +151,40 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export async function me(req: Request, res: Response) {
-  res.json({ data: req.user })
+export async function me(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    const { prisma } = await import("../../lib/prisma")
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.sub },
+      select: {
+        id: true,
+        role: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        emailVerifiedAt: true,
+        preferredLang: true,
+        consentAcceptedAt: true,
+        isActive: true,
+        mustChangePassword: true,
+        createdAt: true,
+      },
+    })
+    if (!user || !user.isActive) { res.status(401).json({ error: "Account not found or deactivated" }); return }
+    res.json({
+      data: {
+        ...req.user,           // keep JWT fields (mfaSetupRequired, mfaVerified, etc.)
+        fullName: user.fullName,
+        email: user.email ?? req.user.email,
+        phone: user.phone ?? req.user.phone,
+        emailVerifiedAt: user.emailVerifiedAt,
+        preferredLang: user.preferredLang,
+        consentAcceptedAt: user.consentAcceptedAt,
+        createdAt: user.createdAt,
+      },
+    })
+  } catch (err) { next(err) }
 }
 
 export async function verifyEmail(req: Request, res: Response, next: NextFunction) {

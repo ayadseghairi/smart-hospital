@@ -17,7 +17,6 @@ const inp = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ou
 
 // ─── Stats Panel ─────────────────────────────────────────────────────────────
 function StatsPanel({ lang }) {
-  const { t } = useTranslation()
   const { data: stats } = useQuery({
     queryKey: ["admin-stats"],
     queryFn: () => apiGet("/admin/stats", lang),
@@ -37,17 +36,20 @@ function StatsPanel({ lang }) {
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {cards.map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="bg-white rounded-xl border border-gray-200 p-5 flex items-center gap-4">
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${color}`}>
-              <Icon size={22} aria-hidden />
+        {cards.map((card) => {
+          const CardIcon = card.icon
+          return (
+            <div key={card.label} className="bg-white rounded-xl border border-gray-200 p-5 flex items-center gap-4">
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${card.color}`}>
+                <CardIcon size={22} aria-hidden />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-800">{card.value}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-800">{value}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{label}</p>
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Institutions breakdown */}
@@ -511,21 +513,24 @@ export default function SuperAdminDashboardPage() {
 
       {/* Nav links */}
       <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems.map(({ key, icon: Icon, label }) => (
-          <button
-            key={key}
-            onClick={() => { setSection(key); if (mobile) setSidebarOpen(false) }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-start ${
-              section === key
-                ? "bg-white/20 text-white"
-                : "text-white/70 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            <Icon size={17} aria-hidden />
-            <span className="flex-1">{label}</span>
-            {section === key && <ChevronIcon size={14} className="opacity-60" aria-hidden />}
-          </button>
-        ))}
+        {navItems.map((item) => {
+          const NavIcon = item.icon
+          return (
+            <button
+              key={item.key}
+              onClick={() => { setSection(item.key); if (mobile) setSidebarOpen(false) }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-start ${
+                section === item.key
+                  ? "bg-white/20 text-white"
+                  : "text-white/70 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <NavIcon size={17} aria-hidden />
+              <span className="flex-1">{item.label}</span>
+              {section === item.key && <ChevronIcon size={14} className="opacity-60" aria-hidden />}
+            </button>
+          )
+        })}
       </div>
 
       {/* User + logout */}
