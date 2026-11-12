@@ -78,7 +78,7 @@ interface CreateDoctorInput {
   email: string
   preferredLang: "ar" | "fr"
   specialtyId: string
-  institutionIds: string[]
+  institutionIds: string[] // may be empty for independent/private doctors
   consultationFeeDZD?: number
   licenseNumber?: string
 }
@@ -107,13 +107,16 @@ export async function createDoctorAccount(createdById: string, input: CreateDoct
     },
   })
 
-  await prisma.doctorInstitution.createMany({
-    data: input.institutionIds.map((institutionId, i) => ({
-      doctorId: doctor.id,
-      institutionId,
-      isPrimary: i === 0,
-    })),
-  })
+  // Link to institutions only if provided (independent doctors have none)
+  if (input.institutionIds.length > 0) {
+    await prisma.doctorInstitution.createMany({
+      data: input.institutionIds.map((institutionId, i) => ({
+        doctorId: doctor.id,
+        institutionId,
+        isPrimary: i === 0,
+      })),
+    })
+  }
 
   await sendInvite(user.id)
 

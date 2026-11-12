@@ -121,7 +121,7 @@ const createDoctorSchema = z.object({
   email: z.string().email(),
   preferredLang: z.enum(["ar", "fr"]).default("ar"),
   specialtyId: z.string().min(1),
-  institutionIds: z.array(z.string()).min(1),
+  institutionIds: z.array(z.string()).default([]), // optional — independent/private doctors have no institution
   consultationFeeDZD: z.number().int().optional(),
   licenseNumber: z.string().optional(),
 })
