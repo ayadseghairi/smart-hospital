@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { Camera } from "lucide-react"
 import Layout from "../../components/Layout"
 import { useAuth } from "../../contexts/AuthContext"
 import { apiGet, apiPatch } from "../../api/client"
@@ -142,7 +143,7 @@ export default function DoctorProfileEditPage() {
 
           {/* Photo upload — coming soon */}
           <div className="bg-gray-50 border border-dashed border-gray-300 rounded-xl p-4 text-center">
-            <i className="bx bx-camera text-2xl text-gray-400 mb-1 block" />
+            <Camera size={24} className="text-gray-400 mb-1 mx-auto" aria-hidden />
             <p className="text-xs text-gray-400">{t("doctor.profile.photoNote")}</p>
           </div>
 

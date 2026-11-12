@@ -3,6 +3,10 @@ import { useState } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { useQuery } from "@tanstack/react-query"
+import {
+  ArrowLeft, ArrowRight, User, Calendar, Star, Phone as PhoneIcon,
+  Building2, Loader2, AlertCircle,
+} from "lucide-react"
 import { apiGet } from "../api/client"
 import Avatar from "../components/common/Avatar"
 
@@ -11,6 +15,8 @@ const DoctorProfile = () => {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const lang = i18n.language === "fr" ? "fr" : "ar"
+  const isRtl = lang === "ar"
+  const BackIcon = isRtl ? ArrowRight : ArrowLeft
   const [activeTab, setActiveTab] = useState("overview")
 
   const { data: doctor, isLoading, error } = useQuery({
@@ -19,7 +25,7 @@ const DoctorProfile = () => {
   })
 
   const tabKeys = ["overview", "schedule", "reviews", "contact"]
-  const tabIcons = { overview: "bx-user", schedule: "bx-calendar", reviews: "bx-star", contact: "bx-phone" }
+  const tabIcons = { overview: User, schedule: Calendar, reviews: Star, contact: PhoneIcon }
 
   const formatFee = (fee) => {
     if (fee == null) return t("doctors.feeOnRequest")
@@ -28,9 +34,9 @@ const DoctorProfile = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-dvh bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
-          <i className="bx bx-loader-alt animate-spin text-4xl text-blue-600 mb-4"></i>
+          <Loader2 size={40} className="animate-spin text-blue-600 mb-4 mx-auto" aria-hidden />
           <p className="text-gray-600">{t("doctors.loading")}</p>
         </div>
       </div>
@@ -39,9 +45,9 @@ const DoctorProfile = () => {
 
   if (error || !doctor) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <i className="bx bx-error text-6xl text-gray-400 mb-4"></i>
+      <div className="min-h-dvh bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center px-4">
+          <AlertCircle size={64} className="text-gray-400 mb-4 mx-auto" aria-hidden />
           <h2 className="text-xl font-semibold text-gray-800 mb-2">{t("doctors.notFound")}</h2>
           <p className="text-gray-500 mb-4">{t("doctors.notFoundDesc")}</p>
           <Link to="/" className="text-blue-600 hover:text-blue-800">{t("nav.backHome")}</Link>
@@ -54,16 +60,16 @@ const DoctorProfile = () => {
   const specialty = lang === "ar" ? doctor.specialty?.nameAr : doctor.specialty?.nameFr
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <header className="bg-white shadow-lg">
+    <div className="min-h-dvh bg-gradient-to-br from-blue-50 to-indigo-100">
+      <header className="bg-white shadow-lg" style={{ paddingTop: "env(safe-area-inset-top)" }}>
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors">
-              <i className="bx bx-arrow-back text-xl"></i>
-              <span>{t("nav.backHome")}</span>
+          <div className="flex items-center justify-between gap-2">
+            <Link to="/" className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded shrink-0">
+              <BackIcon size={20} aria-hidden />
+              <span className="text-sm sm:text-base">{t("nav.backHome")}</span>
             </Link>
-            <h1 className="text-xl font-bold text-gray-800">{t("doctors.profile")}</h1>
-            <div></div>
+            <h1 className="text-base sm:text-xl font-bold text-gray-800 text-center min-w-0 truncate">{t("doctors.profile")}</h1>
+            <div aria-hidden className="w-10 shrink-0" />
           </div>
         </div>
       </header>
@@ -96,21 +102,26 @@ const DoctorProfile = () => {
 
         {/* Tabs */}
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="flex border-b overflow-x-auto">
-            {tabKeys.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`flex items-center gap-2 px-6 py-4 transition-colors whitespace-nowrap ${
-                  activeTab === tab
-                    ? "border-b-2 border-blue-500 text-blue-600 bg-blue-50"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <i className={`bx ${tabIcons[tab]}`}></i>
-                {t(`doctors.tabs.${tab}`)}
-              </button>
-            ))}
+          <div className="flex border-b overflow-x-auto" role="tablist">
+            {tabKeys.map((tab) => {
+              const TabIcon = tabIcons[tab]
+              return (
+                <button
+                  key={tab}
+                  role="tab"
+                  aria-selected={activeTab === tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`flex items-center gap-2 px-4 sm:px-6 py-4 transition-colors whitespace-nowrap text-sm min-h-[48px] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
+                    activeTab === tab
+                      ? "border-b-2 border-blue-500 text-blue-600 bg-blue-50"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  <TabIcon size={16} aria-hidden />
+                  {t(`doctors.tabs.${tab}`)}
+                </button>
+              )
+            })}
           </div>
 
           <div className="p-6">
@@ -127,7 +138,7 @@ const DoctorProfile = () => {
                     <ul className="space-y-1">
                       {doctor.institutionLinks.map((link, i) => (
                         <li key={i} className="flex items-center gap-2 text-gray-600 text-sm">
-                          <i className="bx bx-hospital text-blue-400"></i>
+                          <Building2 size={16} className="text-blue-400 shrink-0" aria-hidden />
                           <Link to={`/institution/${link.institution.id}`} className="hover:underline text-blue-600">
                             {lang === "ar" ? link.institution.nameAr : link.institution.nameFr}
                           </Link>
@@ -151,7 +162,7 @@ const DoctorProfile = () => {
               <div className="space-y-3">
                 {doctor.institutionLinks?.map((link, i) => (
                   <div key={i} className="flex items-center gap-3 text-gray-600">
-                    <i className="bx bx-hospital text-blue-400 text-xl"></i>
+                    <Building2 size={20} className="text-blue-400 shrink-0" aria-hidden />
                     <Link to={`/institution/${link.institution.id}`} className="hover:underline text-blue-600">
                       {lang === "ar" ? link.institution.nameAr : link.institution.nameFr}
                     </Link>

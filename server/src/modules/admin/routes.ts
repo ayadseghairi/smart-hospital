@@ -3,6 +3,7 @@
 import { Router } from "express"
 import { authenticate } from "../../middleware/auth"
 import { canCreateAccounts } from "../../middleware/requireRole"
+import { requireStepUp } from "../../middleware/requireStepUp"
 import { validate } from "../../middleware/validate"
 import { emailRateLimit } from "../../middleware/rateLimit"
 import { z } from "zod"
@@ -103,7 +104,8 @@ adminRouter.post("/doctors", emailRateLimit, validate(createDoctorSchema), async
 
 // ── Users ─────────────────────────────────────────────────────────────────
 
-adminRouter.patch("/users/:id/deactivate", async (req, res, next) => {
+// Deactivating/reactivating users is a sensitive action requiring step-up auth
+adminRouter.patch("/users/:id/deactivate", requireStepUp, async (req, res, next) => {
   try {
     const user = await prisma.user.update({ where: { id: req.params.id }, data: { isActive: false } })
     await audit({ userId: req.user!.sub, action: "DEACTIVATE_USER", entity: "User", entityId: user.id, ip: req.ip })

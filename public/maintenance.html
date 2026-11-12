@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>صيانة مؤقتة | Maintenance — Delin Smart Care</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand:   #2C5F8A;
+      --brand-d: #1a3a5c;
+      --bg:      #EBF3FA;
+      --surface: #ffffff;
+      --text:    #1a2a38;
+      --muted:   #5a7a9a;
+      --border:  #c5daea;
+      --radius:  12px;
+    }
+    html { font-size: 16px; }
+    body {
+      min-height: 100svh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2.5rem 2rem 2rem;
+      max-width: 480px; width: 100%; text-align: center;
+    }
+    .icon {
+      width: 72px; height: 72px; margin: 0 auto 1.25rem;
+      border-radius: 50%; background: var(--bg); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+    }
+    h1 { font-size: 1.4rem; font-weight: 700; color: var(--brand-d); line-height: 1.4; margin-bottom: .5rem; }
+    .subtitle { font-size: .9rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6; }
+    .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+    .emergency-label { font-size: .75rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: .65rem; }
+    .emergency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-bottom: 1.5rem; }
+    .emergency-btn {
+      display: flex; flex-direction: column; align-items: center; gap: .3rem;
+      padding: .75rem .5rem; background: var(--brand); color: #fff;
+      border-radius: var(--radius); text-decoration: none; font-weight: 700; line-height: 1.2;
+    }
+    .emergency-btn:hover, .emergency-btn:focus { background: var(--brand-d); outline: 3px solid var(--brand); outline-offset: 2px; }
+    .emergency-btn .number { font-size: 1.45rem; letter-spacing: .02em; direction: ltr; }
+    .emergency-btn .label { font-size: .68rem; font-weight: 500; opacity: .9; }
+    .footer-note { font-size: .75rem; color: var(--muted); line-height: 1.6; }
+    @media (max-width: 380px) { .emergency-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon" aria-hidden="true">
+      <!-- wrench SVG — inline, no external deps -->
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2C5F8A" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+      </svg>
+    </div>
+
+    <h1>الموقع في صيانة مؤقتة</h1>
+    <p class="subtitle">
+      Le site est en maintenance — Nous revenons très bientôt.<br>
+      نعتذر عن الإزعاج. سنعود قريباً.
+    </p>
+
+    <div class="divider"></div>
+
+    <p class="emergency-label">أرقام الطوارئ — Urgences</p>
+    <div class="emergency-grid">
+      <a class="emergency-btn" href="tel:14" aria-label="الإسعاف — SAMU 14">
+        <span class="number">14</span><span class="label">الإسعاف / SAMU</span>
+      </a>
+      <a class="emergency-btn" href="tel:17" aria-label="الشرطة 17">
+        <span class="number">17</span><span class="label">الشرطة / Police</span>
+      </a>
+      <a class="emergency-btn" href="tel:21" aria-label="الحماية المدنية 21">
+        <span class="number">21</span><span class="label">حماية مدنية / Pompiers</span>
+      </a>
+    </div>
+
+    <p class="footer-note">Delin Smart Care — منصة دلين الصحية الذكية</p>
+  </div>
+</body>
+</html>

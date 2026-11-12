@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { Trash2 } from "lucide-react"
 import Layout from "../../components/Layout"
 import { useAuth } from "../../contexts/AuthContext"
 import { apiGet, apiPost, apiDelete } from "../../api/client"
@@ -111,7 +112,7 @@ export default function DoctorAvailabilityPage() {
                     className="text-red-500 hover:text-red-700 disabled:opacity-50 text-sm"
                     aria-label="delete"
                   >
-                    <i className="bx bx-trash text-lg" />
+                    <Trash2 size={18} aria-hidden />
                   </button>
                 </div>
               ))}

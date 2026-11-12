@@ -3,6 +3,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { useQuery } from "@tanstack/react-query"
+import { Plus, Building2 } from "lucide-react"
 import { apiGet } from "../api/client"
 import Layout from "../components/Layout"
 
@@ -21,8 +22,8 @@ function InstitutionCard({ institution, lang }) {
           {commune && <p className="text-sm text-gray-500 mt-0.5">{commune}</p>}
         </div>
         {institution.hasEmergency24h && (
-          <span className="flex-shrink-0 inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-semibold px-2 py-0.5 rounded-full">
-            <i className="bx bx-plus-medical text-xs"></i>
+          <span className="shrink-0 inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+            <Plus size={12} aria-hidden />
             {t("institutions.emergency24h")}
           </span>
         )}
@@ -144,7 +145,7 @@ export default function InstitutionsPage() {
 
         {!isLoading && !isError && institutions.length === 0 && (
           <div className="text-center py-16">
-            <i className="bx bx-building-house text-5xl text-gray-300 mb-4"></i>
+            <Building2 size={48} className="text-gray-300 mb-4 mx-auto" aria-hidden />
             <p className="text-gray-500 font-medium">{t("institutions.emptyList")}</p>
           </div>
         )}

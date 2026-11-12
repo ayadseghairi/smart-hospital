@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useSearchParams, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { LockKeyholeOpen } from "lucide-react"
 import { apiPost } from "../api/client"
 
 export default function AcceptInvitePage() {
@@ -40,7 +41,7 @@ export default function AcceptInvitePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
-        <i className="bx bx-lock-open text-5xl text-green-500 text-center block mb-4"></i>
+        <LockKeyholeOpen size={48} className="text-green-500 mb-4 mx-auto" aria-hidden />
         <h1 className="text-2xl font-bold text-gray-800 text-center mb-2">{t("auth.acceptInviteTitle")}</h1>
         <p className="text-sm text-gray-500 text-center mb-6">{t("auth.acceptInviteHint")}</p>
         <form onSubmit={handleSubmit} className="space-y-4">

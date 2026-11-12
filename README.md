@@ -73,15 +73,36 @@ npm run seed:validate
 
 ### 5. Create the first super admin
 
-```bash
-# Add to server/.env:
-# SUPER_ADMIN_EMAIL=your@email.dz
-# SUPER_ADMIN_FULL_NAME=Your Full Name
+Edit `server/.env` and fill in the bootstrap variables:
 
+```bash
+SUPER_ADMIN_EMAIL=you@yourcompany.dz
+SUPER_ADMIN_FULL_NAME=Your Full Name
+# Choose a strong temporary password (≥16 chars).
+# You MUST remove this variable from .env after your first login.
+SUPER_ADMIN_INITIAL_PASSWORD=<at-least-16-random-chars>
+```
+
+Then run:
+
+```bash
 cd server && npm run create-super-admin
 ```
 
-An invitation email is sent to `SUPER_ADMIN_EMAIL`. Open Mailpit at `http://localhost:8025` to read it and follow the link.
+**If `SUPER_ADMIN_INITIAL_PASSWORD` is set:** The account is created with that password (hashed with argon2id). You will receive a "Your administrator account is ready" email (no password inside — login link only). At first login you will be forced to change the password before accessing anything else.
+
+**If `SUPER_ADMIN_INITIAL_PASSWORD` is empty:** An invitation email with a set-password link is sent instead.
+
+**After the first login:**
+1. Change your password when prompted (minimum 14 characters for super admin).
+2. Complete TOTP 2FA enrollment at `/account/security/2fa-setup` — you cannot reach `/admin` until enrolled.
+3. **Delete `SUPER_ADMIN_INITIAL_PASSWORD` from `server/.env`.**
+
+To reset the super admin password in an emergency (server shell only):
+
+```bash
+cd server && npm run reset-super-admin-password
+```
 
 ### 6. Start the services
 
@@ -167,8 +188,10 @@ smart-hospital/
 | `npm run build` | TypeScript compile |
 | `npm run seed` | Seed reference data |
 | `npm run seed:validate` | List incomplete institution records |
-| `npm run create-super-admin` | Bootstrap the first super admin (invite by email) |
+| `npm run create-super-admin` | Bootstrap the first super admin from `.env` |
+| `npm run reset-super-admin-password` | Emergency password reset for SUPER_ADMIN (interactive) |
 | `npm run mail:test -- you@email.dz` | Send a test email to validate SMTP settings |
+| `npm run mail:preview` | Render all templates to `.mail-preview/` (browser preview) |
 | `npx vitest run` | Run all unit tests |
 | `npx prisma studio` | Browse the database in the browser |
 

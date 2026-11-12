@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { Settings, Calendar, BarChart2, FileText, Info } from "lucide-react"
 
 // Static color map for admin tab active states — avoids purged dynamic Tailwind classes
 const ADMIN_ACTIVE_STYLES = {
@@ -12,8 +13,8 @@ const ADMIN_ACTIVE_STYLES = {
 }
 
 const ADMIN_SECTION_KEYS = [
-  { id: "overview", color: "blue", icon: "bx-calendar" },
-  { id: "general", color: "gray", icon: "bx-cog" },
+  { id: "overview", color: "blue", Icon: Calendar },
+  { id: "general",  color: "gray", Icon: Settings },
 ]
 
 const AdminPanel = () => {
@@ -27,11 +28,10 @@ const AdminPanel = () => {
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("admin.appointmentsStats")}</h3>
-              <p className="text-gray-500 text-center py-8">
-                <i className="bx bx-bar-chart text-4xl mb-2 text-gray-300"></i>
-                <br />
-                {t("admin.statsPlaceholder")}
-              </p>
+              <div className="text-gray-500 text-center py-8">
+                <BarChart2 size={40} className="mb-2 text-gray-300 mx-auto" aria-hidden />
+                <p>{t("admin.statsPlaceholder")}</p>
+              </div>
             </div>
           </div>
         )
@@ -41,34 +41,33 @@ const AdminPanel = () => {
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("admin.appointmentsManage")}</h3>
-              <p className="text-gray-500 text-center py-8">
-                <i className="bx bx-calendar text-4xl mb-2 text-gray-300"></i>
-                <br />
-                {t("admin.appointmentsPlaceholder")}
-              </p>
+              <div className="text-gray-500 text-center py-8">
+                <Calendar size={40} className="mb-2 text-gray-300 mx-auto" aria-hidden />
+                <p>{t("admin.appointmentsPlaceholder")}</p>
+              </div>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("admin.reports")}</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                  <i className="bx bx-file text-2xl text-blue-500 mb-2"></i>
-                  <div className="font-semibold">{t("admin.dailyReport")}</div>
+                <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center min-h-[80px] flex flex-col items-center justify-center focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
+                  <FileText size={24} className="text-blue-500 mb-2" aria-hidden />
+                  <div className="font-semibold text-sm">{t("admin.dailyReport")}</div>
                 </button>
-                <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                  <i className="bx bx-calendar text-2xl text-green-500 mb-2"></i>
-                  <div className="font-semibold">{t("admin.monthlyReport")}</div>
+                <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center min-h-[80px] flex flex-col items-center justify-center focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
+                  <Calendar size={24} className="text-green-500 mb-2" aria-hidden />
+                  <div className="font-semibold text-sm">{t("admin.monthlyReport")}</div>
                 </button>
-                <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                  <i className="bx bx-bar-chart text-2xl text-purple-500 mb-2"></i>
-                  <div className="font-semibold">{t("admin.annualReport")}</div>
+                <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center min-h-[80px] flex flex-col items-center justify-center focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
+                  <BarChart2 size={24} className="text-purple-500 mb-2" aria-hidden />
+                  <div className="font-semibold text-sm">{t("admin.annualReport")}</div>
                 </button>
               </div>
             </div>
 
             {/* Accounting and HR: out of scope for current phase */}
-            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg text-sm text-yellow-800">
-              <i className="bx bx-info-circle me-2"></i>
+            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg text-sm text-yellow-800 flex items-start gap-2">
+              <Info size={16} className="shrink-0 mt-0.5" aria-hidden />
               {t("admin.comingSoon")}
             </div>
           </div>
@@ -84,7 +83,7 @@ const AdminPanel = () => {
       {/* Admin Section Header */}
       <div className="bg-white p-6 rounded-xl shadow-lg">
         <div className="flex items-center gap-4 mb-6">
-          <i className="bx bx-cog text-4xl text-gray-600"></i>
+          <Settings size={40} className="text-gray-600 shrink-0" aria-hidden />
           <div>
             <h1 className="text-2xl font-bold text-gray-800">{t("admin.title")}</h1>
             <p className="text-gray-600">{t("admin.subtitle")}</p>
@@ -92,21 +91,26 @@ const AdminPanel = () => {
         </div>
 
         {/* Admin Navigation Tabs */}
-        <div className="flex border-b">
-          {ADMIN_SECTION_KEYS.map((section) => (
-            <button
-              key={section.id}
-              onClick={() => setActiveTab(section.id)}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-                activeTab === section.id
-                  ? ADMIN_ACTIVE_STYLES[section.color]
-                  : "border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              <i className={`bx ${section.icon}`}></i>
-              <span>{t(`admin.tabs.${section.id}`)}</span>
-            </button>
-          ))}
+        <div className="flex border-b" role="tablist">
+          {ADMIN_SECTION_KEYS.map((section) => {
+            const SectionIcon = section.Icon
+            return (
+              <button
+                key={section.id}
+                role="tab"
+                aria-selected={activeTab === section.id}
+                onClick={() => setActiveTab(section.id)}
+                className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors text-sm min-h-[48px] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
+                  activeTab === section.id
+                    ? ADMIN_ACTIVE_STYLES[section.color]
+                    : "border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                }`}
+              >
+                <SectionIcon size={16} aria-hidden />
+                <span>{t(`admin.tabs.${section.id}`)}</span>
+              </button>
+            )
+          })}
         </div>
       </div>
 

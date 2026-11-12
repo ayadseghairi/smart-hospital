@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useSearchParams, Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { Loader2, CheckCircle2, XCircle } from "lucide-react"
 import { apiPost } from "../api/client"
 
 export default function VerifyEmailPage() {
@@ -28,13 +29,13 @@ export default function VerifyEmailPage() {
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md text-center">
         {status === "loading" && (
           <>
-            <i className="bx bx-loader-alt text-5xl text-blue-500 animate-spin mb-4"></i>
+            <Loader2 size={48} className="text-blue-500 animate-spin mb-4 mx-auto" aria-hidden />
             <p className="text-gray-600">{t("auth.verifyingEmail")}</p>
           </>
         )}
         {status === "success" && (
           <>
-            <i className="bx bx-check-circle text-6xl text-green-500 mb-4"></i>
+            <CheckCircle2 size={64} className="text-green-500 mb-4 mx-auto" aria-hidden />
             <h1 className="text-2xl font-bold text-gray-800 mb-3">{t("auth.emailVerified")}</h1>
             <p className="text-gray-600 mb-6">{t("auth.emailVerifiedText")}</p>
             <Link to="/login"
@@ -45,7 +46,7 @@ export default function VerifyEmailPage() {
         )}
         {status === "error" && (
           <>
-            <i className="bx bx-x-circle text-6xl text-red-500 mb-4"></i>
+            <XCircle size={64} className="text-red-500 mb-4 mx-auto" aria-hidden />
             <h1 className="text-2xl font-bold text-gray-800 mb-3">{t("auth.verifyEmailError")}</h1>
             <p className="text-gray-600 mb-6">{t("auth.verifyEmailErrorText")}</p>
             <Link to="/login" className="text-blue-600 hover:underline text-sm">

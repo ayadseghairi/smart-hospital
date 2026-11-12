@@ -30,7 +30,7 @@ on:
 
 jobs:
   frontend:
-    name: Lint · Build · Check no fake data
+    name: Lint · Build · Audit · Gitleaks
     runs-on: ubuntu-latest
 
     steps:
@@ -57,12 +57,14 @@ jobs:
       - name: Check no fake data
         run: npm run check:no-fake-data
 
-      - name: Audit dependencies (high severity)
-        run: npm audit --audit-level=high
-        continue-on-error: true   # warn but don't fail until lockfile is clean
+      - name: Audit prod dependencies (BLOCKING — high+critical only)
+        # --omit=dev excludes dev-only vulns (vitest, vite, esbuild etc.)
+        # react-router/react-router-dom: 2 moderate vulns remain (fix requires v8 — major breaking change).
+        # They are below --audit-level=high so this step passes.
+        run: npm audit --omit=dev --audit-level=high
 
-      - name: Gitleaks — scan for secrets
+      - name: Gitleaks — scan for secrets (BLOCKING)
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true   # warn until baseline is established
+        # No continue-on-error: secrets in code fail the build

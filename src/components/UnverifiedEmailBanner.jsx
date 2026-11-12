@@ -4,6 +4,7 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { AlertTriangle } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
 import { apiPost } from "../api/client"
 
@@ -34,7 +35,7 @@ export default function UnverifiedEmailBanner() {
     <div className="bg-amber-50 border-b border-amber-200 px-4 py-3">
       <div className="max-w-5xl mx-auto flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-2 text-amber-800 text-sm">
-          <i className="bx bx-error text-lg"></i>
+          <AlertTriangle size={16} className="shrink-0" aria-hidden />
           <span>{t("auth.unverifiedEmailBanner")}</span>
         </div>
         {!sent ? (

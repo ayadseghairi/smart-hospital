@@ -4,6 +4,7 @@ import { useLocation, Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { useState } from "react"
 import { toast } from "sonner"
+import { Mail } from "lucide-react"
 import { apiPost } from "../api/client"
 
 export default function CheckInboxPage() {
@@ -31,7 +32,7 @@ export default function CheckInboxPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md text-center">
-        <i className="bx bx-envelope text-6xl text-blue-500 mb-4"></i>
+        <Mail size={64} className="text-blue-500 mb-4 mx-auto" aria-hidden />
         <h1 className="text-2xl font-bold text-gray-800 mb-3">{t("auth.checkInboxTitle")}</h1>
         <p className="text-gray-600 mb-2">{t("auth.checkInboxText")}</p>
         {email && (

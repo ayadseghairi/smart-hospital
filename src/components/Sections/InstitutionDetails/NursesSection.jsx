@@ -3,6 +3,20 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import Avatar from "../../common/Avatar"
+import {
+  HeartHandshake, Bandage, Syringe, Activity, Dumbbell, UserCheck,
+  Heart, UserPlus, Calendar, Check, X,
+} from "lucide-react"
+
+const serviceIconMap = {
+  homecare: HeartHandshake,
+  wounds: Bandage,
+  injections: Syringe,
+  vitals: Activity,
+  physio: Dumbbell,
+  elderly: UserCheck,
+}
+const tabIconMap = { services: Heart, nurses: UserPlus, appointments: Calendar }
 
 const NursesSection = () => {
   const { t } = useTranslation()
@@ -11,10 +25,6 @@ const NursesSection = () => {
   const [showBooking, setShowBooking] = useState(false)
 
   const nursingServiceKeys = ["homecare", "wounds", "injections", "vitals", "physio", "elderly"]
-  const nursingServiceIcons = {
-    homecare: "bx-home-heart", wounds: "bx-band-aid", injections: "bx-injection",
-    vitals: "bx-pulse", physio: "bx-dumbbell", elderly: "bx-user-check",
-  }
   const nursingServiceIncludes = {
     homecare: ["قياس العلامات الحيوية", "إعطاء الأدوية", "العناية بالجروح", "المتابعة الطبية"],
     wounds: ["تنظيف الجرح", "تطبيق المطهرات", "تغيير الضمادات", "متابعة الشفاء"],
@@ -32,7 +42,6 @@ const NursesSection = () => {
     price: null,
     duration: t(`nurses.services.${key}.duration`),
     includes: nursingServiceIncludes[key],
-    icon: nursingServiceIcons[key],
     available: true,
   }))
 
@@ -41,7 +50,6 @@ const NursesSection = () => {
   const appointments = []
 
   const tabKeys = ["services", "nurses", "appointments"]
-  const tabIcons = { services: "bx-heart", nurses: "bx-user-plus", appointments: "bx-calendar" }
 
   const handleServiceSelect = (service) => {
     setSelectedService(service)
@@ -51,60 +59,63 @@ const NursesSection = () => {
   const renderServicesTab = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {nursingServices.map((service) => (
-          <div
-            key={service.id}
-            className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow border-s-4 border-pink-500"
-          >
-            <div className="p-6">
-              <div className="text-center mb-4">
-                <i className={`bx ${service.icon} text-4xl text-pink-500 mb-2`}></i>
-                <h3 className="text-lg font-semibold text-gray-800">{service.name}</h3>
-              </div>
-
-              <p className="text-gray-600 text-sm mb-4">{service.description}</p>
-
-              <div className="space-y-2 text-sm mb-4">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">{t("nurses.price")}</span>
-                  <span className="font-semibold text-pink-600">
-                    {service.price != null
-                      ? new Intl.NumberFormat("ar-DZ").format(service.price) + " " + t("common.currency")
-                      : t("nurses.priceUnknown")}
-                  </span>
+        {nursingServices.map((service) => {
+          const ServiceIcon = serviceIconMap[service.key]
+          return (
+            <div
+              key={service.id}
+              className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow border-s-4 border-pink-500"
+            >
+              <div className="p-6">
+                <div className="text-center mb-4">
+                  <ServiceIcon className="w-10 h-10 mx-auto mb-2 text-pink-500" aria-hidden="true" />
+                  <h3 className="text-lg font-semibold text-gray-800">{service.name}</h3>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">{t("nurses.duration")}</span>
-                  <span className="font-medium">{service.duration}</span>
-                </div>
-              </div>
 
-              <div className="mb-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">{t("nurses.includes")}</p>
-                <div className="space-y-1">
-                  {service.includes.slice(0, 2).map((item, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
-                      <i className="bx bx-check text-green-500"></i>
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                  {service.includes.length > 2 && (
-                    <span className="text-xs text-gray-500">
-                      {t("nurses.more", { count: service.includes.length - 2 })}
+                <p className="text-gray-600 text-sm mb-4">{service.description}</p>
+
+                <div className="space-y-2 text-sm mb-4">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">{t("nurses.price")}</span>
+                    <span className="font-semibold text-pink-600">
+                      {service.price != null
+                        ? new Intl.NumberFormat("ar-DZ").format(service.price) + " " + t("common.currency")
+                        : t("nurses.priceUnknown")}
                     </span>
-                  )}
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">{t("nurses.duration")}</span>
+                    <span className="font-medium">{service.duration}</span>
+                  </div>
                 </div>
-              </div>
 
-              <button
-                onClick={() => handleServiceSelect(service)}
-                className="w-full bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 transition-colors"
-              >
-                {t("nurses.requestService")}
-              </button>
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-gray-700 mb-2">{t("nurses.includes")}</p>
+                  <div className="space-y-1">
+                    {service.includes.slice(0, 2).map((item, index) => (
+                      <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                        <Check className="w-4 h-4 text-green-500 shrink-0" aria-hidden="true" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                    {service.includes.length > 2 && (
+                      <span className="text-xs text-gray-500">
+                        {t("nurses.more", { count: service.includes.length - 2 })}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleServiceSelect(service)}
+                  className="w-full bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 transition-colors min-h-[44px]"
+                >
+                  {t("nurses.requestService")}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
@@ -113,7 +124,7 @@ const NursesSection = () => {
     <div className="space-y-6">
       {nurses.length === 0 ? (
         <div className="text-center py-16 text-gray-500">
-          <i className="bx bx-user-plus text-6xl mb-4 text-gray-300"></i>
+          <UserPlus className="w-16 h-16 mx-auto mb-4 text-gray-300" aria-hidden="true" />
           <p className="text-lg">{t("nurses.noNurses")}</p>
         </div>
       ) : (
@@ -143,10 +154,10 @@ const NursesSection = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="flex-1 bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 transition-colors text-sm">
+                  <button className="flex-1 bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 transition-colors text-sm min-h-[44px]">
                     {t("nurses.requestServiceBtn")}
                   </button>
-                  <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                  <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm min-h-[44px]">
                     {t("nurses.profileBtn")}
                   </button>
                 </div>
@@ -164,7 +175,7 @@ const NursesSection = () => {
         <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("nurses.appointmentsTitle")}</h3>
         {appointments.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <i className="bx bx-calendar text-4xl mb-2 text-gray-300"></i>
+            <Calendar className="w-12 h-12 mx-auto mb-2 text-gray-300" aria-hidden="true" />
             <p>{t("nurses.noAppointments")}</p>
           </div>
         ) : (
@@ -181,10 +192,10 @@ const NursesSection = () => {
                   </div>
                 </div>
                 <div className="flex justify-end gap-2">
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm min-h-[44px]">
                     {t("nurses.detailsBtn")}
                   </button>
-                  <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
+                  <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm min-h-[44px]">
                     {t("nurses.cancelBtn")}
                   </button>
                 </div>
@@ -201,7 +212,7 @@ const NursesSection = () => {
       {/* Nurses Section Header */}
       <div className="bg-white p-6 rounded-xl shadow-lg">
         <div className="flex items-center gap-4 mb-6">
-          <i className="bx bx-heart text-4xl text-pink-600"></i>
+          <Heart className="w-10 h-10 text-pink-600 shrink-0" aria-hidden="true" />
           <div>
             <h1 className="text-2xl font-bold text-gray-800">{t("nurses.title")}</h1>
             <p className="text-gray-600">{t("nurses.subtitle")}</p>
@@ -209,21 +220,26 @@ const NursesSection = () => {
         </div>
 
         {/* Tabs Navigation */}
-        <div className="flex border-b mt-6">
-          {tabKeys.map((tabKey) => (
-            <button
-              key={tabKey}
-              onClick={() => setActiveTab(tabKey)}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-                activeTab === tabKey
-                  ? "border-pink-500 text-pink-600 bg-pink-50"
-                  : "border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              <i className={`bx ${tabIcons[tabKey]}`}></i>
-              <span>{t(`nurses.tabs.${tabKey}`)}</span>
-            </button>
-          ))}
+        <div className="flex border-b mt-6" role="tablist">
+          {tabKeys.map((tabKey) => {
+            const TabIcon = tabIconMap[tabKey]
+            return (
+              <button
+                key={tabKey}
+                role="tab"
+                aria-selected={activeTab === tabKey}
+                onClick={() => setActiveTab(tabKey)}
+                className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors min-h-[44px] ${
+                  activeTab === tabKey
+                    ? "border-pink-500 text-pink-600 bg-pink-50"
+                    : "border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                }`}
+              >
+                <TabIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span>{t(`nurses.tabs.${tabKey}`)}</span>
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -234,12 +250,16 @@ const NursesSection = () => {
 
       {/* Booking Modal */}
       {showBooking && selectedService && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold text-gray-800">{t("nurses.requestModal")} - {selectedService.name}</h3>
-              <button onClick={() => setShowBooking(false)} className="text-gray-500 hover:text-gray-700">
-                <i className="bx bx-x text-2xl"></i>
+              <button
+                onClick={() => setShowBooking(false)}
+                className="text-gray-500 hover:text-gray-700 p-1 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                aria-label={t("common.close")}
+              >
+                <X className="w-6 h-6" aria-hidden="true" />
               </button>
             </div>
 
@@ -268,7 +288,7 @@ const NursesSection = () => {
                 <div className="space-y-1">
                   {selectedService.includes.map((item, index) => (
                     <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
-                      <i className="bx bx-check text-green-500"></i>
+                      <Check className="w-4 h-4 text-green-500 shrink-0" aria-hidden="true" />
                       <span>{item}</span>
                     </div>
                   ))}
@@ -277,47 +297,69 @@ const NursesSection = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t("nurses.fullName")}</label>
-                <input type="text" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
-                  placeholder={t("nurses.fullNamePlaceholder")} />
+                <input
+                  type="text"
+                  autoComplete="name"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 text-base"
+                  placeholder={t("nurses.fullNamePlaceholder")}
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t("nurses.phone")}</label>
-                <input type="tel" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
-                  placeholder={t("nurses.phonePlaceholder")} />
+                <input
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 text-base"
+                  placeholder={t("nurses.phonePlaceholder")}
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t("nurses.addressLabel")}</label>
-                <textarea rows={2} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
-                  placeholder={t("nurses.addressPlaceholder")} />
+                <textarea
+                  rows={2}
+                  autoComplete="street-address"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 text-base"
+                  placeholder={t("nurses.addressPlaceholder")}
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t("nurses.preferredDatetime")}</label>
                 <div className="grid grid-cols-2 gap-2">
-                  <input type="date" className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
-                    min={new Date().toISOString().split("T")[0]} />
-                  <input type="time" className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500" />
+                  <input
+                    type="date"
+                    className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 text-base"
+                    min={new Date().toISOString().split("T")[0]}
+                  />
+                  <input
+                    type="time"
+                    className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 text-base"
+                  />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t("nurses.notes")}</label>
-                <textarea rows={3} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
-                  placeholder={t("nurses.notesPlaceholder")} />
+                <textarea
+                  rows={3}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 text-base"
+                  placeholder={t("nurses.notesPlaceholder")}
+                />
               </div>
 
               <div className="flex gap-3">
                 <button
                   onClick={() => { setShowBooking(false) }}
-                  className="flex-1 bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700 transition-colors"
+                  className="flex-1 bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700 transition-colors min-h-[44px]"
                 >
                   {t("nurses.confirm")}
                 </button>
                 <button
                   onClick={() => setShowBooking(false)}
-                  className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors min-h-[44px]"
                 >
                   {t("nurses.cancel")}
                 </button>

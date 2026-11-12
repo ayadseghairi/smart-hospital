@@ -25,6 +25,10 @@ const VerifyEmailPage = lazy(() => import("./pages/VerifyEmailPage"))
 const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"))
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"))
 const AcceptInvitePage = lazy(() => import("./pages/AcceptInvitePage"))
+const ForceChangePasswordPage = lazy(() => import("./pages/ForceChangePasswordPage"))
+const TwoFactorSetupPage = lazy(() => import("./pages/TwoFactorSetupPage"))
+const LoginTwoFactorPage = lazy(() => import("./pages/LoginTwoFactorPage"))
+const InstallPage = lazy(() => import("./pages/InstallPage"))
 
 // Patient area
 const AccountDashboardPage = lazy(() => import("./pages/account/AccountDashboardPage"))
@@ -104,6 +108,7 @@ function AppRoutes() {
           <Route path="/cookies" element={<CookiesPage />} />
           <Route path="/institutions" element={<InstitutionsPage />} />
           <Route path="/doctors" element={<DoctorsPage />} />
+          <Route path="/install" element={<InstallPage />} />
 
           {/* Auth flows — guests only */}
           <Route path="/login" element={<GuestOnly><LoginPage /></GuestOnly>} />
@@ -114,6 +119,19 @@ function AppRoutes() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/accept-invite" element={<AcceptInvitePage />} />
+
+          {/* Force password change — authenticated, blocks other routes server-side */}
+          <Route path="/force-change-password" element={<ForceChangePasswordPage />} />
+
+          {/* TOTP 2FA challenge during login (no ProtectedRoute — user not yet fully authenticated) */}
+          <Route path="/login/2fa" element={<LoginTwoFactorPage />} />
+
+          {/* 2FA setup — requires authentication */}
+          <Route path="/account/security/2fa-setup" element={
+            <ProtectedRoute roles={["SUPER_ADMIN", "DOCTOR", "INSTITUTION_ADMIN", "PATIENT"]}>
+              <TwoFactorSetupPage />
+            </ProtectedRoute>
+          } />
 
           {/* Patient area */}
           <Route path="/account" element={

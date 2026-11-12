@@ -212,3 +212,5 @@ export default {
     darkMode: "class",
   }
   
+// Note: overflow-wrap-anywhere is a custom utility added via index.css
+  

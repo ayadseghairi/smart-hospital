@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
+import { Bot, MessageCircle, PhoneCall, MapPin, Send } from "lucide-react"
 import "./SmartAssistant.css"
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000/api/v1"
@@ -77,7 +78,7 @@ const SmartAssistant = () => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-t-4 border-green-500">
       <div className="text-center mb-4">
-        <i className="bx bx-bot text-5xl text-green-500 mb-3"></i>
+        <Bot size={48} className="text-green-500 mb-3 mx-auto" aria-hidden />
         <h2 className="text-xl font-semibold text-gray-800 mb-2">{t("assistant.title")}</h2>
         <p className="text-gray-600 text-sm">{t("assistant.subtitle")}</p>
       </div>
@@ -88,7 +89,7 @@ const SmartAssistant = () => {
             onClick={() => setIsOpen(true)}
             className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
           >
-            <i className="bx bx-chat"></i>
+            <MessageCircle size={16} aria-hidden />
             <span>{t("assistant.startChat")}</span>
           </button>
 
@@ -126,14 +127,14 @@ const SmartAssistant = () => {
                 {/* Emergency call buttons */}
                 {msg.showEmergency && (
                   <div className="mt-2 flex flex-wrap gap-2">
-                    <a href="tel:14" className="flex items-center gap-1 bg-red-600 text-white text-xs px-3 py-1 rounded-full hover:bg-red-700 transition-colors">
-                      <i className="bx bx-phone-call"></i> {t("emergency.civil")} (14)
+                    <a href="tel:14" className="flex items-center gap-1 bg-red-600 text-white text-xs px-3 py-1.5 rounded-full hover:bg-red-700 transition-colors min-h-[32px]">
+                       <PhoneCall size={12} aria-hidden /> {t("emergency.civil")} (14)
                     </a>
-                    <a href="tel:115" className="flex items-center gap-1 bg-red-600 text-white text-xs px-3 py-1 rounded-full hover:bg-red-700 transition-colors">
-                      <i className="bx bx-phone-call"></i> {t("emergency.samu")} (115)
+                    <a href="tel:115" className="flex items-center gap-1 bg-red-600 text-white text-xs px-3 py-1.5 rounded-full hover:bg-red-700 transition-colors min-h-[32px]">
+                       <PhoneCall size={12} aria-hidden /> {t("emergency.samu")} (115)
                     </a>
-                    <Link to="/emergency" className="flex items-center gap-1 bg-orange-500 text-white text-xs px-3 py-1 rounded-full hover:bg-orange-600 transition-colors">
-                      <i className="bx bx-map"></i> {t("emergency.nearestHospitals")}
+                    <Link to="/emergency" className="flex items-center gap-1 bg-orange-500 text-white text-xs px-3 py-1.5 rounded-full hover:bg-orange-600 transition-colors min-h-[32px]">
+                       <MapPin size={12} aria-hidden /> {t("emergency.nearestHospitals")}
                     </Link>
                   </div>
                 )}
@@ -194,7 +195,7 @@ const SmartAssistant = () => {
               className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={t("assistant.send")}
             >
-              <i className="bx bx-send"></i>
+              <Send size={16} aria-hidden />
             </button>
           </div>
 

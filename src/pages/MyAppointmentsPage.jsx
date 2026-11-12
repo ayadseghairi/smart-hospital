@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { Calendar } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
 import { apiGet, apiPatch } from "../api/client"
 import Layout from "../components/Layout"
@@ -106,7 +107,7 @@ export default function MyAppointmentsPage() {
 
         {filtered.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <i className="bx bx-calendar text-5xl text-gray-300 mb-4" />
+            <Calendar size={48} className="text-gray-300 mb-4 mx-auto" aria-hidden />
             <p className="text-gray-500">{t("appointments.noAppointments")}</p>
           </div>
         ) : (

@@ -1,0 +1,22 @@
+# .gitleaks.toml
+# Gitleaks configuration — allowlist rules for known safe test/CI values.
+# Real secrets are never committed; CI keys are intentionally placeholder values.
+
+title = "Delin Smart Care Gitleaks Config"
+
+[allowlist]
+description = "Test/CI placeholder secrets and documentation examples"
+regexes = [
+  # CI environment variable placeholder for MFA key (all-zeros)
+  "0000000000000000000000000000000000000000000000000000000000000000",
+  # Development placeholder JWT secrets referenced in CI YAML
+  "ci-access-secret-min-32-chars-long",
+  "ci-refresh-secret-min-32-chars-long",
+  # Test file placeholder key (64 zeros)
+  '"0"\\.repeat\\(64\\)',
+]
+
+paths = [
+  ".github/workflows",
+  "server/tests",
+]

@@ -155,6 +155,11 @@ model User {
   preferredLang     Lang      @default(ar)
   isActive          Boolean   @default(true)
   mustSetPassword   Boolean   @default(false)
+  mustChangePassword Boolean  @default(false)  // true after bootstrap/admin-forced reset
+  // TOTP 2FA (required for SUPER_ADMIN before accessing /admin)
+  totpSecret        String?            // AES-256-GCM encrypted TOTP secret (key = MFA_ENCRYPTION_KEY)
+  totpEnabledAt     DateTime?          // null = not enrolled
+  totpLastUsedStep  Int?               // replay protection: last accepted TOTP time-step
   createdById       String?            // super admin who created this account
   consentAcceptedAt DateTime?
   createdAt         DateTime  @default(now())
@@ -168,6 +173,7 @@ model User {
   patientAppointments Appointment[] @relation("PatientAppointments")
   authTokens       AuthToken[]
   refreshTokens    RefreshToken[]
+  recoveryCodes    RecoveryCode[]
   notificationPreference NotificationPreference?
   notifications    Notification[]
   auditLogs        AuditLog[]
@@ -404,11 +410,26 @@ model RefreshToken {
   id          String    @id @default(cuid())
   userId      String
   tokenHash   String    @unique  // SHA-256 of the raw token
+  familyId    String    // token family — reuse of any rotated sibling revokes entire family
   expiresAt   DateTime
   revokedAt   DateTime?
   createdAt   DateTime  @default(now())
 
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+// Hashed single-use TOTP recovery codes (10 per user, shown once at enrollment)
+model RecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String    @unique  // SHA-256 of the raw code
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

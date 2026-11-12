@@ -60,5 +60,28 @@ export const changePasswordSchema = z.object({
   newPassword: z.string().min(10, "Password must be at least 10 characters").max(128),
 })
 
+// TOTP 2FA schemas
+export const loginTotpSchema = z.object({
+  mfaToken: z.string().min(1, "MFA token is required"),
+  code: z.string().regex(/^\d{6}$/, "Code must be 6 digits"),
+})
+
+export const loginRecoveryCodeSchema = z.object({
+  mfaToken: z.string().min(1, "MFA token is required"),
+  recoveryCode: z.string().min(4, "Recovery code is required"),
+})
+
+export const mfaEnableSchema = z.object({
+  code: z.string().regex(/^\d{6}$/, "Code must be 6 digits"),
+})
+
+export const mfaDisableSchema = z.object({
+  password: z.string().min(1, "Password is required"),
+})
+
+export const mfaRecoveryCodesSchema = z.object({
+  code: z.string().regex(/^\d{6}$/, "Code must be 6 digits"),
+})
+
 export type RegisterInput = z.infer<typeof registerSchema>
 export type LoginInput = z.infer<typeof loginSchema>

@@ -1,15 +1,26 @@
 // server/src/modules/auth/service.ts
 import argon2 from "argon2"
 import crypto from "crypto"
+import * as OTPAuth from "otpauth"
+import QRCode from "qrcode"
 import { prisma } from "../../lib/prisma"
 import { normalizePhone } from "../../lib/phone"
 import { generateRawToken, hashToken } from "../../lib/tokens"
-import { signAccessToken, signRefreshToken } from "../../lib/jwt"
+import { signAccessToken, signRefreshToken, signMfaToken, verifyMfaToken } from "../../lib/jwt"
 import { mail } from "../../lib/mail"
 import { env } from "../../config/env"
+import { audit } from "../../lib/audit"
 import { createError } from "../../middleware/errorHandler"
-import { buildVerifyEmailEmail, buildPasswordResetEmail } from "../notifications/templates"
+import { checkPasswordPolicy } from "../../lib/passwordPolicy"
+import {
+  buildVerifyEmailEmail,
+  buildPasswordResetEmail,
+  buildPasswordChangedEmail,
+  buildMfaEnabledEmail,
+  buildMfaDisabledEmail,
+} from "../notifications/templates"
 import { stripBidi } from "../../lib/sanitize"
+import { encryptTotpSecret, decryptTotpSecret } from "../../lib/mfaCrypto"
 import type { RegisterInput, LoginInput } from "./schema"
 
 // Generic auth response to never reveal whether an account exists
@@ -51,7 +62,11 @@ export async function registerPatient(input: RegisterInput) {
   return { userId: user.id }
 }
 
-export async function login(input: LoginInput): Promise<{ accessToken: string; refreshToken: string }> {
+export type LoginResult =
+  | { type: "ok"; accessToken: string; refreshToken: string; mustChangePassword: boolean }
+  | { type: "mfa_required"; mfaToken: string }
+
+export async function login(input: LoginInput): Promise<LoginResult> {
   const normalizedPhone = input.phone ? normalizePhone(input.phone) : null
   const normalizedEmail = input.email?.toLowerCase()
 
@@ -75,25 +90,116 @@ export async function login(input: LoginInput): Promise<{ accessToken: string; r
   const valid = await argon2.verify(user.passwordHash, input.password)
   if (!valid) throw createError("Invalid credentials", 401)
 
-  return issueTokenPair(user.id, user.role, user.email ?? undefined, user.phone ?? undefined)
+  // If TOTP is enrolled, return a short-lived mfaToken instead of a session.
+  // The client must then POST /auth/login/2fa with the mfaToken + TOTP code.
+  if (user.totpEnabledAt && user.totpSecret) {
+    const mfaToken = signMfaToken(user.id)
+    return { type: "mfa_required", mfaToken }
+  }
+
+  const mustChangePassword = user.mustChangePassword ?? false
+  // Determine if MFA setup is required (SUPER_ADMIN without TOTP)
+  const mfaSetupRequired = user.role === "SUPER_ADMIN" && !user.totpEnabledAt
+
+  const { accessToken, refreshToken } = await issueTokenPair(
+    user.id,
+    user.role,
+    user.email ?? undefined,
+    user.phone ?? undefined,
+    mustChangePassword,
+    mfaSetupRequired
+  )
+
+  return { type: "ok", accessToken, refreshToken, mustChangePassword }
+}
+
+// Complete login after TOTP challenge
+export async function loginWithTotp(
+  rawMfaToken: string,
+  code: string
+): Promise<{ accessToken: string; refreshToken: string; mustChangePassword: boolean }> {
+  let payload
+  try {
+    payload = verifyMfaToken(rawMfaToken)
+  } catch {
+    throw createError("Invalid or expired MFA token", 401)
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: payload.sub } })
+  if (!user || !user.isActive || !user.totpEnabledAt || !user.totpSecret) {
+    throw createError("Invalid or expired MFA token", 401)
+  }
+
+  // Verify TOTP code with ±1 step window
+  const decrypted = decryptTotpSecret(user.totpSecret)
+  const totp = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(decrypted), period: 30, digits: 6 })
+  const currentStep = Math.floor(Date.now() / 30000)
+
+  let matched = false
+  for (const step of [currentStep - 1, currentStep, currentStep + 1]) {
+    const expected = totp.generate({ timestamp: step * 30000 })
+    if (expected === code.replace(/\s/g, "")) {
+      // Replay protection: reject if this step was already used
+      if (user.totpLastUsedStep !== null && user.totpLastUsedStep === step) {
+        throw createError("This code has already been used", 401)
+      }
+      // Atomically record the step to prevent replay
+      await prisma.user.update({ where: { id: user.id }, data: { totpLastUsedStep: step } })
+      matched = true
+      break
+    }
+  }
+
+  if (!matched) {
+    throw createError("Invalid two-factor authentication code", 401)
+  }
+
+  const mustChangePassword = user.mustChangePassword ?? false
+
+  const { accessToken, refreshToken } = await issueTokenPair(
+    user.id,
+    user.role,
+    user.email ?? undefined,
+    user.phone ?? undefined,
+    mustChangePassword,
+    false,    // mfaSetupRequired = false (already enrolled)
+    true      // mfaVerified = true
+  )
+
+  await audit({ userId: user.id, action: "MFA_LOGIN", entity: "User", entityId: user.id })
+
+  return { accessToken, refreshToken, mustChangePassword }
 }
 
 export async function issueTokenPair(
   userId: string,
   role: string,
   email?: string,
-  phone?: string
+  phone?: string,
+  mustChangePassword = false,
+  mfaSetupRequired = false,
+  mfaVerified = false,
+  familyId?: string  // pass existing familyId when rotating; omit for new session
 ): Promise<{ accessToken: string; refreshToken: string }> {
   // Create refresh token record
   const rawToken = generateRawToken()
   const tokenHash = hashToken(rawToken)
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30d
+  const tokenFamilyId = familyId ?? crypto.randomUUID()
 
   const record = await prisma.refreshToken.create({
-    data: { userId, tokenHash, expiresAt },
+    data: { userId, tokenHash, familyId: tokenFamilyId, expiresAt },
   })
 
-  const accessToken = signAccessToken({ sub: userId, role, email, phone })
+  const accessToken = signAccessToken({
+    sub: userId,
+    role,
+    email,
+    phone,
+    mustChangePassword: mustChangePassword || undefined,
+    mfaSetupRequired: mfaSetupRequired || undefined,
+    mfaVerified: mfaVerified || undefined,
+  })
   const refreshToken = signRefreshToken({ sub: userId, jti: record.id })
 
   return { accessToken, refreshToken: rawToken }
@@ -103,20 +209,47 @@ export async function refreshAccessToken(rawRefreshToken: string) {
   const tokenHash = hashToken(rawRefreshToken)
   const record = await prisma.refreshToken.findUnique({ where: { tokenHash } })
 
-  if (!record || record.revokedAt || record.expiresAt < new Date()) {
+  if (!record) {
+    throw createError("Invalid refresh token", 401)
+  }
+
+  // Token reuse detection: if the token is already revoked but was issued in a known family,
+  // revoke the entire family (someone is replaying a rotated token).
+  if (record.revokedAt) {
+    await prisma.refreshToken.updateMany({
+      where: { familyId: record.familyId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    })
+    throw createError("Refresh token reuse detected — all sessions revoked", 401)
+  }
+
+  if (record.expiresAt < new Date()) {
     throw createError("Invalid refresh token", 401)
   }
 
   const user = await prisma.user.findUnique({ where: { id: record.userId } })
   if (!user || !user.isActive) throw createError("Account not found or deactivated", 401)
 
-  // Rotate: revoke old, issue new
+  // Rotate: revoke old, issue new within the same family
   await prisma.refreshToken.update({
     where: { id: record.id },
     data: { revokedAt: new Date() },
   })
 
-  return issueTokenPair(user.id, user.role, user.email ?? undefined, user.phone ?? undefined)
+  const mustChangePassword = user.mustChangePassword ?? false
+  const mfaSetupRequired = user.role === "SUPER_ADMIN" && !user.totpEnabledAt
+  const mfaVerified = user.totpEnabledAt ? true : false // keep verified if enrolled
+
+  return issueTokenPair(
+    user.id,
+    user.role,
+    user.email ?? undefined,
+    user.phone ?? undefined,
+    mustChangePassword,
+    mfaSetupRequired,
+    mfaVerified,
+    record.familyId  // keep same family
+  )
 }
 
 export async function logout(rawRefreshToken: string) {
@@ -198,11 +331,23 @@ export async function resetPassword(rawToken: string, newPassword: string) {
     throw createError("Invalid or expired token", 400)
   }
 
+  const user = await prisma.user.findUnique({ where: { id: record.userId } })
+  if (!user) throw createError("User not found", 404)
+
+  // Check new password is not the same as current
+  if (user.passwordHash) {
+    const same = await argon2.verify(user.passwordHash, newPassword)
+    if (same) throw createError("New password must be different from the current password", 400)
+  }
+
+  const policy = checkPasswordPolicy(newPassword, { email: user.email ?? undefined })
+  if (!policy.ok) throw createError(policy.reason!, 400)
+
   const passwordHash = await argon2.hash(newPassword)
 
   await prisma.$transaction([
     prisma.authToken.update({ where: { id: record.id }, data: { usedAt: new Date() } }),
-    prisma.user.update({ where: { id: record.userId }, data: { passwordHash } }),
+    prisma.user.update({ where: { id: record.userId }, data: { passwordHash, mustChangePassword: false } }),
     // Revoke all refresh tokens on password reset
     prisma.refreshToken.updateMany({
       where: { userId: record.userId, revokedAt: null },
@@ -224,6 +369,12 @@ export async function acceptInvite(rawToken: string, newPassword: string) {
     throw createError("Invalid or expired invite link", 400)
   }
 
+  const user = await prisma.user.findUnique({ where: { id: record.userId } })
+  if (!user) throw createError("User not found", 404)
+
+  const policy = checkPasswordPolicy(newPassword, { email: user.email ?? undefined })
+  if (!policy.ok) throw createError(policy.reason!, 400)
+
   const passwordHash = await argon2.hash(newPassword)
 
   await prisma.$transaction([
@@ -233,6 +384,7 @@ export async function acceptInvite(rawToken: string, newPassword: string) {
       data: {
         passwordHash,
         mustSetPassword: false,
+        mustChangePassword: false,
         emailVerifiedAt: new Date(), // invite acceptance verifies the email
       },
     }),
@@ -317,12 +469,13 @@ export async function addEmail(userId: string, email: string) {
 }
 
 // ─── Change password ─────────────────────────────────────────────────────────
+// Handles both voluntary change and forced-change-at-login flow.
 
 export async function changePassword(
   userId: string,
   currentPassword: string,
   newPassword: string,
-  currentTokenHash?: string
+  currentRawRefreshToken?: string
 ) {
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user || !user.passwordHash) throw createError("User not found", 404)
@@ -330,11 +483,29 @@ export async function changePassword(
   const valid = await argon2.verify(user.passwordHash, currentPassword)
   if (!valid) throw createError("Current password is incorrect", 400)
 
+  // Reject if new password is the same as the current one
+  const same = await argon2.verify(user.passwordHash, newPassword)
+  if (same) throw createError("New password must be different from the current password", 400)
+
+  // Enforce password policy (SUPER_ADMIN → min 14 chars)
+  const minLength = user.role === "SUPER_ADMIN" ? 14 : 10
+  const policy = checkPasswordPolicy(newPassword, {
+    minLength,
+    email: user.email ?? undefined,
+  })
+  if (!policy.ok) throw createError(policy.reason!, 400)
+
   const newHash = await argon2.hash(newPassword)
 
+  // Determine the current session token hash to keep that session alive
+  const currentTokenHash = currentRawRefreshToken ? hashToken(currentRawRefreshToken) : undefined
+
   await prisma.$transaction([
-    prisma.user.update({ where: { id: userId }, data: { passwordHash: newHash } }),
-    // Revoke all refresh tokens except current session
+    prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: newHash, mustChangePassword: false },
+    }),
+    // Revoke ALL other refresh tokens (including all other sessions)
     prisma.refreshToken.updateMany({
       where: {
         userId,
@@ -344,6 +515,19 @@ export async function changePassword(
       data: { revokedAt: new Date() },
     }),
   ])
+
+  // Audit entry
+  await audit({ userId, action: "PASSWORD_CHANGED", entity: "User", entityId: userId })
+
+  // Send security email
+  if (user.email) {
+    try {
+      const tpl = buildPasswordChangedEmail(user.email, user.fullName, user.preferredLang)
+      await mail.send({ to: user.email, ...tpl })
+    } catch (err) {
+      // Non-fatal — password was already changed
+    }
+  }
 }
 
 // ─── Sessions ────────────────────────────────────────────────────────────────
@@ -424,4 +608,229 @@ export async function exportOwnData(userId: string) {
   })
 
   return { user, appointments, reviews, exportedAt: new Date().toISOString() }
+}
+
+// ─── TOTP 2FA ─────────────────────────────────────────────────────────────────
+
+const TOTP_ISSUER = "Delin Smart Care"
+const RECOVERY_CODE_COUNT = 10
+
+function generateRecoveryCode(): string {
+  // 8-char base32-style codes: XXXX-XXXX format for readability
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ23456789"
+  let code = ""
+  const bytes = crypto.randomBytes(RECOVERY_CODE_COUNT)
+  for (const byte of bytes) {
+    code += chars[byte % chars.length]
+  }
+  return `${code.slice(0, 4)}-${code.slice(4, 8)}`
+}
+
+// Returns the QR code data URL and the URI; secret stored encrypted in DB
+export async function setupTotp(userId: string): Promise<{
+  uri: string
+  qrCodeDataUrl: string
+}> {
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user) throw createError("User not found", 404)
+
+  // Generate a new TOTP secret
+  const secret = new OTPAuth.Secret()
+  const totp = new OTPAuth.TOTP({
+    issuer: TOTP_ISSUER,
+    label: user.email ?? user.phone ?? userId,
+    secret,
+    period: 30,
+    digits: 6,
+    algorithm: "SHA1",
+  })
+
+  const uri = totp.toString()
+  // Store encrypted secret provisionally (not yet enabled — user must confirm first)
+  const encrypted = encryptTotpSecret(secret.base32)
+  await prisma.user.update({ where: { id: userId }, data: { totpSecret: encrypted } })
+
+  const qrCodeDataUrl = await QRCode.toDataURL(uri)
+  return { uri, qrCodeDataUrl }
+}
+
+// Confirm TOTP setup: user submits the first code to prove they scanned it correctly
+export async function enableTotp(userId: string, code: string): Promise<string[]> {
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user || !user.totpSecret) throw createError("TOTP setup not initiated", 400)
+  if (user.totpEnabledAt) throw createError("TOTP is already enabled", 409)
+
+  const decrypted = decryptTotpSecret(user.totpSecret)
+  const totp = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(decrypted), period: 30, digits: 6 })
+  const currentStep = Math.floor(Date.now() / 30000)
+
+  let matched = false
+  for (const step of [currentStep - 1, currentStep, currentStep + 1]) {
+    if (totp.generate({ timestamp: step * 30000 }) === code.replace(/\s/g, "")) {
+      matched = true
+      break
+    }
+  }
+  if (!matched) throw createError("Invalid authentication code", 401)
+
+  // Generate 10 single-use recovery codes
+  const rawCodes: string[] = []
+  const codeRows: { userId: string; codeHash: string }[] = []
+  for (let i = 0; i < RECOVERY_CODE_COUNT; i++) {
+    const raw = generateRecoveryCode()
+    rawCodes.push(raw)
+    codeRows.push({ userId, codeHash: hashToken(raw) })
+  }
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: userId },
+      data: { totpEnabledAt: new Date(), totpLastUsedStep: currentStep },
+    }),
+    // Clear any previous recovery codes
+    prisma.recoveryCode.deleteMany({ where: { userId } }),
+    prisma.recoveryCode.createMany({ data: codeRows }),
+    // Revoke all other sessions (security: require re-login on all devices after 2FA enable)
+    prisma.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    }),
+  ])
+
+  await audit({ userId, action: "MFA_ENABLED", entity: "User", entityId: userId })
+
+  if (user.email) {
+    try {
+      const tpl = buildMfaEnabledEmail(user.fullName, user.preferredLang)
+      await mail.send({ to: user.email, ...tpl })
+    } catch { /* non-fatal */ }
+  }
+
+  return rawCodes // shown once — never stored in plaintext
+}
+
+// Disable TOTP: requires current password verification (step-up)
+export async function disableTotp(userId: string, password: string): Promise<void> {
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user || !user.passwordHash) throw createError("User not found", 404)
+  if (!user.totpEnabledAt) throw createError("TOTP is not enabled", 400)
+
+  const valid = await argon2.verify(user.passwordHash, password)
+  if (!valid) throw createError("Invalid password", 401)
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: userId },
+      data: { totpSecret: null, totpEnabledAt: null, totpLastUsedStep: null },
+    }),
+    prisma.recoveryCode.deleteMany({ where: { userId } }),
+    // Revoke all sessions (security: require re-login after 2FA disable)
+    prisma.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    }),
+  ])
+
+  await audit({ userId, action: "MFA_DISABLED", entity: "User", entityId: userId })
+
+  if (user.email) {
+    try {
+      const tpl = buildMfaDisabledEmail(user.fullName, user.preferredLang)
+      await mail.send({ to: user.email, ...tpl })
+    } catch { /* non-fatal */ }
+  }
+}
+
+// Regenerate recovery codes (requires TOTP code — step-up auth)
+export async function regenerateRecoveryCodes(userId: string, code: string): Promise<string[]> {
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user || !user.totpSecret || !user.totpEnabledAt) throw createError("TOTP is not enabled", 400)
+
+  const decrypted = decryptTotpSecret(user.totpSecret)
+  const totp = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(decrypted), period: 30, digits: 6 })
+  const currentStep = Math.floor(Date.now() / 30000)
+
+  let matched = false
+  for (const step of [currentStep - 1, currentStep, currentStep + 1]) {
+    if (totp.generate({ timestamp: step * 30000 }) === code.replace(/\s/g, "")) {
+      if (user.totpLastUsedStep !== null && user.totpLastUsedStep === step) {
+        throw createError("This code has already been used", 401)
+      }
+      await prisma.user.update({ where: { id: userId }, data: { totpLastUsedStep: step } })
+      matched = true
+      break
+    }
+  }
+  if (!matched) throw createError("Invalid authentication code", 401)
+
+  const rawCodes: string[] = []
+  const codeRows: { userId: string; codeHash: string }[] = []
+  for (let i = 0; i < RECOVERY_CODE_COUNT; i++) {
+    const raw = generateRecoveryCode()
+    rawCodes.push(raw)
+    codeRows.push({ userId, codeHash: hashToken(raw) })
+  }
+
+  await prisma.$transaction([
+    prisma.recoveryCode.deleteMany({ where: { userId } }),
+    prisma.recoveryCode.createMany({ data: codeRows }),
+  ])
+
+  await audit({ userId, action: "MFA_RECOVERY_CODES_REGENERATED", entity: "User", entityId: userId })
+
+  return rawCodes
+}
+
+// Use a recovery code (for when the authenticator is unavailable)
+export async function loginWithRecoveryCode(
+  rawMfaToken: string,
+  rawCode: string
+): Promise<{ accessToken: string; refreshToken: string; mustChangePassword: boolean }> {
+  let payload
+  try {
+    payload = verifyMfaToken(rawMfaToken)
+  } catch {
+    throw createError("Invalid or expired MFA token", 401)
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: payload.sub } })
+  if (!user || !user.isActive || !user.totpEnabledAt) {
+    throw createError("Invalid or expired MFA token", 401)
+  }
+
+  const codeHash = hashToken(rawCode.replace(/[\s-]/g, "").toUpperCase())
+  const record = await prisma.recoveryCode.findUnique({ where: { codeHash } })
+
+  if (!record || record.userId !== user.id || record.usedAt) {
+    throw createError("Invalid or already-used recovery code", 401)
+  }
+
+  await prisma.recoveryCode.update({ where: { id: record.id }, data: { usedAt: new Date() } })
+
+  const mustChangePassword = user.mustChangePassword ?? false
+  const { accessToken, refreshToken } = await issueTokenPair(
+    user.id, user.role, user.email ?? undefined, user.phone ?? undefined,
+    mustChangePassword, false, true
+  )
+
+  await audit({ userId: user.id, action: "MFA_RECOVERY_CODE_USED", entity: "User", entityId: user.id })
+
+  return { accessToken, refreshToken, mustChangePassword }
+}
+
+// Get TOTP status (for /auth/me or /account/security)
+export async function getMfaStatus(userId: string): Promise<{
+  enabled: boolean
+  enabledAt: Date | null
+  recoveryCodesRemaining: number
+}> {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { totpEnabledAt: true } })
+  const count = user?.totpEnabledAt
+    ? await prisma.recoveryCode.count({ where: { userId, usedAt: null } })
+    : 0
+  return {
+    enabled: !!user?.totpEnabledAt,
+    enabledAt: user?.totpEnabledAt ?? null,
+    recoveryCodesRemaining: count,
+  }
 }

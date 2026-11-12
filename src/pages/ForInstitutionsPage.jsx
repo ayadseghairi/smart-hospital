@@ -81,7 +81,7 @@ export default function ForInstitutionsPage() {
       <Layout>
         <div className="container mx-auto px-4 py-16 max-w-xl text-center">
           <div className="bg-green-50 border border-green-200 rounded-xl p-8">
-            <i className="bx bx-check-circle text-5xl text-green-500 mb-4"></i>
+            <CheckCircle2 size={48} className="text-green-500 mb-4 mx-auto" aria-hidden />
             <h2 className="text-xl font-bold text-gray-800 mb-2">{t("contact.successTitle")}</h2>
             <p className="text-gray-600">{t("contact.successDesc")}</p>
           </div>
@@ -102,7 +102,7 @@ export default function ForInstitutionsPage() {
         {/* Admin-only notice */}
         <section className="mb-10 bg-blue-50 border border-blue-200 rounded-xl p-6">
           <div className="flex gap-3">
-            <i className="bx bx-info-circle text-2xl text-blue-500 flex-shrink-0 mt-0.5"></i>
+            <Info size={22} className="text-blue-500 shrink-0 mt-0.5" aria-hidden />
             <p className="text-gray-700">{t("forInstitutions.adminOnlyNotice")}</p>
           </div>
         </section>

@@ -1,35 +1,51 @@
 // server/scripts/mail-test.ts
-// Send a test email to validate SMTP settings.
-// Usage: npm run mail:test -- recipient@example.dz
+// Send a test email using the real template to validate SMTP settings.
+// Usage: npm run mail:test -- recipient@example.dz [ar|fr]
+// Prints SMTP result (success or sanitized error) — never prints credentials.
 
 import { mail } from "../src/lib/mail"
 import { env } from "../src/config/env"
+import { buildTestEmail } from "../src/modules/notifications/templates"
 
 const to = process.argv[2]
+const lang = (process.argv[3] ?? "fr") as "ar" | "fr"
+
 if (!to) {
-  console.error("Usage: npm run mail:test -- recipient@example.dz")
+  console.error("Usage: npm run mail:test -- recipient@example.dz [ar|fr]")
+  process.exit(1)
+}
+
+// Validate it looks like an email to avoid accidentally printing a secret
+if (!to.includes("@") || to.includes(" ")) {
+  console.error("Error: first argument must be an email address")
   process.exit(1)
 }
 
 async function main() {
   console.log(`Sending test email to: ${to}`)
+  console.log(`Language: ${lang}`)
   console.log(`MAIL_ENABLED: ${env.MAIL_ENABLED}`)
   if (env.MAIL_ENABLED) {
-    console.log(`SMTP: ${env.SMTP_HOST}:${env.SMTP_PORT}`)
+    // Print host:port only — never credentials
+    console.log(`SMTP server: ${env.SMTP_HOST}:${env.SMTP_PORT} (secure=${env.SMTP_SECURE})`)
   }
 
-  await mail.send({
-    to,
-    subject: `Test email — ${env.APP_NAME}`,
-    html: `<p>This is a test email from <strong>${env.APP_NAME}</strong>.</p><p>If you received this, your SMTP settings are correct.</p>`,
-    text: `Test email from ${env.APP_NAME}.\n\nIf you received this, your SMTP settings are correct.`,
-  })
+  const tpl = buildTestEmail(lang)
 
-  console.log("✓ Test email sent successfully")
+  try {
+    await mail.send({ to, ...tpl })
+    console.log("✓ Test email sent successfully")
+  } catch (err) {
+    // Sanitize: never print SMTP credentials, tokens or passwords from the error
+    const message = err instanceof Error ? err.message : String(err)
+    // Strip any potential credential-like strings (basic heuristic)
+    const sanitized = message
+      .replace(/password[=:][^\s,)]+/gi, "password=[REDACTED]")
+      .replace(/user[=:][^\s,)@]+@/gi, "user=[REDACTED]@")
+    console.error("✗ Failed to send test email:")
+    console.error("  " + sanitized)
+    process.exit(1)
+  }
 }
 
-main().catch((err) => {
-  console.error("✗ Failed to send test email:")
-  console.error(err.message)
-  process.exit(1)
-})
+main()

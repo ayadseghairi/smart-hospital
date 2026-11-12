@@ -2,6 +2,9 @@
 import { Request, Response, NextFunction } from "express"
 import * as authService from "./service"
 import { env } from "../../config/env"
+import { signStepUpToken } from "../../lib/jwt"
+import { buildNewDeviceLoginEmail } from "../notifications/templates"
+import { mail } from "../../lib/mail"
 
 const REFRESH_COOKIE = "delin_rt"
 
@@ -26,12 +29,100 @@ export async function register(req: Request, res: Response, next: NextFunction) 
 
 export async function login(req: Request, res: Response, next: NextFunction) {
   try {
-    const { accessToken, refreshToken } = await authService.login(req.body)
-    setRefreshCookie(res, refreshToken)
-    res.json({ data: { accessToken } })
+    const result = await authService.login(req.body)
+    if (result.type === "mfa_required") {
+      // Password was correct but TOTP is required — return a short-lived challenge token
+      res.json({ data: { mfaRequired: true, mfaToken: result.mfaToken } })
+      return
+    }
+    setRefreshCookie(res, result.refreshToken)
+    res.json({ data: { accessToken: result.accessToken, mustChangePassword: result.mustChangePassword } })
+
+    // Send NEW_DEVICE_LOGIN alert for staff roles (non-blocking)
+    void (async () => {
+      try {
+        const { prisma } = await import("../../lib/prisma")
+        const jwt = await import("jsonwebtoken")
+        const decoded = jwt.default.decode(result.accessToken) as { sub?: string } | null
+        const userId = decoded?.sub
+        if (!userId) return
+        const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true, email: true, fullName: true, preferredLang: true } })
+        const staffRoles = ["DOCTOR", "INSTITUTION_ADMIN", "SUPER_ADMIN"]
+        if (user?.email && staffRoles.includes(user.role)) {
+          const ip = req.ip ?? "unknown"
+          const tpl = buildNewDeviceLoginEmail(
+            { fullName: user.fullName, time: new Date(), deviceInfo: ip },
+            user.preferredLang as "ar" | "fr"
+          )
+          await mail.send({ to: user.email, ...tpl })
+        }
+      } catch { /* non-fatal */ }
+    })()
   } catch (err) {
     next(err)
   }
+}
+
+export async function loginTotp(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { mfaToken, code } = req.body
+    const result = await authService.loginWithTotp(mfaToken, code)
+    setRefreshCookie(res, result.refreshToken)
+    res.json({ data: { accessToken: result.accessToken, mustChangePassword: result.mustChangePassword } })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function loginRecoveryCode(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { mfaToken, recoveryCode } = req.body
+    const result = await authService.loginWithRecoveryCode(mfaToken, recoveryCode)
+    setRefreshCookie(res, result.refreshToken)
+    res.json({ data: { accessToken: result.accessToken, mustChangePassword: result.mustChangePassword } })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function mfaSetup(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    const result = await authService.setupTotp(req.user.sub)
+    res.json({ data: result })
+  } catch (err) { next(err) }
+}
+
+export async function mfaEnable(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    const codes = await authService.enableTotp(req.user.sub, req.body.code)
+    res.json({ data: { recoveryCodes: codes, message: "Two-factor authentication has been enabled." } })
+  } catch (err) { next(err) }
+}
+
+export async function mfaDisable(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    await authService.disableTotp(req.user.sub, req.body.password)
+    res.json({ data: { ok: true } })
+  } catch (err) { next(err) }
+}
+
+export async function mfaRecoveryCodes(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    const codes = await authService.regenerateRecoveryCodes(req.user.sub, req.body.code)
+    res.json({ data: { recoveryCodes: codes } })
+  } catch (err) { next(err) }
+}
+
+export async function mfaStatus(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    const status = await authService.getMfaStatus(req.user.sub)
+    res.json({ data: status })
+  } catch (err) { next(err) }
 }
 
 export async function refresh(req: Request, res: Response, next: NextFunction) {
@@ -181,3 +272,22 @@ export async function revokeOtherSessions(req: Request, res: Response, next: Nex
     res.json({ data: { revoked } })
   } catch (err) { next(err) }
 }
+
+export async function stepUp(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user?.sub) { res.status(401).json({ error: "Unauthorized" }); return }
+    // Verify current password
+    const { prisma } = await import("../../lib/prisma")
+    const argon2 = await import("argon2")
+    const user = await prisma.user.findUnique({ where: { id: req.user.sub } })
+    if (!user?.passwordHash) { res.status(401).json({ error: "Unauthorized" }); return }
+    const valid = await argon2.default.verify(user.passwordHash, req.body.password)
+    if (!valid) {
+      res.status(401).json({ error: "Invalid password", code: "INVALID_PASSWORD" })
+      return
+    }
+    const stepUpToken = signStepUpToken(req.user.sub)
+    res.json({ data: { stepUpToken } })
+  } catch (err) { next(err) }
+}
+

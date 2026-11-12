@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
 import { toast } from "sonner"
+import { ChevronLeft, CalendarCheck, Clock, UserCircle2 } from "lucide-react"
 import Layout from "../components/Layout"
 import { apiGet, apiPatch } from "../api/client"
 
@@ -63,12 +64,12 @@ export default function DoctorDashboardPage() {
 
         {/* Pending requests banner */}
         {pendingCount > 0 && (
-          <Link to="/doctor/appointments" className="block">
-            <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 mb-6 flex items-center justify-between hover:bg-amber-100 transition-colors">
+          <Link to="/doctor/appointments" className="block focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none rounded-xl">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 mb-6 flex items-center justify-between hover:bg-amber-100 transition-colors min-h-[56px]">
               <span className="text-amber-800 text-sm font-medium">
                 {t("doctor.dashboard_.pendingCount", { count: pendingCount })}
               </span>
-              <i className="bx bx-chevron-left text-amber-600 text-xl rtl:rotate-180" />
+              <ChevronLeft size={20} className="text-amber-600 rtl:rotate-180" aria-hidden />
             </div>
           </Link>
         )}
@@ -87,7 +88,7 @@ export default function DoctorDashboardPage() {
           )}
           {!loadingToday && !errorToday && todayAppts.length === 0 && (
             <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-              <i className="bx bx-calendar-check text-4xl text-gray-300 mb-2" />
+              <CalendarCheck size={40} className="text-gray-300 mb-2 mx-auto" aria-hidden />
               <p className="text-gray-500 text-sm">{t("doctor.dashboard_.noToday")}</p>
             </div>
           )}
@@ -148,12 +149,12 @@ export default function DoctorDashboardPage() {
         {/* Quick actions */}
         <section>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Link to="/doctor/availability" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all text-center">
-              <i className="bx bx-time text-2xl text-blue-600 mb-2 block" />
+            <Link to="/doctor/availability" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all text-center min-h-[88px] flex flex-col items-center justify-center focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
+              <Clock size={24} className="text-blue-600 mb-2" aria-hidden />
               <p className="text-sm font-medium text-gray-700">{t("doctor.dashboard_.manageAvailability")}</p>
             </Link>
-            <Link to="/doctor/profile" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all text-center">
-              <i className="bx bx-user-circle text-2xl text-blue-600 mb-2 block" />
+            <Link to="/doctor/profile" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all text-center min-h-[88px] flex flex-col items-center justify-center focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
+              <UserCircle2 size={24} className="text-blue-600 mb-2" aria-hidden />
               <p className="text-sm font-medium text-gray-700">{t("doctor.dashboard_.editProfile")}</p>
             </Link>
           </div>

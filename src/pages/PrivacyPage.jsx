@@ -1,17 +1,19 @@
 // src/pages/PrivacyPage.jsx
 import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { ArrowLeft, ArrowRight } from "lucide-react"
 
 export default function PrivacyPage() {
   const { t, i18n } = useTranslation()
   const isAr = i18n.language !== "fr"
+  const BackIcon = isAr ? ArrowRight : ArrowLeft
 
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to="/" className="text-blue-600 hover:underline text-sm flex items-center gap-1">
-            <i className="bx bx-arrow-back"></i>
+          <Link to="/" className="text-blue-600 hover:underline text-sm flex items-center gap-1 min-h-[44px] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded">
+            <BackIcon size={16} aria-hidden />
             {t("nav.backHome")}
           </Link>
           <h1 className="text-xl font-bold text-gray-800">

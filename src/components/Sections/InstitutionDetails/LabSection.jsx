@@ -2,6 +2,21 @@
 
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import {
+  FlaskConical, Droplets, Circle, Square, Syringe, Heart, Dna,
+  FileText, Settings, Home, Clock, Phone, Check, X,
+} from "lucide-react"
+
+const categoryIconMap = {
+  all: FlaskConical, blood: Droplets, kidney: Circle,
+  liver: Square, diabetes: Syringe, lipids: Heart, hormones: Dna,
+}
+const tabIconMap = { tests: FlaskConical, results: FileText, services: Settings }
+const serviceIconMap = {
+  homeVisit: { Icon: Home, color: "text-blue-500", btnColor: "bg-blue-600 hover:bg-blue-700" },
+  fastResults: { Icon: Clock, color: "text-green-500", btnColor: "bg-green-600 hover:bg-green-700" },
+  consult: { Icon: Phone, color: "text-purple-500", btnColor: "bg-purple-600 hover:bg-purple-700" },
+}
 
 const LabSection = () => {
   const { t } = useTranslation()
@@ -29,42 +44,35 @@ const LabSection = () => {
   }))
 
   const categoryKeys = ["all", "blood", "kidney", "liver", "diabetes", "lipids", "hormones"]
-  const categoryIcons = {
-    all: "bx-test-tube", blood: "bx-droplet", kidney: "bx-shape-circle",
-    liver: "bx-shape-square", diabetes: "bx-injection", lipids: "bx-heart", hormones: "bx-dna",
-  }
 
   // No mock data — test results come from the real API (Phase 5)
   const testResults = []
 
   const tabKeys = ["tests", "results", "services"]
-  const tabIcons = { tests: "bx-test-tube", results: "bx-file", services: "bx-cog" }
+  const labServiceKeys = ["homeVisit", "fastResults", "consult"]
 
   const handleTestSelect = (test) => {
     setSelectedTest(test)
     setShowBooking(true)
   }
 
-  const labServices = [
-    { key: "homeVisit", icon: "bx-home", color: "text-blue-500", btnColor: "bg-blue-600 hover:bg-blue-700" },
-    { key: "fastResults", icon: "bx-time", color: "text-green-500", btnColor: "bg-green-600 hover:bg-green-700" },
-    { key: "consult", icon: "bx-phone", color: "text-purple-500", btnColor: "bg-purple-600 hover:bg-purple-700" },
-  ]
-
   const renderTestsTab = () => (
     <div className="space-y-6">
       {/* Category Filter */}
       <div className="bg-white p-6 rounded-lg shadow">
         <div className="flex flex-wrap gap-2">
-          {categoryKeys.map((catKey) => (
-            <button
-              key={catKey}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-yellow-100 hover:text-yellow-700 transition-colors"
-            >
-              <i className={`bx ${categoryIcons[catKey]}`}></i>
-              <span className="text-sm">{t(`lab.categories.${catKey}`)}</span>
-            </button>
-          ))}
+          {categoryKeys.map((catKey) => {
+            const CatIcon = categoryIconMap[catKey]
+            return (
+              <button
+                key={catKey}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-yellow-100 hover:text-yellow-700 transition-colors"
+              >
+                <CatIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span className="text-sm">{t(`lab.categories.${catKey}`)}</span>
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -100,7 +108,7 @@ const LabSection = () => {
                 <div className="space-y-1">
                   {test.includes.slice(0, 2).map((item, index) => (
                     <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
-                      <i className="bx bx-check text-green-500"></i>
+                      <Check className="w-4 h-4 text-green-500 shrink-0" aria-hidden="true" />
                       <span>{item}</span>
                     </div>
                   ))}
@@ -114,7 +122,7 @@ const LabSection = () => {
 
               <button
                 onClick={() => handleTestSelect(test)}
-                className="w-full bg-yellow-600 text-white py-2 rounded-lg hover:bg-yellow-700 transition-colors"
+                className="w-full bg-yellow-600 text-white py-2 rounded-lg hover:bg-yellow-700 transition-colors min-h-[44px]"
               >
                 {t("lab.bookBtn")}
               </button>
@@ -131,7 +139,7 @@ const LabSection = () => {
         <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("lab.resultsTitle")}</h3>
         {testResults.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <i className="bx bx-file text-4xl mb-2 text-gray-300"></i>
+            <FileText className="w-12 h-12 mx-auto mb-2 text-gray-300" aria-hidden="true" />
             <p>{t("lab.noResults")}</p>
           </div>
         ) : (
@@ -150,16 +158,19 @@ const LabSection = () => {
   const renderServicesTab = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {labServices.map((svc) => (
-          <div key={svc.key} className="bg-white p-6 rounded-lg shadow text-center">
-            <i className={`bx ${svc.icon} text-4xl ${svc.color} mb-3`}></i>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">{t(`lab.services.${svc.key}.title`)}</h3>
-            <p className="text-gray-600 text-sm mb-4">{t(`lab.services.${svc.key}.desc`)}</p>
-            <button className={`w-full ${svc.btnColor} text-white py-2 rounded-lg transition-colors`}>
-              {t(`lab.services.${svc.key}.btn`)}
-            </button>
-          </div>
-        ))}
+        {labServiceKeys.map((key) => {
+          const { Icon, color, btnColor } = serviceIconMap[key]
+          return (
+            <div key={key} className="bg-white p-6 rounded-lg shadow text-center">
+              <Icon className={`w-10 h-10 mx-auto mb-3 ${color}`} aria-hidden="true" />
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">{t(`lab.services.${key}.title`)}</h3>
+              <p className="text-gray-600 text-sm mb-4">{t(`lab.services.${key}.desc`)}</p>
+              <button className={`w-full ${btnColor} text-white py-2 rounded-lg transition-colors min-h-[44px]`}>
+                {t(`lab.services.${key}.btn`)}
+              </button>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -169,7 +180,7 @@ const LabSection = () => {
       {/* Lab Section Header */}
       <div className="bg-white p-6 rounded-xl shadow-lg">
         <div className="flex items-center gap-4 mb-6">
-          <i className="bx bx-test-tube text-4xl text-yellow-600"></i>
+          <FlaskConical className="w-10 h-10 text-yellow-600 shrink-0" aria-hidden="true" />
           <div>
             <h1 className="text-2xl font-bold text-gray-800">{t("lab.title")}</h1>
             <p className="text-gray-600">{t("lab.subtitle")}</p>
@@ -179,21 +190,26 @@ const LabSection = () => {
         {/* Section summary — real numbers from API in Phase 5 */}
 
         {/* Tabs Navigation */}
-        <div className="flex border-b mt-6">
-          {tabKeys.map((tabKey) => (
-            <button
-              key={tabKey}
-              onClick={() => setActiveTab(tabKey)}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-                activeTab === tabKey
-                  ? "border-yellow-500 text-yellow-600 bg-yellow-50"
-                  : "border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              <i className={`bx ${tabIcons[tabKey]}`}></i>
-              <span>{t(`lab.tabs.${tabKey}`)}</span>
-            </button>
-          ))}
+        <div className="flex border-b mt-6" role="tablist">
+          {tabKeys.map((tabKey) => {
+            const TabIcon = tabIconMap[tabKey]
+            return (
+              <button
+                key={tabKey}
+                role="tab"
+                aria-selected={activeTab === tabKey}
+                onClick={() => setActiveTab(tabKey)}
+                className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors min-h-[44px] ${
+                  activeTab === tabKey
+                    ? "border-yellow-500 text-yellow-600 bg-yellow-50"
+                    : "border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                }`}
+              >
+                <TabIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span>{t(`lab.tabs.${tabKey}`)}</span>
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -204,12 +220,16 @@ const LabSection = () => {
 
       {/* Booking Modal */}
       {showBooking && selectedTest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold text-gray-800">{t("lab.modalTitle")} - {selectedTest.name}</h3>
-              <button onClick={() => setShowBooking(false)} className="text-gray-500 hover:text-gray-700">
-                <i className="bx bx-x text-2xl"></i>
+              <button
+                onClick={() => setShowBooking(false)}
+                className="text-gray-500 hover:text-gray-700 p-1 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                aria-label={t("common.close")}
+              >
+                <X className="w-6 h-6" aria-hidden="true" />
               </button>
             </div>
 
@@ -241,7 +261,8 @@ const LabSection = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t("lab.fullName")}</label>
                 <input
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                  autoComplete="name"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 text-base"
                   placeholder={t("lab.fullNamePlaceholder")}
                 />
               </div>
@@ -250,7 +271,9 @@ const LabSection = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t("lab.phone")}</label>
                 <input
                   type="tel"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 text-base"
                   placeholder={t("lab.phonePlaceholder")}
                 />
               </div>
@@ -259,7 +282,7 @@ const LabSection = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t("lab.preferredDate")}</label>
                 <input
                   type="date"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 text-base"
                   min={new Date().toISOString().split("T")[0]}
                 />
               </div>
@@ -267,13 +290,13 @@ const LabSection = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => { setShowBooking(false) }}
-                  className="flex-1 bg-yellow-600 text-white py-3 rounded-lg hover:bg-yellow-700 transition-colors"
+                  className="flex-1 bg-yellow-600 text-white py-3 rounded-lg hover:bg-yellow-700 transition-colors min-h-[44px]"
                 >
                   {t("lab.confirm")}
                 </button>
                 <button
                   onClick={() => setShowBooking(false)}
-                  className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors min-h-[44px]"
                 >
                   {t("lab.cancel")}
                 </button>

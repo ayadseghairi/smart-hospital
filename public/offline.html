@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>غير متصل — Hors ligne | Delin Smart Care</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --brand:   #2C5F8A;
+        --brand-d: #1a3a5c;
+        --bg:      #EBF3FA;
+        --surface: #ffffff;
+        --text:    #1a2a38;
+        --muted:   #5a7a9a;
+        --border:  #c5daea;
+        --radius:  12px;
+      }
+
+      html { font-size: 16px; }
+
+      body {
+        min-height: 100svh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        gap: 0;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 2rem 1.75rem 2.25rem;
+        max-width: 480px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1.25rem;
+        border-radius: 50%;
+        background: var(--bg);
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Wifi-off SVG — inline, no external assets */
+      .icon svg { width: 32px; height: 32px; }
+
+      h1 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--brand-d);
+        line-height: 1.4;
+        margin-bottom: 0.35rem;
+      }
+
+      .subtitle {
+        font-size: 0.9rem;
+        color: var(--muted);
+        margin-bottom: 1.75rem;
+        line-height: 1.6;
+        direction: ltr;
+        unicode-bidi: plaintext;
+      }
+
+      /* ── Emergency section ── */
+      .emergency-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.65rem;
+      }
+
+      .emergency-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.6rem;
+        margin-bottom: 1.75rem;
+      }
+
+      .emergency-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.75rem 0.5rem;
+        background: var(--brand);
+        color: #fff;
+        border-radius: var(--radius);
+        text-decoration: none;
+        font-weight: 700;
+        line-height: 1.2;
+        transition: background 0.15s;
+      }
+
+      .emergency-btn:hover,
+      .emergency-btn:focus {
+        background: var(--brand-d);
+        outline: 3px solid var(--brand);
+        outline-offset: 2px;
+      }
+
+      .emergency-btn .number {
+        font-size: 1.45rem;
+        letter-spacing: 0.02em;
+        direction: ltr;
+      }
+
+      .emergency-btn .label {
+        font-size: 0.68rem;
+        font-weight: 500;
+        opacity: 0.9;
+      }
+
+      /* ── Retry button ── */
+      .retry-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.75rem;
+        background: transparent;
+        border: 2px solid var(--brand);
+        color: var(--brand);
+        border-radius: var(--radius);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        justify-content: center;
+        transition: background 0.15s, color 0.15s;
+      }
+
+      .retry-btn:hover,
+      .retry-btn:focus {
+        background: var(--brand);
+        color: #fff;
+        outline: none;
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--border);
+        margin: 1.5rem 0;
+      }
+
+      .footer-note {
+        font-size: 0.75rem;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      @media (max-width: 380px) {
+        .emergency-grid { grid-template-columns: 1fr; }
+        .emergency-btn { flex-direction: row; gap: 0.75rem; }
+        .emergency-btn .number { font-size: 1.6rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+
+      <!-- Wifi-off icon (inline SVG, no external assets) -->
+      <div class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2C5F8A" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="1" y1="1" x2="23" y2="23"/>
+          <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+          <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+          <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/>
+          <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+          <circle cx="12" cy="20" r="1" fill="#2C5F8A" stroke="none"/>
+        </svg>
+      </div>
+
+      <!-- Title -->
+      <h1>لا يوجد اتصال بالإنترنت</h1>
+      <p class="subtitle">
+        Vous êtes hors ligne — Vérifiez votre connexion et réessayez.
+      </p>
+
+      <!-- Emergency numbers -->
+      <p class="emergency-label">أرقام الطوارئ — Urgences</p>
+      <div class="emergency-grid">
+        <a class="emergency-btn" href="tel:14" aria-label="الإسعاف — SAMU 14">
+          <span class="number">14</span>
+          <span class="label">الإسعاف / SAMU</span>
+        </a>
+        <a class="emergency-btn" href="tel:17" aria-label="الشرطة 17">
+          <span class="number">17</span>
+          <span class="label">الشرطة / Police</span>
+        </a>
+        <a class="emergency-btn" href="tel:21" aria-label="الحماية المدنية 21">
+          <span class="number">21</span>
+          <span class="label">حماية مدنية / Pompiers</span>
+        </a>
+      </div>
+
+      <!-- Retry -->
+      <button class="retry-btn" onclick="location.reload()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        إعادة المحاولة / Réessayer
+      </button>
+
+      <div class="divider"></div>
+      <p class="footer-note">
+        Delin Smart Care — منصة دلين الصحية الذكية
+      </p>
+    </div>
+  </body>
+</html>

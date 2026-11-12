@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { Eye, EyeOff } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
 
 const ROLE_HOME = {
@@ -26,6 +27,7 @@ export default function LoginPage() {
 
   const [form, setForm] = useState({ identifier: "", password: "" })
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -38,6 +40,24 @@ export default function LoginPage() {
         ...(isPhone ? { phone: form.identifier } : { email: form.identifier }),
       }
       const data = await login(credentials)
+
+      // Two-step TOTP challenge: server returned mfaRequired
+      if (data?.mfaRequired) {
+        const params = new URLSearchParams(location.search)
+        const returnTo = params.get("returnTo")
+        navigate("/login/2fa", {
+          replace: true,
+          state: { mfaToken: data.mfaToken, returnTo: returnTo ?? "" },
+        })
+        return
+      }
+
+      // Server-side forced password change takes priority
+      if (data?.mustChangePassword) {
+        navigate("/force-change-password", { replace: true })
+        return
+      }
+
       const role = data?.user?.role ?? null
 
       // Check returnTo query param first (safe path only)
@@ -60,9 +80,22 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">{t("auth.login")}</h1>
+    <div
+      className="flex items-center justify-center bg-gray-50 px-4 py-8"
+      style={{ minHeight: "100svh" }}
+    >
+      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-6">
+          <img
+            src="/logo.jpg"
+            alt={t("brand.logoAlt")}
+            width={56}
+            height={56}
+            className="w-14 h-14 rounded-2xl object-cover mb-3 shadow-sm"
+          />
+          <h1 className="text-2xl font-bold text-gray-800">{t("auth.login")}</h1>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -73,12 +106,15 @@ export default function LoginPage() {
               id="identifier"
               type="text"
               autoComplete="username"
+              inputMode="email"
+              enterKeyHint="next"
               value={form.identifier}
               onChange={(e) => setForm({ ...form, identifier: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2C5F8A] focus:border-transparent"
               placeholder={t("auth.phoneOrEmailPlaceholder")}
               dir="ltr"
+              style={{ fontSize: "16px" }}
             />
           </div>
 
@@ -86,19 +122,32 @@ export default function LoginPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">
               {t("auth.password")}
             </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                enterKeyHint="done"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2C5F8A] focus:border-transparent pe-11"
+                style={{ fontSize: "16px" }}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 end-0 px-3 flex items-center text-gray-400 hover:text-gray-600 focus-visible:outline-none"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}
+              </button>
+            </div>
           </div>
 
           <div className="text-end">
-            <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
+            <Link to="/forgot-password" className="text-sm text-[#2C5F8A] hover:underline">
               {t("auth.forgotPassword")}
             </Link>
           </div>
@@ -106,7 +155,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50"
+            className="w-full bg-[#2C5F8A] text-white py-3 rounded-xl hover:bg-[#245075] transition-colors font-semibold min-h-[48px] disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:outline-none"
           >
             {loading ? t("common.loading") : t("auth.loginButton")}
           </button>
@@ -114,7 +163,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-gray-600">
           {t("auth.noAccount")}{" "}
-          <Link to="/register" className="text-blue-600 hover:underline font-semibold">
+          <Link to="/register" className="text-[#2C5F8A] hover:underline font-semibold">
             {t("auth.createPatientAccount")}
           </Link>
         </p>

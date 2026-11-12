@@ -1,5 +1,6 @@
 // server/src/config/env.ts
-// Zod-validated environment — fails fast at startup with a clear message
+// Zod-validated environment — fails fast at startup with a clear message.
+// NEVER print secret values in error messages.
 import { z } from "zod"
 
 const envSchema = z
@@ -27,7 +28,8 @@ const envSchema = z
     SMTP_USER: z.string().optional(),
     SMTP_PASS: z.string().optional(),
     MAIL_FROM_NAME: z.string().default("Delin Smart Care"),
-    MAIL_FROM_ADDRESS: z.string().email().default("no-reply@delin.dz"),
+    // MAIL_FROM_ADDRESS falls back to SMTP_USER (applied in superRefine below)
+    MAIL_FROM_ADDRESS: z.string().optional(),
     MAIL_REPLY_TO: z.string().optional(),
 
     EMAIL_VERIFY_TTL_HOURS: z.coerce.number().default(24),
@@ -41,6 +43,15 @@ const envSchema = z
 
     SUPER_ADMIN_EMAIL: z.string().email().optional(),
     SUPER_ADMIN_FULL_NAME: z.string().optional(),
+    // TEMPORARY — hashed at first use; owner must remove after first login
+    SUPER_ADMIN_INITIAL_PASSWORD: z.string().optional(),
+
+    // AES-256-GCM key for encrypting stored TOTP secrets (must be exactly 32 bytes = 64 hex chars)
+    // Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+    MFA_ENCRYPTION_KEY: z
+      .string()
+      .regex(/^[0-9a-fA-F]{64}$/, "MFA_ENCRYPTION_KEY must be exactly 64 hex characters (32 bytes)")
+      .optional(),
   })
   .superRefine((data, ctx) => {
     // If MAIL_ENABLED=true, all SMTP settings must be present
@@ -50,6 +61,7 @@ const envSchema = z
         if (!data[key]) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
+            // No secret values in the message — just the variable name
             message: `${key} is required when MAIL_ENABLED=true`,
             path: [key],
           })
@@ -69,7 +81,14 @@ if (!parsed.success) {
   process.exit(1)
 }
 
-export const env = parsed.data
+// Apply MAIL_FROM_ADDRESS fallback (SMTP_USER) after validation
+const raw = parsed.data
+const MAIL_FROM_ADDRESS = raw.MAIL_FROM_ADDRESS || raw.SMTP_USER || "no-reply@delin.dz"
+
+export const env = {
+  ...raw,
+  MAIL_FROM_ADDRESS,
+}
 
 export const reminderOffsets: number[] = env.REMINDER_OFFSETS_HOURS
   .split(",")

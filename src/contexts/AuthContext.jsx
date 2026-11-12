@@ -26,6 +26,10 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (credentials) => {
     const data = await apiPost("/auth/login", credentials, lang)
+    // If MFA is required, return immediately — no session yet
+    if (data?.mfaRequired) {
+      return data
+    }
     setAccessToken(data.accessToken)
     // Fetch full user profile (role, etc.) after login
     const me = await apiGet("/auth/me", lang)
@@ -41,6 +45,19 @@ export function AuthProvider({ children }) {
     } finally {
       clearAccessToken()
       setUser(null)
+      // Clear any runtime caches so no personal data lingers in the SW cache
+      if (typeof caches !== "undefined") {
+        try {
+          const names = await caches.keys()
+          await Promise.all(
+            names
+              .filter((n) => n !== "emergency-numbers") // keep offline emergency numbers
+              .map((n) => caches.delete(n))
+          )
+        } catch {
+          // cache API not available (e.g. http) — ignore
+        }
+      }
     }
   }, [lang])
 

@@ -4,6 +4,7 @@ import { useParams, Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
+import { ArrowLeft, ArrowRight, CheckCircle2, AlertCircle, AlertTriangle, Info, Loader2 } from "lucide-react"
 import { apiGet, apiPost } from "../api/client"
 import { useAuth } from "../contexts/AuthContext"
 import Avatar from "../components/common/Avatar"
@@ -12,6 +13,8 @@ const AppointmentBooking = () => {
   const { doctorId } = useParams()
   const { t, i18n } = useTranslation()
   const lang = i18n.language === "fr" ? "fr" : "ar"
+  const isRtl = lang === "ar"
+  const BackIcon = isRtl ? ArrowRight : ArrowLeft
   const { user } = useAuth()
 
   const [selectedDate, setSelectedDate] = useState("")
@@ -62,17 +65,17 @@ const AppointmentBooking = () => {
 
   if (doctorLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <i className="bx bx-loader-alt animate-spin text-4xl text-blue-600"></i>
+      <div className="min-h-dvh bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <Loader2 size={40} className="animate-spin text-blue-600" aria-hidden />
       </div>
     )
   }
 
   if (doctorError || !doctor) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <i className="bx bx-error text-6xl text-gray-400 mb-4"></i>
+      <div className="min-h-dvh bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center px-4">
+          <AlertCircle size={64} className="text-gray-400 mb-4 mx-auto" aria-hidden />
           <h2 className="text-xl font-semibold text-gray-800 mb-2">{t("appointment.doctorNotFound")}</h2>
           <Link to="/" className="text-blue-600 hover:text-blue-800">{t("nav.backHome")}</Link>
         </div>
@@ -83,22 +86,22 @@ const AppointmentBooking = () => {
   const specialty = lang === "ar" ? doctor.specialty?.nameAr : doctor.specialty?.nameFr
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <header className="bg-white shadow-lg">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to={`/doctor/${doctorId}`} className="flex items-center gap-2 text-blue-600 hover:text-blue-800">
-            <i className="bx bx-arrow-back text-xl"></i>
-            <span>{t("nav.backToDoctorProfile")}</span>
+    <div className="min-h-dvh bg-gradient-to-br from-blue-50 to-indigo-100">
+      <header className="bg-white shadow-lg" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">
+          <Link to={`/doctor/${doctorId}`} className="flex items-center gap-2 text-blue-600 hover:text-blue-800 min-h-[44px] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded shrink-0">
+            <BackIcon size={20} aria-hidden />
+            <span className="text-sm sm:text-base">{t("nav.backToDoctorProfile")}</span>
           </Link>
-          <h1 className="text-xl font-bold text-gray-800">{t("appointment.title")}</h1>
-          <div></div>
+          <h1 className="text-base sm:text-xl font-bold text-gray-800 text-center min-w-0 truncate">{t("appointment.title")}</h1>
+          <div aria-hidden className="w-10 shrink-0" />
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         {submitted ? (
           <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <i className="bx bx-check-circle text-6xl text-green-500 mb-4"></i>
+            <CheckCircle2 size={64} className="text-green-500 mb-4 mx-auto" aria-hidden />
             <h2 className="text-2xl font-bold text-gray-800 mb-3">{t("appointment.submitted")}</h2>
             <p className="text-gray-600 mb-6">{t("appointment.submittedDesc")}</p>
             <div className="flex gap-3 justify-center">
@@ -125,7 +128,7 @@ const AppointmentBooking = () => {
             {!canBook && (
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
                 <div className="flex items-start gap-3">
-                  <i className="bx bx-error text-amber-600 text-xl"></i>
+                  <AlertTriangle size={20} className="text-amber-600 mt-0.5 shrink-0" aria-hidden />
                   <div>
                     <p className="font-semibold text-amber-800">{t("appointment.emailRequired")}</p>
                     <p className="text-sm text-amber-700 mt-1">{t("appointment.emailRequiredHint")}</p>
@@ -193,7 +196,7 @@ const AppointmentBooking = () => {
 
                     {/* Notice: manual approval */}
                     <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-2">
-                      <i className="bx bx-info-circle text-blue-500"></i>
+                      <Info size={16} className="text-blue-500 shrink-0 mt-0.5" aria-hidden />
                       <p className="text-sm text-blue-800">{t("appointment.noticeText")}</p>
                     </div>
 

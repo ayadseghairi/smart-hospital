@@ -143,7 +143,7 @@ export default function DoctorsPage() {
 
         {!isLoading && !isError && doctors.length === 0 && (
           <div className="text-center py-16">
-            <i className="bx bx-user-circle text-5xl text-gray-300 mb-4"></i>
+            <UserCircle2 size={48} className="text-gray-300 mb-4 mx-auto" aria-hidden />
             <p className="text-gray-500 font-medium">{t("doctors.emptyList")}</p>
           </div>
         )}

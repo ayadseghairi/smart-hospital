@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
+import { AlertTriangle, Calendar, User, ShieldCheck } from "lucide-react"
 import Layout from "../../components/Layout"
 import { useAuth } from "../../contexts/AuthContext"
 import { apiGet } from "../../api/client"
@@ -47,7 +48,7 @@ export default function AccountDashboardPage() {
         {/* Unverified-email warning */}
         {user && !user.emailVerifiedAt && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
-            <i className="bx bx-error text-amber-500 text-lg mt-0.5" />
+            <AlertTriangle size={18} className="text-amber-500 mt-0.5 shrink-0" aria-hidden />
             <div>
               <p className="text-sm text-amber-800">{t("account.dashboard.unverifiedEmail")}</p>
               <Link to="/account/add-email" className="text-sm text-amber-700 underline mt-1 inline-block">
@@ -74,7 +75,7 @@ export default function AccountDashboardPage() {
 
           {!isLoading && !error && appointments.length === 0 && (
             <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-              <i className="bx bx-calendar text-4xl text-gray-300 mb-2" />
+              <Calendar size={40} className="text-gray-300 mb-2 mx-auto" aria-hidden />
               <p className="text-gray-500 text-sm">{t("account.dashboard.noUpcoming")}</p>
             </div>
           )}
@@ -104,16 +105,16 @@ export default function AccountDashboardPage() {
         {/* Quick actions */}
         <section>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Link to="/account/appointments" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all text-center">
-              <i className="bx bx-calendar text-2xl text-blue-600 mb-2 block" />
+            <Link to="/account/appointments" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all text-center min-h-[88px] flex flex-col items-center justify-center focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
+              <Calendar size={24} className="text-blue-600 mb-2" aria-hidden />
               <p className="text-sm font-medium text-gray-700">{t("account.dashboard.viewAllAppointments")}</p>
             </Link>
-            <Link to="/account/profile" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all text-center">
-              <i className="bx bx-user text-2xl text-blue-600 mb-2 block" />
+            <Link to="/account/profile" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all text-center min-h-[88px] flex flex-col items-center justify-center focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
+              <User size={24} className="text-blue-600 mb-2" aria-hidden />
               <p className="text-sm font-medium text-gray-700">{t("account.dashboard.editProfile")}</p>
             </Link>
-            <Link to="/account/security" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all text-center">
-              <i className="bx bx-shield text-2xl text-blue-600 mb-2 block" />
+            <Link to="/account/security" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all text-center min-h-[88px] flex flex-col items-center justify-center focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
+              <ShieldCheck size={24} className="text-blue-600 mb-2" aria-hidden />
               <p className="text-sm font-medium text-gray-700">{t("account.dashboard.accountSettings")}</p>
             </Link>
           </div>

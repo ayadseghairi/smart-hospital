@@ -5,6 +5,10 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { useQuery } from "@tanstack/react-query"
+import {
+  ArrowLeft, ArrowRight, Home as HomeIcon, Settings, UserPlus, Camera,
+  Plus, TestTube, Heart, Phone, MapPin, Building2, Loader2, AlertCircle,
+} from "lucide-react"
 import { apiGet } from "../api/client"
 import AdminPanel from "../components/Sections/InstitutionDetails/AdminPanel"
 import DoctorsSection from "../components/Sections/InstitutionDetails/DoctorsSection"
@@ -25,13 +29,13 @@ const SECTION_ACTIVE_STYLES = {
 }
 
 const SECTIONS = [
-  { id: "overview", color: "blue",   icon: "bx-home" },
-  { id: "admin",    color: "gray",   icon: "bx-cog" },
-  { id: "doctors",  color: "green",  icon: "bx-user-plus" },
-  { id: "imaging",  color: "purple", icon: "bx-camera" },
-  { id: "pharmacy", color: "red",    icon: "bx-plus-medical" },
-  { id: "lab",      color: "yellow", icon: "bx-test-tube" },
-  { id: "nurses",   color: "pink",   icon: "bx-heart" },
+  { id: "overview", color: "blue",   Icon: HomeIcon  },
+  { id: "admin",    color: "gray",   Icon: Settings  },
+  { id: "doctors",  color: "green",  Icon: UserPlus  },
+  { id: "imaging",  color: "purple", Icon: Camera    },
+  { id: "pharmacy", color: "red",    Icon: Plus      },
+  { id: "lab",      color: "yellow", Icon: TestTube  },
+  { id: "nurses",   color: "pink",   Icon: Heart     },
 ]
 
 const InstitutionPage = () => {
@@ -73,8 +77,8 @@ const InstitutionPage = () => {
         return (
           <div className="bg-white rounded-xl shadow-lg p-8">
             <div className="text-center mb-8">
-              <i className="bx bx-hospital text-6xl text-blue-500 mb-4"></i>
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                <Building2 size={64} className="text-blue-500 mb-4 mx-auto" aria-hidden />
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">
                 {lang === "ar" ? institution?.nameAr : institution?.nameFr}
               </h2>
               <p className="text-gray-600">
@@ -85,7 +89,7 @@ const InstitutionPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               {institution?.phone && (
                 <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <i className="bx bx-phone text-3xl text-green-500 mb-2"></i>
+                  <Phone size={32} className="text-green-500 mb-2 mx-auto" aria-hidden />
                   <h3 className="font-semibold text-gray-800">{t("institutions.phone")}</h3>
                   <a href={`tel:${institution.phone}`} className="text-gray-600 hover:underline" dir="ltr">
                     {institution.phone}
@@ -94,7 +98,7 @@ const InstitutionPage = () => {
               )}
               {(lang === "ar" ? institution?.addressAr : institution?.addressFr) && (
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <i className="bx bx-map text-3xl text-purple-500 mb-2"></i>
+                  <MapPin size={32} className="text-purple-500 mb-2 mx-auto" aria-hidden />
                   <h3 className="font-semibold text-gray-800">{t("institutions.address")}</h3>
                   <p className="text-gray-600">
                     {lang === "ar" ? institution.addressAr : institution.addressFr}
@@ -103,7 +107,7 @@ const InstitutionPage = () => {
               )}
               {institution?.hasEmergency24h && (
                 <div className="text-center p-4 bg-red-50 rounded-lg">
-                  <i className="bx bx-heart text-3xl text-red-500 mb-2"></i>
+                  <Heart size={32} className="text-red-500 mb-2 mx-auto" aria-hidden />
                   <h3 className="font-semibold text-gray-800">{t("emergency.open24h")}</h3>
                 </div>
               )}
@@ -113,9 +117,16 @@ const InstitutionPage = () => {
               <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("institutions.quickServices")}</h3>
               <Link
                 to={`/institution/${id}/doctors`}
-                className="block w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
+                className="block w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-center mb-3"
               >
                 {t("institutions.bookAppointment")}
+              </Link>
+              {/* Report an error in this information */}
+              <Link
+                to={`/contact?type=REPORT_ERROR&ref=${encodeURIComponent(id)}&name=${encodeURIComponent(lang === "ar" ? institution?.nameAr ?? "" : institution?.nameFr ?? "")}`}
+                className="block w-full text-center text-sm text-gray-500 hover:text-gray-700 underline py-1"
+              >
+                {t("institutions.reportError")}
               </Link>
             </div>
           </div>
@@ -123,11 +134,14 @@ const InstitutionPage = () => {
     }
   }
 
+  const isRtl = lang === "ar"
+  const BackIcon = isRtl ? ArrowRight : ArrowLeft
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-dvh bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
-          <i className="bx bx-loader-alt animate-spin text-4xl text-blue-600 mb-4"></i>
+          <Loader2 size={40} className="animate-spin text-blue-600 mb-4 mx-auto" aria-hidden />
           <p className="text-gray-600">{t("institutions.loading")}</p>
         </div>
       </div>
@@ -136,9 +150,9 @@ const InstitutionPage = () => {
 
   if (error || !institution) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <i className="bx bx-error text-6xl text-gray-400 mb-4"></i>
+      <div className="min-h-dvh bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center px-4">
+          <AlertCircle size={64} className="text-gray-400 mb-4 mx-auto" aria-hidden />
           <h2 className="text-xl font-semibold text-gray-800 mb-2">{t("institutions.notFound")}</h2>
           <p className="text-gray-500 mb-4">{t("institutions.notFoundDesc")}</p>
           <Link to="/" className="text-blue-600 hover:text-blue-800">{t("nav.backHome")}</Link>
@@ -148,47 +162,52 @@ const InstitutionPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <header className="bg-white shadow-lg">
+    <div className="min-h-dvh bg-gradient-to-br from-blue-50 to-indigo-100">
+      <header className="bg-white shadow-lg" style={{ paddingTop: "env(safe-area-inset-top)" }}>
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors">
-              <i className="bx bx-arrow-back text-xl"></i>
-              <span>{t("nav.backHome")}</span>
+          <div className="flex items-center justify-between gap-2">
+            <Link to="/" className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded shrink-0">
+              <BackIcon size={20} aria-hidden />
+              <span className="text-sm sm:text-base">{t("nav.backHome")}</span>
             </Link>
-            <div className="text-center">
-              <h1 className="text-xl font-bold text-gray-800">
+            <div className="text-center min-w-0">
+              <h1 className="text-base sm:text-xl font-bold text-gray-800 truncate">
                 {lang === "ar" ? institution.nameAr : institution.nameFr}
               </h1>
-              <p className="text-gray-600">{t("institutions.digitalPlatform")}</p>
+              <p className="text-gray-600 text-sm">{t("institutions.digitalPlatform")}</p>
             </div>
-            <div></div>
+            <div aria-hidden className="w-10 shrink-0" />
           </div>
         </div>
       </header>
 
-      <nav className="bg-white border-b">
+      <nav className="bg-white border-b" aria-label={t("nav.mainNav")}>
         <div className="container mx-auto px-4">
-          <div className="flex overflow-x-auto">
-            {SECTIONS.map((sectionItem) => (
-              <button
-                key={sectionItem.id}
-                onClick={() => handleSectionChange(sectionItem.id)}
-                className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
-                  activeSection === sectionItem.id
-                    ? SECTION_ACTIVE_STYLES[sectionItem.color]
-                    : "border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-                }`}
-              >
-                <i className={`bx ${sectionItem.icon}`}></i>
-                <span>{t(`institutions.sections.${sectionItem.id}`)}</span>
-              </button>
-            ))}
+          <div className="flex overflow-x-auto" role="tablist">
+            {SECTIONS.map((sectionItem) => {
+              const SectionIcon = sectionItem.Icon
+              return (
+                <button
+                  key={sectionItem.id}
+                  role="tab"
+                  aria-selected={activeSection === sectionItem.id}
+                  onClick={() => handleSectionChange(sectionItem.id)}
+                  className={`flex items-center gap-2 px-4 sm:px-6 py-4 border-b-2 transition-colors whitespace-nowrap text-sm min-h-[48px] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
+                    activeSection === sectionItem.id
+                      ? SECTION_ACTIVE_STYLES[sectionItem.color]
+                      : "border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                  }`}
+                >
+                  <SectionIcon size={16} aria-hidden />
+                  <span>{t(`institutions.sections.${sectionItem.id}`)}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
       </nav>
 
-      <main className="container mx-auto px-4 py-8">{renderActiveSection()}</main>
+      <main className="container mx-auto px-4 py-6 sm:py-8">{renderActiveSection()}</main>
     </div>
   )
 }

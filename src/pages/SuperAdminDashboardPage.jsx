@@ -134,7 +134,9 @@ function UsersPanel({ lang }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">{t("admin.users")}</h2>
-      <div className="overflow-x-auto">
+
+      {/* Desktop table — hidden on small screens */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-start text-gray-500 border-b">
@@ -158,11 +160,11 @@ function UsersPanel({ lang }) {
                 </td>
                 <td className="py-3 flex gap-2">
                   {u.isActive
-                    ? <button onClick={() => deactivate.mutate(u.id)} className="text-red-600 hover:underline text-xs">{t("admin.deactivate")}</button>
-                    : <button onClick={() => reactivate.mutate(u.id)} className="text-green-600 hover:underline text-xs">{t("admin.reactivate")}</button>
+                    ? <button onClick={() => deactivate.mutate(u.id)} className="text-red-600 hover:underline text-xs min-h-[44px] flex items-center">{t("admin.deactivate")}</button>
+                    : <button onClick={() => reactivate.mutate(u.id)} className="text-green-600 hover:underline text-xs min-h-[44px] flex items-center">{t("admin.reactivate")}</button>
                   }
                   {u.mustSetPassword && (
-                    <button onClick={() => resendInvite.mutate(u.id)} className="text-blue-600 hover:underline text-xs ms-2">{t("admin.resendInvite")}</button>
+                    <button onClick={() => resendInvite.mutate(u.id)} className="text-blue-600 hover:underline text-xs ms-2 min-h-[44px] flex items-center">{t("admin.resendInvite")}</button>
                   )}
                 </td>
               </tr>
@@ -170,6 +172,32 @@ function UsersPanel({ lang }) {
           </tbody>
         </table>
         {users.length === 0 && <p className="text-center text-gray-400 py-4">{t("admin.noUsers")}</p>}
+      </div>
+
+      {/* Mobile card list — shown below md */}
+      <div className="md:hidden space-y-3">
+        {users.length === 0 && <p className="text-center text-gray-400 py-4">{t("admin.noUsers")}</p>}
+        {users.map(u => (
+          <div key={u.id} className="border border-gray-200 rounded-xl p-4 space-y-2">
+            <div className="flex items-start justify-between gap-2">
+              <p className="font-medium text-gray-800 text-sm">{u.fullName}</p>
+              <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${u.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                {u.isActive ? t("admin.active") : t("admin.inactive")}
+              </span>
+            </div>
+            <p className="text-xs text-gray-400" dir="ltr">{u.email}</p>
+            <p className="text-xs text-gray-500">{u.role}</p>
+            <div className="flex gap-3 pt-1">
+              {u.isActive
+                ? <button onClick={() => deactivate.mutate(u.id)} className="text-red-600 text-xs min-h-[44px] flex items-center hover:underline">{t("admin.deactivate")}</button>
+                : <button onClick={() => reactivate.mutate(u.id)} className="text-green-600 text-xs min-h-[44px] flex items-center hover:underline">{t("admin.reactivate")}</button>
+              }
+              {u.mustSetPassword && (
+                <button onClick={() => resendInvite.mutate(u.id)} className="text-blue-600 text-xs min-h-[44px] flex items-center hover:underline">{t("admin.resendInvite")}</button>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

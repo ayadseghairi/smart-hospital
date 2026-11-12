@@ -22,6 +22,8 @@ import { contactRouter } from "./modules/contact/routes"
 // Doctor self-service router (availability, profile, appointments)
 import { authenticate } from "./middleware/auth"
 import { requireRole } from "./middleware/requireRole"
+import { requirePasswordChange } from "./middleware/requirePasswordChange"
+import { requireMfaEnrolled } from "./middleware/requireMfaEnrolled"
 import { validate } from "./middleware/validate"
 import { availabilityRuleSchema, updateDoctorProfileSchema } from "./modules/doctors/schema"
 import * as doctorCtrl from "./modules/doctors/controller"
@@ -142,6 +144,8 @@ doctorRouter.patch(
 const api = express.Router()
 // Cache-Control: no-store on all authenticated API responses
 api.use((_req, res, next) => { res.setHeader("Cache-Control", "no-store"); next() })
+// Block all endpoints except the three allowed ones when mustChangePassword is set
+api.use(requirePasswordChange)
 api.use("/auth", authRouter)
 api.use("/institutions", institutionsRouter)
 api.use("/institution", institutionAdminRouter)
@@ -151,7 +155,8 @@ api.use("/doctor", doctorRouter)
 api.use("/search", searchRouter)
 api.use("/emergency", emergencyRouter)
 api.use("/assistant", assistantRouter)
-api.use("/admin", adminRouter)
+// Admin routes: also require TOTP enrollment for SUPER_ADMIN
+api.use("/admin", requireMfaEnrolled, adminRouter)
 api.use("/notifications", notificationsRouter)
 api.use("/contact", contactRouter)
 

@@ -2,6 +2,7 @@
 
 import { useNavigate, Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { UserPlus } from "lucide-react"
 import Avatar from "../../common/Avatar"
 
 const DoctorsSection = () => {
@@ -19,7 +20,7 @@ const DoctorsSection = () => {
       <h2 className="text-3xl font-semibold text-gray-800 mb-8 text-center">{t("doctors.title")}</h2>
       {doctors.length === 0 ? (
         <div className="text-center py-16 text-gray-500">
-          <i className="bx bx-user-plus text-6xl mb-4 text-gray-300"></i>
+          <UserPlus size={64} className="mb-4 text-gray-300 mx-auto" aria-hidden />
           <p className="text-lg">{t("doctors.empty")}</p>
         </div>
       ) : (

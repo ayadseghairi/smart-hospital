@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { Search, Loader2 } from "lucide-react"
 import "./SearchBox.css"
 
 const SearchBox = ({ onSearch }) => {
@@ -28,7 +29,7 @@ const SearchBox = ({ onSearch }) => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-t-4 border-blue-500">
       <div className="text-center mb-4">
-        <i className="bx bx-search text-5xl text-blue-500 mb-3"></i>
+        <Search size={48} className="text-blue-500 mb-3 mx-auto" aria-hidden />
         <h2 className="text-xl font-semibold text-gray-800 mb-2">{t("search.title")}</h2>
         <p className="text-gray-600 text-sm">{t("search.subtitle")}</p>
       </div>
@@ -36,29 +37,31 @@ const SearchBox = ({ onSearch }) => {
       <div className="space-y-3">
         <div className="relative">
           <input
-            type="text"
+            type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t("search.placeholder")}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+            className="w-full ps-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ fontSize: "16px" }}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            aria-label={t("search.button")}
           />
-          <i className="bx bx-search absolute start-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <Search size={16} className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden />
         </div>
 
         <button
           onClick={handleSearch}
           disabled={isSearching || !searchQuery.trim()}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[48px] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
         >
           {isSearching ? (
             <>
-              <i className="bx bx-loader-alt animate-spin"></i>
+              <Loader2 size={16} className="animate-spin" aria-hidden />
               <span>{t("search.searching")}</span>
             </>
           ) : (
             <>
-              <i className="bx bx-search"></i>
+              <Search size={16} aria-hidden />
               <span>{t("search.button")}</span>
             </>
           )}

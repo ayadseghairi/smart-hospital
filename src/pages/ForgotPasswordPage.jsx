@@ -2,6 +2,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { Mail } from "lucide-react"
 import { apiPost } from "../api/client"
 
 export default function ForgotPasswordPage() {
@@ -29,7 +30,7 @@ export default function ForgotPasswordPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md text-center">
-          <i className="bx bx-envelope text-6xl text-blue-500 mb-4"></i>
+          <Mail size={64} className="text-blue-500 mb-4 mx-auto" aria-hidden />
           <h1 className="text-2xl font-bold text-gray-800 mb-3">{t("auth.checkInboxTitle")}</h1>
           <p className="text-gray-600 mb-6">{t("auth.forgotPasswordSent")}</p>
           <Link to="/login" className="text-blue-600 hover:underline text-sm">{t("auth.backToLogin")}</Link>

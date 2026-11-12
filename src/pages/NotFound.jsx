@@ -2,6 +2,7 @@
 
 import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { AlertCircle } from "lucide-react"
 import "./NotFound.css"
 
 const NotFound = () => {
@@ -9,9 +10,9 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className="text-center">
+      <div className="text-center px-4">
         <div className="mb-8">
-          <i className="bx bx-error-circle text-8xl text-gray-400 mb-4"></i>
+          <AlertCircle size={96} className="text-gray-400 mb-4 mx-auto" aria-hidden />
           <h1 className="text-6xl font-bold text-gray-800 mb-2">404</h1>
           <h2 className="text-2xl font-semibold text-gray-600 mb-4">{t("notFound.title")}</h2>
           <p className="text-gray-500 mb-8 max-w-md mx-auto">{t("notFound.desc")}</p>

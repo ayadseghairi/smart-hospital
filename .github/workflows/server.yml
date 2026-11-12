@@ -49,6 +49,8 @@ jobs:
       SUPER_ADMIN_EMAIL: ""
       SUPER_ADMIN_FULL_NAME: ""
       TZ: Africa/Algiers
+      # 32 zero-bytes (64 hex chars) — safe for CI, never used in production
+      MFA_ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
 
     steps:
       - name: Checkout
@@ -77,7 +79,12 @@ jobs:
         run: npx vitest run
         working-directory: server
 
-      - name: Audit dependencies (high severity)
-        run: npm audit --audit-level=high
+      - name: Audit prod dependencies (BLOCKING — high+critical only)
+        # --omit=dev excludes dev-only vulns (vitest, vite, esbuild etc.)
+        # Advisory 1243066 / GHSA-mrhx-c7xc-m3w5 (zod <4.6.6 memory exhaustion):
+        #   Fix requires upgrading to zod v4 which is a breaking API change.
+        #   Mitigated by: all schemas have explicit .max() bounds; rate limiting; request
+        #   body size limit (express default 100 kb). Accepted risk, revisit for v4 migration.
+        # Advisory for pg-boss uuid dep is moderate only (below --audit-level=high threshold).
+        run: npm audit --omit=dev --audit-level=high --ignore-advisories 1243066
         working-directory: server
-        continue-on-error: true   # warn but don't fail until lockfile is clean

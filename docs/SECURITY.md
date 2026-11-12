@@ -198,11 +198,15 @@
 | Sub-control | Status | Notes |
 |---|---|---|
 | Lockfiles committed | ✅ | `package-lock.json` present |
-| `npm audit` in CI | ❌ MISSING | — |
+| `npm audit` in CI (BLOCKING) | ✅ | Server: `--omit=dev --audit-level=high --ignore-advisories 1243066`; Frontend: `--omit=dev --audit-level=high`; both exit 0. `.github/workflows/server.yml` + `frontend.yml` — `continue-on-error` removed. |
+| Advisory 1243066 / GHSA-mrhx-c7xc-m3w5 (zod) | Accepted | Zod v3 memory exhaustion on oversized constrained collections. Fix = upgrade to zod v4 (breaking). **Mitigated by:** explicit `.max()` on all schemas, express body size limit (100 kb), rate limiting. Accepted risk; schedule zod v4 migration post-launch. |
 | Dependabot / Renovate | ❌ MISSING | — |
-| No CDN scripts | ✅ | boxicons via npm |
+| No CDN scripts | ✅ | `boxicons` uninstalled; all icons via tree-shaken `lucide-react` |
 | `eslint-plugin-security` | ❌ MISSING | — |
-| gitleaks in CI | ❌ MISSING | — |
+| gitleaks in CI (BLOCKING) | ✅ | `.github/workflows/frontend.yml` — `continue-on-error` removed; `.gitleaks.toml` allowlist for CI placeholder values |
+| nodemailer upgraded | ✅ | Upgraded to 10.5.0 to clear critical/high CVEs |
+| argon2 upgraded | ✅ | Upgraded to 0.45.2 to clear critical CVEs |
+| react-router-dom upgraded | ✅ | Upgraded to 6.30.6; remaining 2 advisories are moderate (below threshold) |
 
 ### C12. Security tests
 
@@ -213,15 +217,19 @@
 | Double booking prevention | ✅ | `tests/unit/appointments-service.test.ts` |
 | IDOR: patient A vs patient B | ✅ | `tests/unit/appointments-service.test.ts` |
 | Reminder idempotency | ✅ | `tests/unit/reminder-idempotency.test.ts` |
-| Mass assignment (role field in register) | ❌ MISSING | — |
-| Vertical role escalation matrix | ❌ MISSING | — |
-| SQLi payloads in search/filter | ❌ MISSING | — |
-| XSS payloads in text fields | ❌ MISSING | — |
-| Open redirect on `returnTo` | ❌ MISSING | — |
-| Rate limit and lockout | ❌ MISSING | — |
-| Refresh token reuse detection | ❌ MISSING | — |
-| Security headers present | ❌ MISSING | — |
-| CSRF rejection | ❌ MISSING | — |
+| Mass assignment (role field in register) | ❌ MISSING | Planned |
+| Vertical role escalation matrix | ❌ MISSING | Planned |
+| SQLi payloads in search/filter | ❌ MISSING | Prisma parameterized queries make this low risk |
+| XSS payloads in text fields | ❌ MISSING | React escapes by default; no `dangerouslySetInnerHTML` (ESLint enforced) |
+| Open redirect on `returnTo` | ❌ MISSING | Covered by `src/lib/returnTo.js` allowlist logic |
+| Rate limit and lockout | ❌ MISSING | Planned |
+| Refresh token family reuse detection | ✅ | `tests/unit/totp.test.ts` — "Refresh token family reuse detection" suite |
+| TOTP 2FA (AES crypto, MFA tokens, replay, recovery codes) | ✅ | `tests/unit/totp.test.ts` (9 tests) |
+| SUPER_ADMIN gate flow (login→pw-change→2FA→/admin) | ✅ | `tests/unit/super-admin-flow.test.ts` (4 tests) |
+| Bootstrap idempotency + no-log of initial password | ✅ | `tests/unit/bootstrap.test.ts` (4 tests) |
+| Email template rendering (30 templates) | ✅ | `tests/unit/email-templates.test.ts` |
+| Security headers present | ❌ MISSING | Planned |
+| CSRF rejection | ❌ MISSING | Planned |
 
 ---
 
@@ -233,12 +241,13 @@
 | SMTP domain (SPF/DKIM/DMARC) | Emails may be marked spam or spoofed | Set up proper sending domain before launch |
 | External penetration test | Code review cannot find all vulnerabilities | Commission a pentest before public launch |
 | Pharmacy duty rota | No verified data source | Do not build until a real source is confirmed |
-| TOTP 2FA mandatory for SUPER_ADMIN | Platform admin account is highest-risk | Implement before first super-admin is created in production |
+| TOTP 2FA mandatory for SUPER_ADMIN | Platform admin account is highest-risk | Schema and middleware implemented; enrollment UI needed before production |
 | SMS/OTP for phone-only registration | Phone numbers unverifiable without SMS | Keep OTP deferred; enforce email verification for booking |
 | Analytics | Owner has not opted in to any analytics | Do not add any tracking without explicit owner decision |
 | Algerian public holidays | Hard-coding is a maintenance burden | Keep as configurable data in DB |
 | Backup / restore runbook | Undocumented | Write and test before launch |
 | DB migration credentials | docker-compose uses same user for runtime and migration | Separate credentials for production |
+| **Temporary password in `.env`** | `SUPER_ADMIN_INITIAL_PASSWORD` sits in `.env` until removed; mitigations: (1) minimum 16 chars, (2) forced change at first login, (3) argon2id hash at rest, (4) never logged or emailed, (5) idempotent bootstrap skips if admin exists. Owner must `chmod 600 .env` and delete the variable immediately after first login. | Accepted risk — mitigations applied |
 
 ---
 
@@ -247,3 +256,4 @@
 | Version | Date | Changes |
 |---|---|---|
 | 1.0 | 2025 | Initial audit and security hardening |
+| 2.0 | 2025-11-12 | TOTP 2FA end-to-end (AES-256-GCM, otpauth, ±1 step, replay protection, 10 hashed recovery codes, two-step login); refresh token family reuse detection; step-up re-auth (`POST /auth/step-up`); NEW_DEVICE_LOGIN email for staff; CI hardened (npm audit + gitleaks BLOCKING); zod advisory documented as accepted risk; nodemailer/argon2/react-router-dom upgraded; boxicons removed; EmergencyPage commune picker; ForceChangePasswordPage auth guard; InstitutionPage report-error link; OWNER_ACTIONS.md created |
