@@ -1,4 +1,5 @@
 // src/pages/DoctorDashboardPage.jsx
+import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { Link, useNavigate } from "react-router-dom"
@@ -7,9 +8,10 @@ import {
   Calendar, Clock, UserCircle2, ShieldCheck, LogOut,
   CheckCircle2, XCircle, AlertCircle,
   ClipboardList, ChevronRight, ChevronLeft, Phone,
+  Trash2, AlertTriangle,
 } from "lucide-react"
 import Layout from "../components/Layout"
-import { apiGet, apiPatch } from "../api/client"
+import { apiGet, apiPatch, apiDelete } from "../api/client"
 import { useAuth } from "../contexts/AuthContext"
 
 const STATUS_META = {
@@ -39,6 +41,7 @@ export default function DoctorDashboardPage() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const qc = useQueryClient()
+  const [deleteConfirm, setDeleteConfirm] = useState("")
 
   const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Africa/Algiers" })
 
@@ -64,6 +67,16 @@ export default function DoctorDashboardPage() {
       qc.invalidateQueries({ queryKey: ["doctor-appointments"] })
     },
     onError: () => toast.error(t("appointments.updateError")),
+  })
+
+  const deleteAccount = useMutation({
+    mutationFn: () => apiDelete("/auth/account", lang),
+    onSuccess: async () => {
+      toast.success(lang === "ar" ? "تم حذف الحساب." : "Compte supprimé.")
+      await logout()
+      navigate("/login", { replace: true })
+    },
+    onError: () => toast.error(lang === "ar" ? "حدث خطأ أثناء الحذف." : "Erreur lors de la suppression."),
   })
 
   const formatTime = (iso) =>
@@ -273,6 +286,48 @@ export default function DoctorDashboardPage() {
                 </Link>
               )
             })}
+          </div>
+        </section>
+
+        {/* ── Danger zone — delete account ── */}
+        <section className="bg-white rounded-2xl border border-red-100 overflow-hidden">
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-red-50">
+            <AlertTriangle size={16} className="text-red-500 shrink-0" aria-hidden />
+            <h2 className="text-sm font-semibold text-red-700">
+              {lang === "ar" ? "منطقة الخطر" : "Zone dangereuse"}
+            </h2>
+          </div>
+          <div className="px-5 py-4 space-y-3">
+            <p className="text-sm text-gray-600">
+              {lang === "ar"
+                ? "حذف الحساب إجراء لا رجعة فيه. سيتم مسح جميع بياناتك الشخصية وإلغاء جلسات الدخول."
+                : "La suppression du compte est irréversible. Toutes vos données personnelles seront effacées."}
+            </p>
+            <p className="text-xs text-gray-400">
+              {lang === "ar"
+                ? "اكتب «حذف» للتأكيد قبل الضغط على الزر."
+                : "Tapez «supprimer» pour confirmer avant de cliquer."}
+            </p>
+            <input
+              type="text"
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              placeholder={lang === "ar" ? "اكتب: حذف" : "Tapez: supprimer"}
+              className="w-full border border-red-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
+            />
+            <button
+              onClick={() => deleteAccount.mutate()}
+              disabled={
+                deleteAccount.isPending ||
+                (lang === "ar" ? deleteConfirm !== "حذف" : deleteConfirm.toLowerCase() !== "supprimer")
+              }
+              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <Trash2 size={15} aria-hidden />
+              {deleteAccount.isPending
+                ? t("common.loading")
+                : lang === "ar" ? "حذف الحساب نهائياً" : "Supprimer le compte définitivement"}
+            </button>
           </div>
         </section>
 

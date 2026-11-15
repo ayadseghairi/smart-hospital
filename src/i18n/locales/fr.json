@@ -1000,5 +1000,51 @@
     "enableSuccess": "Double authentification activée avec succès",
     "disableSuccess": "Double authentification désactivée",
     "error": "Code de vérification incorrect"
+  },
+  
+  "home": {
+    "hero": {
+      "title": "Trouvez votre médecin et prenez rendez-vous à Khenchela",
+      "subtitle": "Médecins, établissements de santé et services médicaux au même endroit, avec confirmation et rappel de votre rendez-vous par e-mail.",
+      "emergencyCta": "Urgence ?",
+      "searchLabel": "Rechercher un médecin, une spécialité ou un établissement",
+      "searchPlaceholder": "Rechercher un médecin, une spécialité ou un établissement",
+      "searchButton": "Rechercher"
+    },
+    "stats": {
+      "institutions": "établissements vérifiés",
+      "doctors": "médecins",
+      "specialties": "spécialités"
+    },
+    "quick": {
+      "title": "Que recherchez-vous ?",
+      "doctors": "Médecins",
+      "institutions": "Établissements de santé",
+      "specialties": "Spécialités",
+      "imaging": "Imagerie",
+      "lab": "Analyses",
+      "pharmacy": "Pharmacies"
+    },
+    "emergency": {
+      "title": "Numéros d'urgence nationaux",
+      "note": "En cas de danger, appelez immédiatement.",
+      "nearby": "Établissements d'urgence les plus proches"
+    },
+    "how": {
+      "title": "Comment ça marche ?",
+      "search": { "title": "Recherchez", "text": "Choisissez le médecin ou l'établissement qui vous convient." },
+      "request": { "title": "Demandez un rendez-vous", "text": "Choisissez un créneau disponible et envoyez votre demande. Elle est confirmée par le médecin ou l'établissement." },
+      "confirm": { "title": "Recevez confirmation et rappel", "text": "Nous vous envoyons la confirmation et un rappel de votre rendez-vous par e-mail." }
+    },
+    "assistant": {
+      "title": "Besoin d'aide pour choisir ?",
+      "text": "L'assistant vous suggère la spécialité adaptée. Il ne pose pas de diagnostic et ne remplace pas un médecin."
+    },
+    "partner": {
+      "title": "Vous êtes médecin ou établissement de santé ?",
+      "text": "Les comptes des médecins et des établissements sont créés par l'administration de la plateforme. Envoyez-nous votre demande.",
+      "cta": "Demander à rejoindre"
+    }
   }
 }
+

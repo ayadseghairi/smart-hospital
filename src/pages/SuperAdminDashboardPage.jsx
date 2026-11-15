@@ -819,10 +819,6 @@ function CreateDoctorPanel({ lang }) {
 
   const create = async (e) => {
     e.preventDefault()
-    if (selectedInstitutions.length === 0) {
-      toast.error(lang === "ar" ? "اختر مؤسسة واحدة على الأقل." : "Sélectionnez au moins un établissement.")
-      return
-    }
     setLoading(true)
     try {
       await apiPost("/admin/doctors", {
@@ -864,10 +860,13 @@ function CreateDoctorPanel({ lang }) {
           {/* Institution multi-select */}
           <div>
             <p className="text-xs font-medium text-gray-500 mb-2">
-              {lang === "ar" ? "المؤسسات المرتبطة *" : "Établissements liés *"}
+              {lang === "ar" ? "المؤسسات المرتبطة (اختياري)" : "Établissements liés (optionnel)"}
+            </p>
+            <p className="text-xs text-gray-400 mb-2">
+              {lang === "ar" ? "اتركها فارغة للطبيب المستقل العامل لحسابه الخاص." : "Laissez vide pour un médecin indépendant."}
             </p>
             {allInstitutions.length === 0 ? (
-              <p className="text-xs text-gray-400">{lang === "ar" ? "لا توجد مؤسسات بعد." : "Aucun établissement disponible."}</p>
+              <p className="text-xs text-gray-400">{lang === "ar" ? "لا توجد مؤسسات — سيعمل الطبيب بشكل مستقل." : "Aucun établissement — médecin indépendant."}</p>
             ) : (
               <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
                 {allInstitutions.map(inst => (
