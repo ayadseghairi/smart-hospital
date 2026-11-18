@@ -6,7 +6,7 @@ import { z } from "zod"
 const envSchema = z
   .object({
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-    PORT: z.coerce.number().default(4000),
+    PORT: z.coerce.number().default(4041),
     TZ: z.string().default("Africa/Algiers"),
 
     DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
