@@ -1,0 +1,51 @@
+# =============================================================================
+#  delin-frontend.service — Delin Smart Care frontend preview (port 4040)
+#
+#  Install:
+#    sudo cp /opt/delin/systemd/delin-frontend.service /etc/systemd/system/
+#    sudo systemctl daemon-reload
+#    sudo systemctl enable --now delin-frontend
+# =============================================================================
+
+[Unit]
+Description=Delin Smart Care — Frontend (port 4040)
+Documentation=https://github.com/ayadseghairi/smart-hospital
+After=network-online.target delin-backend.service
+Wants=network-online.target
+# Frontend is useful only when the backend is up
+After=delin-backend.service
+
+[Service]
+Type=simple
+User=delin
+Group=delin
+
+# ── Working directory & environment ─────────────────────────────────────────
+WorkingDirectory=/opt/delin
+EnvironmentFile=/opt/delin/.env.local
+
+Environment=NODE_ENV=production
+
+# ── Run vite preview ─────────────────────────────────────────────────────────
+ExecStart=/usr/bin/npm run preview -- --port 4040 --host 0.0.0.0
+
+# ── Restart policy ───────────────────────────────────────────────────────────
+Restart=always
+RestartSec=5s
+StartLimitIntervalSec=60s
+StartLimitBurst=5
+
+# ── Logging ──────────────────────────────────────────────────────────────────
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=delin-frontend
+
+# ── Security hardening ───────────────────────────────────────────────────────
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/delin
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

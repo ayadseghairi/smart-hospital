@@ -2,26 +2,35 @@
 # =============================================================================
 #  start.sh — Delin Smart Care startup script for Ubuntu server
 #
-#  Usage:
-#    chmod +x start.sh
-#    ./start.sh           # start both frontend (4040) and backend (4041)
-#    ./start.sh stop      # stop both processes
-#    ./start.sh status    # show running processes
-#    ./start.sh logs      # tail logs
+#  Commands:
+#    ./start.sh install    # build, deploy to /opt/delin, install & enable systemd services
+#    ./start.sh uninstall  # stop & remove systemd services
+#    ./start.sh start      # start services via systemd (after install)
+#    ./start.sh stop       # stop services via systemd
+#    ./start.sh restart    # restart services via systemd
+#    ./start.sh status     # show systemd service status
+#    ./start.sh logs       # tail journald logs for both services
+#    ./start.sh dev        # run frontend+backend locally with pm2 (dev mode)
 #
-#  Prerequisites (Ubuntu):
+#  First-time setup on Ubuntu:
 #    sudo apt-get update && sudo apt-get install -y nodejs npm postgresql
-#    npm install -g pm2
+#    sudo useradd --system --create-home --home-dir /opt/delin --shell /bin/bash delin
+#    sudo chown -R delin:delin /opt/delin
+#    sudo -u delin git clone https://github.com/ayadseghairi/smart-hospital /opt/delin
+#    sudo /opt/delin/start.sh install
 # =============================================================================
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_DIR="$SCRIPT_DIR/.logs"
-mkdir -p "$LOG_DIR"
+DEPLOY_DIR="/opt/delin"
+SYSTEMD_DIR="/etc/systemd/system"
 
 FRONTEND_PORT=4040
 BACKEND_PORT=4041
+
+SERVICES=(delin-backend delin-frontend)
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -32,124 +41,203 @@ check_command() {
   fi
 }
 
+need_root() {
+  if [[ "$EUID" -ne 0 ]]; then
+    echo "❌  This command must be run as root (use sudo)." >&2
+    exit 1
+  fi
+}
+
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
-# ─── Stop ────────────────────────────────────────────────────────────────────
+# ─── Install (build + register systemd) ──────────────────────────────────────
 
-stop_all() {
-  log "Stopping services…"
-  if command -v pm2 &>/dev/null; then
-    pm2 delete delin-frontend delin-backend 2>/dev/null || true
-    pm2 save --force
+install_services() {
+  need_root
+  check_command node
+  check_command npm
+
+  log "=== Delin Smart Care — install ==="
+
+  # ── 1. Environment files ──────────────────────────────────────────────────
+  if [[ ! -f "$DEPLOY_DIR/.env.local" ]]; then
+    log "⚠  No .env.local found — copying template (fill in secrets!)"
+    cp "$DEPLOY_DIR/.env.example" "$DEPLOY_DIR/.env.local"
   fi
-  log "Services stopped."
+
+  if [[ ! -f "$DEPLOY_DIR/server/.env" ]]; then
+    log "⚠  No server/.env found — copying template (fill in secrets!)"
+    cp "$DEPLOY_DIR/server/.env.example" "$DEPLOY_DIR/server/.env"
+  fi
+
+  # ── 2. Install npm dependencies ───────────────────────────────────────────
+  log "Installing frontend dependencies…"
+  cd "$DEPLOY_DIR"
+  npm install --omit=dev --no-audit --no-fund
+
+  log "Installing backend dependencies…"
+  cd "$DEPLOY_DIR/server"
+  npm install --omit=dev --no-audit --no-fund
+
+  # ── 3. Build frontend ─────────────────────────────────────────────────────
+  log "Building frontend…"
+  cd "$DEPLOY_DIR"
+  npm run build
+
+  # ── 4. Build backend ──────────────────────────────────────────────────────
+  log "Building backend…"
+  cd "$DEPLOY_DIR/server"
+  npm install --no-audit --no-fund   # need devDeps (tsc) for build
+  npm run build
+  npm prune --omit=dev               # clean devDeps after build
+
+  # ── 5. Run DB migrations ──────────────────────────────────────────────────
+  log "Running database migrations…"
+  cd "$DEPLOY_DIR/server"
+  npx prisma migrate deploy
+
+  # ── 6. Install systemd unit files ─────────────────────────────────────────
+  log "Installing systemd service files…"
+  cp "$DEPLOY_DIR/systemd/delin-backend.service"  "$SYSTEMD_DIR/delin-backend.service"
+  cp "$DEPLOY_DIR/systemd/delin-frontend.service" "$SYSTEMD_DIR/delin-frontend.service"
+
+  systemctl daemon-reload
+
+  # ── 7. Enable & start ─────────────────────────────────────────────────────
+  log "Enabling services (auto-start on boot)…"
+  systemctl enable delin-backend delin-frontend
+
+  log "Starting services…"
+  systemctl restart delin-backend
+  sleep 2
+  systemctl restart delin-frontend
+
+  log ""
+  log "✅  Installation complete."
+  log "   Frontend : http://0.0.0.0:$FRONTEND_PORT"
+  log "   Backend  : http://0.0.0.0:$BACKEND_PORT"
+  log ""
+  log "   ./start.sh status   — check service health"
+  log "   ./start.sh logs     — tail live logs"
+  log "   ./start.sh restart  — restart after code update"
+}
+
+# ─── Uninstall ────────────────────────────────────────────────────────────────
+
+uninstall_services() {
+  need_root
+  log "Uninstalling Delin Smart Care systemd services…"
+
+  for svc in "${SERVICES[@]}"; do
+    systemctl stop    "$svc" 2>/dev/null || true
+    systemctl disable "$svc" 2>/dev/null || true
+    rm -f "$SYSTEMD_DIR/$svc.service"
+  done
+
+  systemctl daemon-reload
+  log "✅  Services removed."
+}
+
+# ─── Start / Stop / Restart ──────────────────────────────────────────────────
+
+start_services() {
+  need_root
+  for svc in "${SERVICES[@]}"; do
+    log "Starting $svc…"
+    systemctl start "$svc"
+  done
+}
+
+stop_services() {
+  need_root
+  for svc in "${SERVICES[@]}"; do
+    log "Stopping $svc…"
+    systemctl stop "$svc"
+  done
+}
+
+restart_services() {
+  need_root
+  for svc in "${SERVICES[@]}"; do
+    log "Restarting $svc…"
+    systemctl restart "$svc"
+  done
 }
 
 # ─── Status ──────────────────────────────────────────────────────────────────
 
 show_status() {
-  if command -v pm2 &>/dev/null; then
-    pm2 list
-  else
-    echo "pm2 not installed — cannot show status."
-  fi
+  for svc in "${SERVICES[@]}"; do
+    echo "──────────────────────────────────────"
+    systemctl status "$svc" --no-pager -l || true
+  done
 }
 
 # ─── Logs ────────────────────────────────────────────────────────────────────
 
 show_logs() {
-  if command -v pm2 &>/dev/null; then
-    pm2 logs --lines 100
-  else
-    tail -n 100 "$LOG_DIR"/*.log 2>/dev/null || echo "No log files found."
-  fi
+  journalctl -u delin-backend -u delin-frontend -n 100 -f
 }
 
-# ─── Start ───────────────────────────────────────────────────────────────────
+# ─── Dev mode (local, uses pm2) ──────────────────────────────────────────────
 
-start_all() {
+dev_start() {
   check_command node
   check_command npm
   check_command pm2
 
-  log "=== Delin Smart Care — startup ==="
-  log "Frontend port : $FRONTEND_PORT"
-  log "Backend port  : $BACKEND_PORT"
+  mkdir -p "$LOG_DIR"
 
-  # ── 1. Environment files ──────────────────────────────────────────────────
+  log "=== Delin Smart Care — dev mode ==="
+
   if [[ ! -f "$SCRIPT_DIR/.env.local" && ! -f "$SCRIPT_DIR/.env" ]]; then
-    log "⚠  No .env.local found — copying from .env.example (edit it before production use)"
+    log "⚠  No .env.local found — copying from .env.example"
     cp "$SCRIPT_DIR/.env.example" "$SCRIPT_DIR/.env.local"
   fi
 
   if [[ ! -f "$SCRIPT_DIR/server/.env" ]]; then
-    log "⚠  No server/.env found — copying from server/.env.example (fill in secrets before use)"
+    log "⚠  No server/.env found — copying from server/.env.example"
     cp "$SCRIPT_DIR/server/.env.example" "$SCRIPT_DIR/server/.env"
   fi
 
-  # ── 2. Install dependencies ───────────────────────────────────────────────
-  log "Installing frontend dependencies…"
-  cd "$SCRIPT_DIR"
-  npm install --prefer-offline --no-audit --no-fund
-
-  log "Installing backend dependencies…"
+  log "Starting backend (dev) on port $BACKEND_PORT…"
   cd "$SCRIPT_DIR/server"
-  npm install --prefer-offline --no-audit --no-fund
-
-  # ── 3. Build frontend ─────────────────────────────────────────────────────
-  log "Building frontend…"
-  cd "$SCRIPT_DIR"
-  npm run build
-
-  # ── 4. Build backend ──────────────────────────────────────────────────────
-  log "Building backend…"
-  cd "$SCRIPT_DIR/server"
-  npm run build
-
-  # ── 5. Run DB migrations ──────────────────────────────────────────────────
-  log "Running database migrations…"
-  cd "$SCRIPT_DIR/server"
-  npx prisma migrate deploy
-
-  # ── 6. Start processes with pm2 ───────────────────────────────────────────
-  log "Starting backend on port $BACKEND_PORT…"
-  cd "$SCRIPT_DIR/server"
-  PORT=$BACKEND_PORT pm2 start dist/server.js \
+  PORT=$BACKEND_PORT pm2 start "npm run dev" \
     --name delin-backend \
     --output "$LOG_DIR/backend-out.log" \
     --error  "$LOG_DIR/backend-err.log" \
     --time
 
-  log "Starting frontend preview on port $FRONTEND_PORT…"
+  log "Starting frontend (dev) on port $FRONTEND_PORT…"
   cd "$SCRIPT_DIR"
   pm2 start npm \
     --name delin-frontend \
     --output "$LOG_DIR/frontend-out.log" \
     --error  "$LOG_DIR/frontend-err.log" \
     --time \
-    -- run preview -- --port "$FRONTEND_PORT" --host 0.0.0.0
+    -- run dev -- --port "$FRONTEND_PORT" --host 0.0.0.0
 
   pm2 save --force
 
   log ""
-  log "✅  Services started."
-  log "   Frontend : http://0.0.0.0:$FRONTEND_PORT"
-  log "   Backend  : http://0.0.0.0:$BACKEND_PORT"
-  log ""
-  log "   Run './start.sh logs'   to tail logs"
-  log "   Run './start.sh stop'   to stop all services"
-  log "   Run './start.sh status' to see pm2 process list"
+  log "✅  Dev servers started."
+  log "   Frontend : http://localhost:$FRONTEND_PORT"
+  log "   Backend  : http://localhost:$BACKEND_PORT"
 }
 
 # ─── Entry point ─────────────────────────────────────────────────────────────
 
-case "${1:-start}" in
-  start)  start_all  ;;
-  stop)   stop_all   ;;
-  status) show_status ;;
-  logs)   show_logs  ;;
+case "${1:-}" in
+  install)   install_services   ;;
+  uninstall) uninstall_services ;;
+  start)     start_services     ;;
+  stop)      stop_services      ;;
+  restart)   restart_services   ;;
+  status)    show_status        ;;
+  logs)      show_logs          ;;
+  dev)       dev_start          ;;
   *)
-    echo "Usage: $0 {start|stop|status|logs}"
+    echo "Usage: $0 {install|uninstall|start|stop|restart|status|logs|dev}"
     exit 1
     ;;
 esac

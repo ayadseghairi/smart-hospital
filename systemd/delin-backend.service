@@ -1,0 +1,54 @@
+# =============================================================================
+#  delin-backend.service — Delin Smart Care API server (port 4041)
+#
+#  Install:
+#    sudo cp /opt/delin/systemd/delin-backend.service /etc/systemd/system/
+#    sudo systemctl daemon-reload
+#    sudo systemctl enable --now delin-backend
+# =============================================================================
+
+[Unit]
+Description=Delin Smart Care — Backend API (port 4041)
+Documentation=https://github.com/ayadseghairi/smart-hospital
+After=network-online.target postgresql.service
+Wants=network-online.target
+# Start after DB is ready
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=delin
+Group=delin
+
+# ── Working directory & environment ─────────────────────────────────────────
+WorkingDirectory=/opt/delin/server
+EnvironmentFile=/opt/delin/server/.env
+
+# Hardcoded port override (matches EnvironmentFile but explicit for clarity)
+Environment=PORT=4041
+Environment=NODE_ENV=production
+
+# ── Run the compiled server ───────────────────────────────────────────────────
+ExecStartPre=/usr/bin/npx prisma migrate deploy
+ExecStart=/usr/bin/node dist/server.js
+
+# ── Restart policy ───────────────────────────────────────────────────────────
+Restart=always
+RestartSec=5s
+StartLimitIntervalSec=60s
+StartLimitBurst=5
+
+# ── Logging ──────────────────────────────────────────────────────────────────
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=delin-backend
+
+# ── Security hardening ───────────────────────────────────────────────────────
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/delin/server
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
